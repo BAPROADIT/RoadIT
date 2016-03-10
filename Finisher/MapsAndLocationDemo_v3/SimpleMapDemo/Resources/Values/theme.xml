@@ -1,0 +1,5 @@
+<resources>
+	<style name="Theme.Custom" parent="@android:style/Theme.DeviceDefault">
+		<item name="android:colorAccent">#ffdd2c00</item>
+	</style>
+</resources>
