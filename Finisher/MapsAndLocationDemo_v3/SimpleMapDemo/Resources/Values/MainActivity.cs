@@ -21,7 +21,6 @@
         //private List<SampleActivity> _activities;
         private bool _isGooglePlayServicesInstalled;
 
-
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
         {
             switch (resultCode)
@@ -39,7 +38,7 @@
 
         protected override void OnCreate(Bundle bundle)
         {
-            base.OnCreate(bundle);
+            //base.OnCreate(bundle);
             _isGooglePlayServicesInstalled = TestIfGooglePlayServicesIsInstalled();
             //InitializeListView();
 			SampleActivity activity = new SampleActivity(Resource.String.activity_label_mapwithmarkers, Resource.String.activity_description_mapwithmarkers, typeof(MapWithMarkersActivity));

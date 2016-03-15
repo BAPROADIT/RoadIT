@@ -28,6 +28,7 @@
 	<!-- Notice here that we have the package name of our application as a prefix on the permissions. -->
 	<uses-permission android:name="com.xamarin.docs.android.mapsandlocationdemo3.permission.MAPS_RECEIVE" />
 	<uses-permission android:name="android.permission.ACCESS_LOCATION_EXTRA_COMMANDS" />
+	<uses-permission android:name="android.permission.LOCATION_HARDWARE" />
 	<permission android:name="com.xamarin.docs.android.mapsandlocationdemo3.permission.MAPS_RECEIVE" android:protectionLevel="signature" />
 	<application android:icon="@drawable/icon" android:label="ROAD IT">
 		<!-- Put your Google Maps V2 API Key here. This key will not work for you.-->

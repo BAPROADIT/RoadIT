@@ -343,23 +343,11 @@ namespace SimpleMapDemo
 		public partial class String
 		{
 			
-			// aapt resource value: 0x7f040027
-			public const int activity_description_axml = 2130968615;
+			// aapt resource value: 0x7f040025
+			public const int activity_description_mapwithmarkers = 2130968613;
 			
-			// aapt resource value: 0x7f040029
-			public const int activity_description_mapwithmarkers = 2130968617;
-			
-			// aapt resource value: 0x7f04002b
-			public const int activity_description_mapwithoverlays = 2130968619;
-			
-			// aapt resource value: 0x7f040026
-			public const int activity_label_axml = 2130968614;
-			
-			// aapt resource value: 0x7f040028
-			public const int activity_label_mapwithmarkers = 2130968616;
-			
-			// aapt resource value: 0x7f04002a
-			public const int activity_label_mapwithoverlays = 2130968618;
+			// aapt resource value: 0x7f040024
+			public const int activity_label_mapwithmarkers = 2130968612;
 			
 			// aapt resource value: 0x7f040022
 			public const int app_name = 2130968610;
@@ -467,13 +455,7 @@ namespace SimpleMapDemo
 			public const int common_signin_button_text_long = 2130968609;
 			
 			// aapt resource value: 0x7f040023
-			public const int mapsAppText = 2130968611;
-			
-			// aapt resource value: 0x7f040024
-			public const int mapsAppTextDescription = 2130968612;
-			
-			// aapt resource value: 0x7f040025
-			public const int streetViewText = 2130968613;
+			public const int streetViewText = 2130968611;
 			
 			static String()
 			{
