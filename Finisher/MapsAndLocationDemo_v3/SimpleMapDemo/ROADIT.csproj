@@ -82,6 +82,8 @@
     <AndroidResource Include="Resources\Layout\BasicDemo.axml" />
     <None Include="packages.config" />
     <AndroidResource Include="Resources\values\theme.xml" />
+    <AndroidResource Include="Resources\Drawable\finisher.png" />
+    <AndroidResource Include="Resources\Drawable\truck.png" />
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\Values\Strings.xml">

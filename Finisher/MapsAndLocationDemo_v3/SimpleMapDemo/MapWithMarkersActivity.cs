@@ -13,19 +13,23 @@ namespace SimpleMapDemo
 
 	[Activity(Label = "ROAD IT", MainLauncher = true)]
 
+	//TODO niet altijd zoomen op locatie als ze veranderd
+	//TODO marker finisher dynamisch
+
 	public class MapWithMarkersActivity : Activity, ILocationListener
     {
         private static readonly LatLng MAS = new LatLng(51.229241, 4.404648);
 		private LatLng ownloc = new LatLng(0,0);
-        private GoogleMap map;
+		private GoogleMap map;
         private MapFragment mapFragment;
 		private LocationManager locMgr;
-		string tag = "MainActivity";
+		string tag = "MainActivity";	
 
 		public void OnLocationChanged(Android.Locations.Location location)
 		{
 			ownloc = new LatLng(location.Latitude,location.Longitude);
 			SetupMapIfNeeded();
+			ZoomOnLoc ();
 		}
 
         protected override void OnCreate(Bundle bundle)
@@ -34,10 +38,7 @@ namespace SimpleMapDemo
 			Log.Debug (tag, "OnCreate called");		
             SetContentView(Resource.Layout.MapLayout);
             InitMapFragment();
-            SetupAnimateToButton();
-
-
-
+			SetupAnimateToButton();
         }
 
         protected override void OnResume()
@@ -74,10 +75,6 @@ namespace SimpleMapDemo
  
                 Log.Debug(tag, "Starting location updates with " + locationProvider.ToString());
                 locMgr.RequestLocationUpdates (locationProvider, 2000, 1, this);*/
-			
-
-
-            SetupMapIfNeeded();
         }
 
 		protected override void OnStart ()
@@ -96,36 +93,37 @@ namespace SimpleMapDemo
 					.InvokeMapType(GoogleMap.MapTypeNormal)
 					.InvokeZoomControlsEnabled(true)
 					.InvokeCompassEnabled(true);
-					
-				//TODO DIT FIXEN
-					//enable own location
-					//map.MyLocationEnabled = true;
-
+				
                 FragmentTransaction fragTx = FragmentManager.BeginTransaction();
                 mapFragment = MapFragment.NewInstance(mapOptions);
                 fragTx.Add(Resource.Id.map, mapFragment, "map");
                 fragTx.Commit();
             }
+				
         }
 
         private void SetupAnimateToButton()
         {
             Button animateButton = FindViewById<Button>(Resource.Id.animateButton);
             animateButton.Click += (sender, e) =>{
-				animateButton.Text = ownloc.ToString();
-                // Move the camera to the Passchendaele Memorial in Belgium.
-                CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
-				builder.Target(ownloc);
-                builder.Zoom(14);
-                builder.Bearing(0);
-                builder.Tilt(0);
-                CameraPosition cameraPosition = builder.Build();
-
-                // AnimateCamera provides a smooth, animation effect while moving
-                // the camera to the the position.
-                map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
+				animateButton.Text = "Location: " + ownloc.ToString();
+                
             };
         }
+
+		private void ZoomOnLoc()
+		{
+			CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
+			builder.Target(ownloc);
+			builder.Zoom(14);
+			builder.Bearing(0);
+			builder.Tilt(0);
+			CameraPosition cameraPosition = builder.Build();
+
+			// AnimateCamera provides a smooth, animation effect while moving
+			// the camera to the the position.
+			map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
+		}
 
 		private void SetupMapIfNeeded()
         {
@@ -135,23 +133,23 @@ namespace SimpleMapDemo
                 map = mapFragment.Map;
                 if (map != null)
                 {
-					
+					BitmapDescriptor finisher = BitmapDescriptorFactory.FromResource(Resource.Drawable.finisher);					
                     MarkerOptions markerOpt1 = new MarkerOptions();
-                    markerOpt1.SetPosition(MAS);
-                    markerOpt1.SetTitle("MAS");
-                    markerOpt1.InvokeIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueCyan));
+					markerOpt1.SetPosition(ownloc);
+                    markerOpt1.SetTitle("FINISHER");
+					markerOpt1.InvokeIcon(finisher);
                     map.AddMarker(markerOpt1);
 
+					BitmapDescriptor truck = BitmapDescriptorFactory.FromResource(Resource.Drawable.truck);	
 					MarkerOptions markerOpt2 = new MarkerOptions();
-					markerOpt2.SetPosition(ownloc);
-					markerOpt2.SetTitle("FINISHER");
-					markerOpt2.InvokeIcon(BitmapDescriptorFactory.DefaultMarker(BitmapDescriptorFactory.HueRed));
+					markerOpt2.SetPosition(MAS);
+					markerOpt2.SetTitle("Truck");
+					markerOpt2.InvokeIcon(truck);
 					map.AddMarker(markerOpt2);
 
 					//We create an instance of CameraUpdate, and move the map to it.
-					CameraUpdate cameraUpdate = CameraUpdateFactory.NewLatLngZoom(ownloc, 15);
-                    map.MoveCamera(cameraUpdate);
-				
+					//CameraUpdate cameraUpdate = CameraUpdateFactory.NewLatLngZoom(ownloc, 15);
+                    //map.MoveCamera(cameraUpdate);				
                 }
             }
         }

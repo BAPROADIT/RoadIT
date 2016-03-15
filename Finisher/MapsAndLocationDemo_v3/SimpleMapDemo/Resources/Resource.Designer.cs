@@ -232,13 +232,19 @@ namespace SimpleMapDemo
 			public const int common_signin_btn_text_pressed_light = 2130837529;
 			
 			// aapt resource value: 0x7f02001a
-			public const int Icon = 2130837530;
+			public const int finisher = 2130837530;
 			
 			// aapt resource value: 0x7f02001b
-			public const int monkey = 2130837531;
+			public const int Icon = 2130837531;
 			
 			// aapt resource value: 0x7f02001c
-			public const int polarbear = 2130837532;
+			public const int monkey = 2130837532;
+			
+			// aapt resource value: 0x7f02001d
+			public const int polarbear = 2130837533;
+			
+			// aapt resource value: 0x7f02001e
+			public const int truck = 2130837534;
 			
 			static Drawable()
 			{
