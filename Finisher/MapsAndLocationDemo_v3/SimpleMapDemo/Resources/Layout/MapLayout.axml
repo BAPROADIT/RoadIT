@@ -7,7 +7,12 @@
         android:id="@+id/animateButton"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Animate to Location" />
+        android:text="Press for duration" />
+    <TextView
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textView1" />
     <FrameLayout
         android:id="@+id/map"
         android:layout_width="fill_parent"

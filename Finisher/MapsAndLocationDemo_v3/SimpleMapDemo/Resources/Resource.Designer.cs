@@ -277,8 +277,8 @@ namespace SimpleMapDemo
 			// aapt resource value: 0x7f080007
 			public const int map = 2131230727;
 			
-			// aapt resource value: 0x7f08000b
-			public const int mapWithOverlay = 2131230731;
+			// aapt resource value: 0x7f08000c
+			public const int mapWithOverlay = 2131230732;
 			
 			// aapt resource value: 0x7f080001
 			public const int none = 2131230721;
@@ -291,6 +291,9 @@ namespace SimpleMapDemo
 			
 			// aapt resource value: 0x7f080004
 			public const int terrain = 2131230724;
+			
+			// aapt resource value: 0x7f08000b
+			public const int textView1 = 2131230731;
 			
 			// aapt resource value: 0x7f080008
 			public const int title = 2131230728;

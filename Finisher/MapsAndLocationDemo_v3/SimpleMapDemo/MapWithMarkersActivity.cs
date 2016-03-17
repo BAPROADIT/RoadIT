@@ -10,6 +10,13 @@ namespace SimpleMapDemo
 	using Android.Content;
 	using Android.Runtime;
 	using Android.Views;
+	using System.Json;
+	using System;
+	using System.Collections.Generic;
+	using System.Linq;
+	using System.Text;
+	using Newtonsoft.Json;
+	using Newtonsoft.Json.Linq;
 
 	[Activity(Label = "ROAD IT", MainLauncher = true)]
 
@@ -106,9 +113,12 @@ namespace SimpleMapDemo
         {
             Button animateButton = FindViewById<Button>(Resource.Id.animateButton);
             animateButton.Click += (sender, e) =>{
-				animateButton.Text = "Location: " + ownloc.ToString();
-                
-            };
+				string ownlocstring = ownloc.Latitude.ToString() + "," + ownloc.Longitude.ToString();
+				string truckstring = MAS.Latitude.ToString() + "," + MAS.Longitude.ToString();
+				//animateButton.Text = "Duration: " + getDistanceTo(ownlocstring,truckstring);
+				TextView textfield = FindViewById<TextView>(Resource.Id.textView1);
+				textfield.Text = "Duration from truck to finisher: " + getDistanceTo(ownlocstring,truckstring) + "s";
+			};
         }
 
 		private void ZoomOnLoc()
@@ -167,6 +177,52 @@ namespace SimpleMapDemo
 			Log.Debug (tag, provider + " availability has changed to " + status.ToString());
 		}
 
+		public int getDistanceTo(string origin, string destination)
+		{
+			System.Threading.Thread.Sleep(1000);
+			int duration = -1;
+			string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + destination + "&sensor=false";
+			string requesturl = url;string content = fileGetJSON(requesturl);
+			JObject _Jobj = JObject.Parse(content);
+			try
+			{
+				duration = (int)_Jobj.SelectToken("routes[0].legs[0].duration.value");
+				Toast.MakeText (this, duration, ToastLength.Long).Show ();
+				return duration;
+
+			}
+			catch
+			{
+				return duration;
+			}
+		}
+		protected string fileGetJSON(string fileName)
+		{
+			string _sData = string.Empty;
+			string me = string.Empty;
+			try
+			{
+				if (fileName.ToLower().IndexOf("http:") > -1)
+				{
+					System.Net.WebClient wc = new System.Net.WebClient();
+					byte[] response = wc.DownloadData(fileName);
+					_sData = System.Text.Encoding.ASCII.GetString(response);
+
+				}
+				else
+				{
+					System.IO.StreamReader sr = new System.IO.StreamReader(fileName);
+					_sData = sr.ReadToEnd();
+					sr.Close();
+				}
+			}
+			catch { _sData = "unable to connect to server "; }
+			return _sData;
+		}
+
+
+	}
+
 
     }
-}
+
