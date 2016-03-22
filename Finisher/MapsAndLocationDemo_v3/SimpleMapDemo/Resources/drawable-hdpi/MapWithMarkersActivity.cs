@@ -20,23 +20,29 @@ namespace SimpleMapDemo
 
 	[Activity(Label = "ROAD IT", MainLauncher = true)]
 
-	//TODO niet altijd zoomen op locatie als ze veranderd
-	//TODO marker finisher dynamisch
-
 	public class MapWithMarkersActivity : Activity, ILocationListener
     {
-        private static readonly LatLng MAS = new LatLng(51.229241, 4.404648);
-		private LatLng ownloc = new LatLng(0,0);
+        private static readonly LatLng truck1loc = new LatLng(51.229241, 4.404648);
+		private LatLng finisherloc = new LatLng(0,0);
 		private GoogleMap map;
         private MapFragment mapFragment;
 		private LocationManager locMgr;
-		string tag = "MainActivity";	
+		string tag = "MainActivity";
+		MarkerOptions markerfinisher = new MarkerOptions();
+		MarkerOptions markertruck = new MarkerOptions();
+		Boolean firstloc = true;
 
 		public void OnLocationChanged(Android.Locations.Location location)
 		{
-			ownloc = new LatLng(location.Latitude,location.Longitude);
-			SetupMapIfNeeded();
-			ZoomOnLoc ();
+			finisherloc = new LatLng(location.Latitude,location.Longitude);
+			if(firstloc == true)
+			{
+				InitMarkers();
+				ZoomOnLoc();
+				firstloc = false;
+			}
+			RefreshMarkers();
+			getDuration();
 		}
 
         protected override void OnCreate(Bundle bundle)
@@ -66,22 +72,6 @@ namespace SimpleMapDemo
 			} else {
 				Toast.MakeText (this, "The Network Provider does not exist or is not enabled!", ToastLength.Long).Show ();
 			}
-
-
-			// Comment the line above, and uncomment the following, to test
-			// the GetBestProvider option. This will determine the best provider
-			// at application launch. Note that once the provide has been set
-			// it will stay the same until the next time this method is called
-
-			/*var locationCriteria = new Criteria();
- 
-                locationCriteria.Accuracy = Accuracy.Coarse;
-                locationCriteria.PowerRequirement = Power.Medium;
- 
-                string locationProvider = locMgr.GetBestProvider(locationCriteria, true);
- 
-                Log.Debug(tag, "Starting location updates with " + locationProvider.ToString());
-                locMgr.RequestLocationUpdates (locationProvider, 2000, 1, this);*/
         }
 
 		protected override void OnStart ()
@@ -113,18 +103,24 @@ namespace SimpleMapDemo
         {
             Button animateButton = FindViewById<Button>(Resource.Id.animateButton);
             animateButton.Click += (sender, e) =>{
-				string ownlocstring = ownloc.Latitude.ToString() + "," + ownloc.Longitude.ToString();
-				string truckstring = MAS.Latitude.ToString() + "," + MAS.Longitude.ToString();
-				//animateButton.Text = "Duration: " + getDistanceTo(ownlocstring,truckstring);
-				TextView textfield = FindViewById<TextView>(Resource.Id.textView1);
-				textfield.Text = "Duration from truck to finisher: " + getDistanceTo(ownlocstring,truckstring) + "s";
+				getDuration();				
 			};
         }
 
+		private void getDuration()
+		{
+			string ownlocstring = finisherloc.Latitude.ToString() + "," + finisherloc.Longitude.ToString();
+			string truckstring = truck1loc.Latitude.ToString() + "," + truck1loc.Longitude.ToString();
+			//animateButton.Text = "Duration: " + getDistanceTo(ownlocstring,truckstring);
+			TextView textfield = FindViewById<TextView>(Resource.Id.textView1);
+			textfield.Text = "Duration from truck to finisher: " + getDistanceTo(ownlocstring,truckstring) + "s";
+		}
+
+		//niet meer nodig
 		private void ZoomOnLoc()
 		{
 			CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
-			builder.Target(ownloc);
+			builder.Target(finisherloc);
 			builder.Zoom(14);
 			builder.Bearing(0);
 			builder.Tilt(0);
@@ -135,33 +131,26 @@ namespace SimpleMapDemo
 			map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
 		}
 
-		private void SetupMapIfNeeded()
+		private void InitMarkers()
+		{
+			map = mapFragment.Map;
+
+			BitmapDescriptor truck = BitmapDescriptorFactory.FromResource(Resource.Drawable.truck);
+
+			markertruck.SetPosition(truck1loc);
+			markertruck.SetTitle("Truck");
+			markertruck.SetIcon(truck);
+			map.AddMarker(markertruck);
+
+			//blauw bolletje + zoomfit knopje
+			map.MyLocationEnabled = true;
+		}
+
+		private void RefreshMarkers()
         {
-			
-            if (map == null)
-            {
-                map = mapFragment.Map;
-                if (map != null)
-                {
-					BitmapDescriptor finisher = BitmapDescriptorFactory.FromResource(Resource.Drawable.finisher);					
-                    MarkerOptions markerOpt1 = new MarkerOptions();
-					markerOpt1.SetPosition(ownloc);
-                    markerOpt1.SetTitle("FINISHER");
-					markerOpt1.InvokeIcon(finisher);
-                    map.AddMarker(markerOpt1);
-
-					BitmapDescriptor truck = BitmapDescriptorFactory.FromResource(Resource.Drawable.truck);	
-					MarkerOptions markerOpt2 = new MarkerOptions();
-					markerOpt2.SetPosition(MAS);
-					markerOpt2.SetTitle("Truck");
-					markerOpt2.InvokeIcon(truck);
-					map.AddMarker(markerOpt2);
-
-					//We create an instance of CameraUpdate, and move the map to it.
-					//CameraUpdate cameraUpdate = CameraUpdateFactory.NewLatLngZoom(ownloc, 15);
-                    //map.MoveCamera(cameraUpdate);				
-                }
-            }
+			map.Clear ();
+			markertruck.SetPosition(truck1loc);
+			map.AddMarker(markertruck);
         }
 
 		public void OnProviderDisabled (string provider)
@@ -219,10 +208,6 @@ namespace SimpleMapDemo
 			catch { _sData = "unable to connect to server "; }
 			return _sData;
 		}
-
-
 	}
-
-
-    }
+}
 
