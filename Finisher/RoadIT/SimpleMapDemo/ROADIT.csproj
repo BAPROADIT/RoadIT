@@ -7,16 +7,18 @@
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>SimpleMapDemo</RootNamespace>
-    <AssemblyName>SimpleMapDemo</AssemblyName>
+    <RootNamespace>ROADIT</RootNamespace>
+    <AssemblyName>ROADIT</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <AndroidApplication>true</AndroidApplication>
     <AndroidResgenFile>Resources\Resource.Designer.cs</AndroidResgenFile>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <MandroidI18n />
-    <AndroidUseLatestPlatformSdk>False</AndroidUseLatestPlatformSdk>
-    <TargetFrameworkVersion>v5.1</TargetFrameworkVersion>
+    <AndroidUseLatestPlatformSdk>true</AndroidUseLatestPlatformSdk>
+    <TargetFrameworkVersion>v6.0</TargetFrameworkVersion>
+    <SynchReleaseVersion>false</SynchReleaseVersion>
+    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -34,7 +36,6 @@
     <Optimize>false</Optimize>
     <OutputPath>bin\Release</OutputPath>
     <WarningLevel>4</WarningLevel>
-    <AndroidUseSharedRuntime>false</AndroidUseSharedRuntime>
     <JavaMaximumHeapSize>512M</JavaMaximumHeapSize>
     <DebugType>full</DebugType>
     <AndroidSupportedAbis>armeabi;armeabi-v7a;x86;arm64-v8a;x86_64</AndroidSupportedAbis>
@@ -72,20 +73,18 @@
   <ItemGroup>
     <Compile Include="ErrorDialogFragment.cs" />
     <Compile Include="FeatureRowHolder.cs" />
-    <Compile Include="MapWithOverlaysActivity.cs" />
     <Compile Include="Resources\Resource.Designer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SampleActivity.cs" />
     <Compile Include="BasicDemoActivity.cs" />
     <Compile Include="SimpleMapDemoActivityAdapter.cs" />
     <Compile Include="Resources\Values\MainActivity.cs" />
-    <Compile Include="Resources\drawable-hdpi\MapWithMarkersActivity.cs" />
+    <Compile Include="MapWithMarkersActivity.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
     <None Include="Assets\AboutAssets.txt" />
     <AndroidResource Include="Resources\Layout\MapLayout.axml" />
-    <AndroidResource Include="Resources\Layout\MapWithOverlayLayout.axml" />
     <AndroidResource Include="Resources\Layout\Feature.axml">
       <SubType>AndroidResource</SubType>
     </AndroidResource>

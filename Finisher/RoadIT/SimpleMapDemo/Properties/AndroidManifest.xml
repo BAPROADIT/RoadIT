@@ -1,6 +1,6 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.xamarin.docs.android.mapsandlocationdemo3" android:versionName="4.10" android:versionCode="10">
-	<uses-sdk android:minSdkVersion="10" android:targetSdkVersion="21" />
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.xamarin.docs.android.roadit" android:versionName="4.10" android:versionCode="10">
+	<uses-sdk android:targetSdkVersion="23" android:minSdkVersion="10" />
 	<!-- Google Maps for Android v2 requires OpenGL ES v2 -->
 	<uses-feature android:glEsVersion="0x00020000" android:required="true" />
 	<!-- We need to be able to download map tiles and access Google Play Services-->
@@ -35,4 +35,9 @@
 		<meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyCR1v1H-ZtTuYi9U00eEqa6OgR0u6QrpdI" />
 		<meta-data android:name="com.google.android.gms.version" android:value="@integer/google_play_services_version" />
 	</application>
+	<intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+            <category android:name="android.intent.category.DEFAULT" />
+        </intent-filter>
 </manifest>

@@ -1,4 +1,4 @@
-﻿namespace SimpleMapDemo
+﻿namespace ROADIT
 {
     using Android.Content;
     using Android.Views;

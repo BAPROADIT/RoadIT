@@ -7,7 +7,7 @@
         android:id="@+id/animateButton"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Press for duration" />
+        android:text="ZoomFit" />
     <TextView
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_width="match_parent"

@@ -1,4 +1,4 @@
-namespace SimpleMapDemo
+namespace ROADIT
 {
     using Android.App;
     using Android.Gms.Maps;
@@ -12,6 +12,7 @@ namespace SimpleMapDemo
 	using Android.Views;
 	using System.Json;
 	using System;
+	using System.Threading;
 	using System.Collections.Generic;
 	using System.Linq;
 	using System.Text;
@@ -27,6 +28,9 @@ namespace SimpleMapDemo
 		private GoogleMap map;
         private MapFragment mapFragment;
 		private LocationManager locMgr;
+		private string ownlocstring;
+		private string truckstring;
+		private string durationString;
 		string tag = "MainActivity";
 		MarkerOptions markerfinisher = new MarkerOptions();
 		MarkerOptions markertruck = new MarkerOptions();
@@ -42,7 +46,15 @@ namespace SimpleMapDemo
 				firstloc = false;
 			}
 			RefreshMarkers();
-			getDuration();
+			drawRoute();
+
+			//multithreaded method call, prevents app stutters
+			ThreadStart getDurationThreadStart = new ThreadStart(getDuration);
+			Thread getDurationThread = new Thread(getDurationThreadStart);
+			getDurationThread.Start();
+			//getDuration();
+
+
 		}
 
         protected override void OnCreate(Bundle bundle)
@@ -98,22 +110,30 @@ namespace SimpleMapDemo
             }
 				
         }
-
+			
         private void SetupAnimateToButton()
         {
             Button animateButton = FindViewById<Button>(Resource.Id.animateButton);
             animateButton.Click += (sender, e) =>{
-				getDuration();				
+				ZoomOnLoc();
 			};
         }
 
 		private void getDuration()
 		{
-			string ownlocstring = finisherloc.Latitude.ToString() + "," + finisherloc.Longitude.ToString();
-			string truckstring = truck1loc.Latitude.ToString() + "," + truck1loc.Longitude.ToString();
+			ownlocstring = finisherloc.Latitude.ToString() + "," + finisherloc.Longitude.ToString();
+			truckstring = truck1loc.Latitude.ToString() + "," + truck1loc.Longitude.ToString();
 			//animateButton.Text = "Duration: " + getDistanceTo(ownlocstring,truckstring);
-			TextView textfield = FindViewById<TextView>(Resource.Id.textView1);
-			textfield.Text = "Duration from truck to finisher: " + getDistanceTo(ownlocstring,truckstring) + "s";
+			durationString = "Duration from truck to finisher: " + getDistanceTo(ownlocstring, truckstring) + "s";
+
+			//update textfield in main UI thread
+			RunOnUiThread(() => setDurationTextField());
+		}
+
+		private void setDurationTextField()
+		{
+			TextView durationtextfield = FindViewById<TextView>(Resource.Id.textView1);
+			durationtextfield.Text = durationString;
 		}
 
 		//niet meer nodig
@@ -121,7 +141,7 @@ namespace SimpleMapDemo
 		{
 			CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
 			builder.Target(finisherloc);
-			builder.Zoom(14);
+			builder.Zoom(12);
 			builder.Bearing(0);
 			builder.Tilt(0);
 			CameraPosition cameraPosition = builder.Build();
@@ -134,9 +154,7 @@ namespace SimpleMapDemo
 		private void InitMarkers()
 		{
 			map = mapFragment.Map;
-
 			BitmapDescriptor truck = BitmapDescriptorFactory.FromResource(Resource.Drawable.truck);
-
 			markertruck.SetPosition(truck1loc);
 			markertruck.SetTitle("Truck");
 			markertruck.SetIcon(truck);
@@ -185,6 +203,22 @@ namespace SimpleMapDemo
 				return duration;
 			}
 		}
+
+		private void drawRoute()
+		{
+			var polylineOptions = new PolylineOptions();
+			polylineOptions.InvokeColor(0x660000ff);
+
+			//List<LatLng> routeCoordinates;
+
+
+			//foreach
+			polylineOptions.Add(new LatLng(finisherloc.Latitude, finisherloc.Longitude));
+			polylineOptions.Add(new LatLng(truck1loc.Latitude, truck1loc.Longitude));
+
+			map.AddPolyline(polylineOptions);
+		}
+
 		protected string fileGetJSON(string fileName)
 		{
 			string _sData = string.Empty;

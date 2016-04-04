@@ -1,4 +1,4 @@
-namespace SimpleMapDemo
+namespace ROADIT
 {
     using Android.App;
     using Android.OS;

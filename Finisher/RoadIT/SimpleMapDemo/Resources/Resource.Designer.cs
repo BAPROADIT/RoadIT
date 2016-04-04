@@ -9,9 +9,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: global::Android.Runtime.ResourceDesignerAttribute("SimpleMapDemo.Resource", IsApplication=true)]
+[assembly: global::Android.Runtime.ResourceDesignerAttribute("ROADIT.Resource", IsApplication=true)]
 
-namespace SimpleMapDemo
+namespace ROADIT
 {
 	
 	
@@ -277,9 +277,6 @@ namespace SimpleMapDemo
 			// aapt resource value: 0x7f080007
 			public const int map = 2131230727;
 			
-			// aapt resource value: 0x7f08000c
-			public const int mapWithOverlay = 2131230732;
-			
 			// aapt resource value: 0x7f080001
 			public const int none = 2131230721;
 			
@@ -335,9 +332,6 @@ namespace SimpleMapDemo
 			
 			// aapt resource value: 0x7f030002
 			public const int MapLayout = 2130903042;
-			
-			// aapt resource value: 0x7f030003
-			public const int MapWithOverlayLayout = 2130903043;
 			
 			static Layout()
 			{
