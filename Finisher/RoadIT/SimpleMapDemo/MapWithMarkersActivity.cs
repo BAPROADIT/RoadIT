@@ -31,6 +31,7 @@ namespace ROADIT
 		private string ownlocstring;
 		private string truckstring;
 		private string durationString;
+		private JObject _Jobj;
 		string tag = "MainActivity";
 		MarkerOptions markerfinisher = new MarkerOptions();
 		MarkerOptions markertruck = new MarkerOptions();
@@ -46,14 +47,14 @@ namespace ROADIT
 				firstloc = false;
 			}
 			RefreshMarkers();
-			drawRoute();
-
 			//multithreaded method call, prevents app stutters
 			ThreadStart getDurationThreadStart = new ThreadStart(getDuration);
 			Thread getDurationThread = new Thread(getDurationThreadStart);
 			getDurationThread.Start();
-			//getDuration();
 
+			ThreadStart drawRouteThreadStart = new ThreadStart(drawRoute);
+			Thread drawRouteThread = new Thread(drawRouteThreadStart);
+			drawRouteThread.Start();
 
 		}
 
@@ -126,14 +127,10 @@ namespace ROADIT
 			//animateButton.Text = "Duration: " + getDistanceTo(ownlocstring,truckstring);
 			durationString = "Duration from truck to finisher: " + getDistanceTo(ownlocstring, truckstring) + "s";
 
-			//update textfield in main UI thread
-			RunOnUiThread(() => setDurationTextField());
-		}
-
-		private void setDurationTextField()
-		{
 			TextView durationtextfield = FindViewById<TextView>(Resource.Id.textView1);
-			durationtextfield.Text = durationString;
+
+			//update textfield in main UI thread
+			RunOnUiThread(() => durationtextfield.Text = durationString);
 		}
 
 		//niet meer nodig
@@ -160,7 +157,7 @@ namespace ROADIT
 			markertruck.SetIcon(truck);
 			map.AddMarker(markertruck);
 
-			//blauw bolletje + zoomfit knopje
+			//blue location
 			map.MyLocationEnabled = true;
 		}
 
@@ -186,17 +183,16 @@ namespace ROADIT
 
 		public int getDistanceTo(string origin, string destination)
 		{
-			System.Threading.Thread.Sleep(1000);
+			System.Threading.Thread.Sleep(50);
+
 			int duration = -1;
 			string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + destination + "&sensor=false";
 			string requesturl = url;string content = fileGetJSON(requesturl);
-			JObject _Jobj = JObject.Parse(content);
+			_Jobj = JObject.Parse(content);
 			try
 			{
 				duration = (int)_Jobj.SelectToken("routes[0].legs[0].duration.value");
-				Toast.MakeText (this, duration, ToastLength.Long).Show ();
 				return duration;
-
 			}
 			catch
 			{
@@ -206,17 +202,87 @@ namespace ROADIT
 
 		private void drawRoute()
 		{
+			System.Threading.Thread.Sleep(50);
+
 			var polylineOptions = new PolylineOptions();
-			polylineOptions.InvokeColor(0x660000ff);
+			polylineOptions.InvokeColor(0x66000099);
+			polylineOptions.InvokeWidth(9);
 
-			//List<LatLng> routeCoordinates;
+			string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + ownlocstring + "&destination=" + truckstring+ "&sensor=false";
+			string requesturl = url; string content = fileGetJSON(requesturl);
+			JObject _Jobjdraw = JObject.Parse(content);
+			string polyPoints;
+			polyPoints = (string)_Jobjdraw.SelectToken("routes[0].overview_polyline.points");
 
+			List<LatLng> drawCoordinates;
+			drawCoordinates = DecodePolylinePoints(polyPoints);
+			foreach (var position in drawCoordinates)
+			{
+				polylineOptions.Add(new LatLng(position.Latitude, position.Longitude));
+			}
 
-			//foreach
-			polylineOptions.Add(new LatLng(finisherloc.Latitude, finisherloc.Longitude));
-			polylineOptions.Add(new LatLng(truck1loc.Latitude, truck1loc.Longitude));
+			//draw route in main UI thread
+			RunOnUiThread(() => map.AddPolyline(polylineOptions));
+		}
 
-			map.AddPolyline(polylineOptions);
+		private List<LatLng> DecodePolylinePoints(string encodedPoints)
+		{
+			if (encodedPoints == null || encodedPoints == "") return null;
+			List<LatLng> poly = new List<LatLng>();
+			char[] polylinechars = encodedPoints.ToCharArray();
+			int index = 0;
+
+			int currentLat = 0;
+			int currentLng = 0;
+			int next5bits;
+			int sum;
+			int shifter;
+
+			try
+			{
+				while (index < polylinechars.Length)
+				{
+					// calculate next latitude
+					sum = 0;
+					shifter = 0;
+					do
+					{
+						next5bits = (int)polylinechars[index++] - 63;
+						sum |= (next5bits & 31) << shifter;
+						shifter += 5;
+					} while (next5bits >= 32 && index < polylinechars.Length);
+
+					if (index >= polylinechars.Length)
+						break;
+
+					currentLat += (sum & 1) == 1 ? ~(sum >> 1) : (sum >> 1);
+
+					//calculate next longitude
+					sum = 0;
+					shifter = 0;
+					do
+					{
+						next5bits = (int)polylinechars[index++] - 63;
+						sum |= (next5bits & 31) << shifter;
+						shifter += 5;
+					} while (next5bits >= 32 && index < polylinechars.Length);
+
+					if (index >= polylinechars.Length && next5bits >= 32)
+						break;
+
+					currentLng += (sum & 1) == 1 ? ~(sum >> 1) : (sum >> 1);
+
+					double latdouble = Convert.ToDouble(currentLat) / 100000.0;
+					double lngdouble = Convert.ToDouble(currentLng) / 100000.0;
+					LatLng p = new LatLng(latdouble,lngdouble);
+					poly.Add(p);
+				}
+			}
+			catch (Exception ex)
+			{
+				// logo it
+			}
+			return poly;
 		}
 
 		protected string fileGetJSON(string fileName)
