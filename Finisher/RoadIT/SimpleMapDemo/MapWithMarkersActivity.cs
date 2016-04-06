@@ -47,6 +47,11 @@ namespace ROADIT
 				firstloc = false;
 			}
 			RefreshMarkers();
+
+			//Thread MapsAPICallThread = new Thread(() => mapAPICall(ownlocstring,truckstring));
+			//MapsAPICallThread.Start();
+
+
 			//multithreaded method call, prevents app stutters
 			ThreadStart getDurationThreadStart = new ThreadStart(getDuration);
 			Thread getDurationThread = new Thread(getDurationThreadStart);
@@ -120,19 +125,6 @@ namespace ROADIT
 			};
         }
 
-		private void getDuration()
-		{
-			ownlocstring = finisherloc.Latitude.ToString() + "," + finisherloc.Longitude.ToString();
-			truckstring = truck1loc.Latitude.ToString() + "," + truck1loc.Longitude.ToString();
-			//animateButton.Text = "Duration: " + getDistanceTo(ownlocstring,truckstring);
-			durationString = "Duration from truck to finisher: " + getDistanceTo(ownlocstring, truckstring) + "s";
-
-			TextView durationtextfield = FindViewById<TextView>(Resource.Id.textView1);
-
-			//update textfield in main UI thread
-			RunOnUiThread(() => durationtextfield.Text = durationString);
-		}
-
 		//niet meer nodig
 		private void ZoomOnLoc()
 		{
@@ -181,13 +173,26 @@ namespace ROADIT
 			Log.Debug (tag, provider + " availability has changed to " + status.ToString());
 		}
 
+		private void getDuration()
+		{
+			ownlocstring = finisherloc.Latitude.ToString() + "," + finisherloc.Longitude.ToString();
+			truckstring = truck1loc.Latitude.ToString() + "," + truck1loc.Longitude.ToString();
+			//animateButton.Text = "Duration: " + getDistanceTo(ownlocstring,truckstring);
+			durationString = "Duration from truck to finisher: " + getDistanceTo(ownlocstring, truckstring) + "s";
+
+			TextView durationtextfield = FindViewById<TextView>(Resource.Id.textView1);
+
+			//update textfield in main UI thread
+			RunOnUiThread(() => durationtextfield.Text = durationString);
+		}
+
 		public int getDistanceTo(string origin, string destination)
 		{
 			System.Threading.Thread.Sleep(50);
 
 			int duration = -1;
 			string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + destination + "&sensor=false";
-			string requesturl = url;string content = fileGetJSON(requesturl);
+			string requesturl = url; string content = fileGetJSON(requesturl);
 			_Jobj = JObject.Parse(content);
 			try
 			{
@@ -198,6 +203,18 @@ namespace ROADIT
 			{
 				return duration;
 			}
+		}
+
+		private void mapAPICall(string origin, string destination)
+		{
+			System.Threading.Thread.Sleep(50);
+
+			string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + destination + "&sensor=false";
+			string requesturl = url; string content = fileGetJSON(requesturl);
+			_Jobj = JObject.Parse(content);
+
+			getDuration();
+			drawRoute();
 		}
 
 		private void drawRoute()
