@@ -24,13 +24,15 @@ namespace ROADIT
 	public class MapWithMarkersActivity : Activity, ILocationListener
     {
         private static readonly LatLng truck1loc = new LatLng(51.229241, 4.404648);
+		private static LatLng cineloc = new LatLng(51.2354242, 4.4105663);
 		private LatLng finisherloc = new LatLng(0,0);
 		private GoogleMap map;
         private MapFragment mapFragment;
 		private LocationManager locMgr;
-		private string ownlocstring;
-		private string truckstring;
-		private string durationString;
+		string ownlocstring;
+		string truckstring;
+		string cinestring;
+		string durationString;
 		private JObject _Jobj;
 		string tag = "MainActivity";
 		MarkerOptions markerfinisher = new MarkerOptions();
@@ -39,13 +41,16 @@ namespace ROADIT
 
 		public void OnLocationChanged(Android.Locations.Location location)
 		{
+			Toast.MakeText(this, "Location changed", ToastLength.Long).Show();
 			finisherloc = new LatLng(location.Latitude,location.Longitude);
 			if(firstloc == true)
 			{
 				InitMarkers();
 				ZoomOnLoc();
+				locsToString();
 				firstloc = false;
 			}
+			locsToString();
 			RefreshMarkers();
 
 			//Thread MapsAPICallThread = new Thread(() => mapAPICall(ownlocstring,truckstring));
@@ -57,9 +62,13 @@ namespace ROADIT
 			Thread getDurationThread = new Thread(getDurationThreadStart);
 			getDurationThread.Start();
 
-			ThreadStart drawRouteThreadStart = new ThreadStart(drawRoute);
-			Thread drawRouteThread = new Thread(drawRouteThreadStart);
+			//ThreadStart drawRouteThreadStart = new ThreadStart(drawRoute(ownlocstring,truckstring));
+			Thread drawRouteThread = new Thread(() => drawRoute(ownlocstring, truckstring, "red"));
 			drawRouteThread.Start();
+
+			//ThreadStart drawRouteThreadStart2 = new ThreadStart(drawRoute(ownlocstring, cinestring));
+			Thread drawRouteThread2 = new Thread(() => drawRoute(ownlocstring, cinestring, "blue"));
+			drawRouteThread2.Start();
 
 		}
 
@@ -86,7 +95,7 @@ namespace ROADIT
 			// and an ILocationListener (recall that this class impletents the ILocationListener interface)
 			if (locMgr.AllProviders.Contains (LocationManager.NetworkProvider)
 				&& locMgr.IsProviderEnabled (LocationManager.NetworkProvider)) {
-				locMgr.RequestLocationUpdates (LocationManager.NetworkProvider, 2000, 1, this);
+ 				locMgr.RequestLocationUpdates (LocationManager.NetworkProvider, 2000, 1, this);
 			} else {
 				Toast.MakeText (this, "The Network Provider does not exist or is not enabled!", ToastLength.Long).Show ();
 			}
@@ -173,10 +182,15 @@ namespace ROADIT
 			Log.Debug (tag, provider + " availability has changed to " + status.ToString());
 		}
 
-		private void getDuration()
+		private void locsToString()
 		{
 			ownlocstring = finisherloc.Latitude.ToString() + "," + finisherloc.Longitude.ToString();
 			truckstring = truck1loc.Latitude.ToString() + "," + truck1loc.Longitude.ToString();
+			cinestring = cineloc.Latitude.ToString() + "," + cineloc.Longitude.ToString();
+		}
+
+		private void getDuration()
+		{
 			//animateButton.Text = "Duration: " + getDistanceTo(ownlocstring,truckstring);
 			durationString = "Duration from truck to finisher: " + getDistanceTo(ownlocstring, truckstring) + "s";
 
@@ -214,18 +228,30 @@ namespace ROADIT
 			_Jobj = JObject.Parse(content);
 
 			getDuration();
-			drawRoute();
+			//drawRoute(ownlocstring,truckstring);
 		}
 
-		private void drawRoute()
+		private void drawRoute(string origin, string destination, string color)
 		{
 			System.Threading.Thread.Sleep(50);
 
 			var polylineOptions = new PolylineOptions();
-			polylineOptions.InvokeColor(0x66000099);
+			if (color == "blue")
+			{
+				polylineOptions.InvokeColor(0x66000099);
+			}
+			else if (color == "red")
+			{
+				polylineOptions.InvokeColor(0x66ff0000);
+			}
+			else
+			{
+				polylineOptions.InvokeColor(0x66000099);
+			}
+
 			polylineOptions.InvokeWidth(9);
 
-			string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + ownlocstring + "&destination=" + truckstring+ "&sensor=false";
+			string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + destination + "&sensor=false";
 			string requesturl = url; string content = fileGetJSON(requesturl);
 			JObject _Jobjdraw = JObject.Parse(content);
 			string polyPoints;
@@ -240,6 +266,7 @@ namespace ROADIT
 
 			//draw route in main UI thread
 			RunOnUiThread(() => map.AddPolyline(polylineOptions));
+
 		}
 
 		private List<LatLng> DecodePolylinePoints(string encodedPoints)

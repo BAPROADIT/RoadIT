@@ -9,8 +9,13 @@
     using Android.Util;
     using Android.Views;
     using Android.Widget;
-
     using AndroidUri = Android.Net.Uri;
+	using Android.Hardware;
+	using Android.Locations;
+	using System;
+	//using Android.Support.Design.Widget;
+	using Android.Support.V4.App;
+	using Android.Content.PM;
 
     [Activity(Label = "@string/app_name", MainLauncher = true, Icon = "@drawable/icon")]
     public class MainActivity : ListActivity
@@ -20,6 +25,17 @@
 
         //private List<SampleActivity> _activities;
         private bool _isGooglePlayServicesInstalled;
+
+		static readonly int REQUEST_COARSELOCATION = 0;
+		static readonly int REQUEST_FINELOCATION = 1;
+		static readonly int REQUEST_INTERNET = 2;
+
+		static string[] PERMISSIONS_CONTACT = {
+
+			Android.Manifest.Permission.Internet,
+			Android.Manifest.Permission.AccessCoarseLocation,
+			Android.Manifest.Permission.AccessFineLocation,
+		};
 
 
         protected override void OnActivityResult(int requestCode, Result resultCode, Intent data)
@@ -41,9 +57,14 @@
         {
             base.OnCreate(bundle);
             _isGooglePlayServicesInstalled = TestIfGooglePlayServicesIsInstalled();
-            //InitializeListView();
+			//gps = new GPS((LocationManager)GetSystemService(LocationService), _gpsText);
+            initLocationManager();
+			RequestInternetPermission();
+
+			//InitializeListView();
 			SampleActivity activity = new SampleActivity(Resource.String.activity_label_mapwithmarkers, Resource.String.activity_description_mapwithmarkers, typeof(MapWithMarkersActivity));
 			activity.Start(this);
+
         }
 
 //        protected override void OnListItemClick(ListView l, View v, int position, long id)
@@ -102,5 +123,122 @@
             }
             return false;
         }
+
+		public void initLocationManager()
+		{
+			if (ActivityCompat.CheckSelfPermission(this, Android.Manifest.Permission.AccessCoarseLocation) != (int)Android.Content.PM.Permission.Granted)
+			{
+
+				// CoarseLocation permission has not been granted
+				RequestCoarsePermission();
+			}
+			if (ActivityCompat.CheckSelfPermission(this, Android.Manifest.Permission.AccessFineLocation) != (int)Android.Content.PM.Permission.Granted)
+			{
+
+				// FineLocation permission has not been granted
+				RequestFinePermission();
+			}
+			if (ActivityCompat.CheckSelfPermission(this, Android.Manifest.Permission.Internet) != (int)Android.Content.PM.Permission.Granted)
+			{
+
+				// Internet permission has not been granted
+				RequestInternetPermission();
+			}
+
+			//gps.InitializeLocationManager();
+		}
+
+		/**
+     	* Requests the CoarseLocation permission.
+		* If the permission has been denied previously, a SnackBar will prompt the user to grant the
+		* permission, otherwise it is requested directly.
+		*/
+		void RequestCoarsePermission()
+		{
+			//Log.Info (TAG, "COARSE permission has NOT been granted. Requesting permission.");
+
+			if (ActivityCompat.ShouldShowRequestPermissionRationale(this, Android.Manifest.Permission.AccessCoarseLocation))
+			{
+				// Provide an additional rationale to the user if the permission was not granted
+				// and the user would benefit from additional context for the use of the permission.
+				// For example if the user has previously denied the permission.
+				//Log.Info (TAG, "Displaying COARSE permission rationale to provide additional context.");
+
+				//Snackbar.Make(layout, Resource.String.hello,
+				//	Snackbar.LengthIndefinite).SetAction(Resource.String.hello, new Action<View>(delegate (View obj)
+				//	{
+				//		ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.AccessCoarseLocation }, REQUEST_COARSELOCATION);
+				//	})).Show();
+
+				ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.AccessCoarseLocation }, REQUEST_COARSELOCATION);
+			}
+			else {
+				// Camera permission has not been granted yet. Request it directly.
+				ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.AccessCoarseLocation }, REQUEST_COARSELOCATION);
+			}
+		}
+
+		/**
+     	* Requests the FineLocation permission.
+		* If the permission has been denied previously, a SnackBar will prompt the user to grant the
+		* permission, otherwise it is requested directly.
+		*/
+		void RequestFinePermission()
+		{
+			//Log.Info (TAG, "Fine permission has NOT been granted. Requesting permission.");
+
+			if (ActivityCompat.ShouldShowRequestPermissionRationale(this, Android.Manifest.Permission.AccessFineLocation))
+			{
+				// Provide an additional rationale to the user if the permission was not granted
+				// and the user would benefit from additional context for the use of the permission.
+				// For example if the user has previously denied the permission.
+				//Log.Info (TAG, "Displaying Fine permission rationale to provide additional context.");
+
+				//Snackbar.Make(layout, Resource.String.hello,
+				//	Snackbar.LengthIndefinite).SetAction(Resource.String.hello, new Action<View>(delegate (View obj)
+				//	{
+				//		ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.AccessFineLocation }, REQUEST_FINELOCATION);
+				//	})).Show();
+
+				ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.AccessFineLocation }, REQUEST_FINELOCATION);
+
+			}
+			else {
+				// Camera permission has not been granted yet. Request it directly.
+				ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.AccessFineLocation }, REQUEST_FINELOCATION);
+			}
+		}
+
+		/**
+     	* Requests the Internet permission.
+		* If the permission has been denied previously, a SnackBar will prompt the user to grant the
+		* permission, otherwise it is requested directly.
+		*/
+		void RequestInternetPermission()
+		{
+			//Log.Info (TAG, "Internet permission has NOT been granted. Requesting permission.");
+
+			ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.Internet }, REQUEST_INTERNET);
+
+			if (ActivityCompat.ShouldShowRequestPermissionRationale(this, Android.Manifest.Permission.Internet))
+			{
+				// Provide an additional rationale to the user if the permission was not granted
+				// and the user would benefit from additional context for the use of the permission.
+				// For example if the user has previously denied the permission.
+				//Log.Info (TAG, "Displaying Intenet permission rationale to provide additional context.");
+
+				//Snackbar.Make(layout, Resource.String.hello,
+				//	Snackbar.LengthIndefinite).SetAction(Resource.String.hello, new Action<View>(delegate (View obj)
+				//	{
+				//		ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.Internet }, REQUEST_INTERNET);
+				//	})).Show();
+
+				ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.Internet }, REQUEST_INTERNET);
+			}
+			else {
+				// Camera permission has not been granted yet. Request it directly.
+				ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.Internet }, REQUEST_INTERNET);
+			}
+		}
     }
 }
