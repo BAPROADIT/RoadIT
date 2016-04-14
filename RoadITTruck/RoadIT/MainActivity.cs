@@ -11,7 +11,7 @@ namespace RoadIT
 	[Activity(Label = "RoadIT", MainLauncher = true, Icon = "@mipmap/icon")]
 	public class MainActivity : ListActivity
 	{
-		int count = 1;
+		//int count = 1;
 		public static readonly string Tag = "ROAD IT";
 		public static readonly int InstallGooglePlayServicesId = 1000;
 		private bool _isGooglePlayServicesInstalled;
@@ -35,7 +35,7 @@ namespace RoadIT
 			initLocationManager();
 			RequestInternetPermission();
 
-			SampleActivity activity = new SampleActivity(Resource.String.activity_label_finisher, Resource.String.activity_description_finisher, typeof(Finisher));
+			SampleActivity activity = new SampleActivity(Resource.String.activity_label_truck, Resource.String.activity_description_truck, typeof(Truck));
 			activity.Start(this);
 
 			// Set our view from the "main" layout resource

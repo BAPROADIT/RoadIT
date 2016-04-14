@@ -19,13 +19,13 @@ namespace RoadIT
 		{
 			Log.Debug("MqttSubscribe", message.ToString());
 			string test = message.ToString();
-			Finisher.MQTTin(test);
+			Truck.MQTTin(test);
 		}
 
 		public void ConnectionLost(Throwable cause)
 		{
 			Log.Debug("MqttSubscribe", "connectionlost");
-			Finisher.ConfigMQTT();
+			Truck.ConfigMQTT();
 		}
 
 		public void DeliveryComplete(IMqttDeliveryToken token)
