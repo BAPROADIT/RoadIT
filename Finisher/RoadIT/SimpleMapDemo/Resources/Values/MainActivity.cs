@@ -64,7 +64,6 @@
 			//InitializeListView();
 			SampleActivity activity = new SampleActivity(Resource.String.activity_label_mapwithmarkers, Resource.String.activity_description_mapwithmarkers, typeof(MapWithMarkersActivity));
 			activity.Start(this);
-
         }
 
 //        protected override void OnListItemClick(ListView l, View v, int position, long id)

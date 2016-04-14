@@ -18,32 +18,47 @@ namespace ROADIT
 	using System.Text;
 	using Newtonsoft.Json;
 	using Newtonsoft.Json.Linq;
+	//using Java.Lang;
+
+	using Org.Eclipse.Paho.Client.Mqttv3;
+	using Org.Eclipse.Paho.Client.Mqttv3.Internal;
+	using Org.Eclipse.Paho.Client.Mqttv3.Logging;
+	using Org.Eclipse.Paho.Client.Mqttv3.Persist;
+	using Org.Eclipse.Paho.Client.Mqttv3.Util;
 
 	[Activity(Label = "ROAD IT", MainLauncher = true)]
 
 	public class MapWithMarkersActivity : Activity, ILocationListener
-    {
-        private static readonly LatLng truck1loc = new LatLng(51.229241, 4.404648);
+	{
+		private static readonly LatLng truck1loc = new LatLng(51.229241, 4.404648);
 		private static LatLng cineloc = new LatLng(51.2354242, 4.4105663);
-		private LatLng finisherloc = new LatLng(0,0);
+		private LatLng finisherloc = new LatLng(0, 0);
 		private GoogleMap map;
-        private MapFragment mapFragment;
+		private MapFragment mapFragment;
 		private LocationManager locMgr;
 		string ownlocstring;
 		string truckstring;
 		string cinestring;
+		static string varloc="";
 		string durationString;
 		private JObject _Jobj;
 		string tag = "MainActivity";
+
 		MarkerOptions markerfinisher = new MarkerOptions();
 		MarkerOptions markertruck = new MarkerOptions();
-		Boolean firstloc = true;
+		public static string broker = "tcp://iot.eclipse.org:1883";
+		public static string clientId = "JavaSample";
+
+		public static MemoryPersistence persistence = new MemoryPersistence();
+		public static MqttClient Client = new MqttClient(broker, clientId, persistence);
+
+		bool firstloc = true;
 
 		public void OnLocationChanged(Android.Locations.Location location)
 		{
 			Toast.MakeText(this, "Location changed", ToastLength.Long).Show();
-			finisherloc = new LatLng(location.Latitude,location.Longitude);
-			if(firstloc == true)
+			finisherloc = new LatLng(location.Latitude, location.Longitude);
+			if (firstloc == true)
 			{
 				InitMarkers();
 				ZoomOnLoc();
@@ -63,14 +78,17 @@ namespace ROADIT
 			getDurationThread.Start();
 
 			//ThreadStart drawRouteThreadStart = new ThreadStart(drawRoute(ownlocstring,truckstring));
-			Thread drawRouteThread = new Thread(() => drawRoute(ownlocstring, truckstring, "red"));
+			Thread drawRouteThread = new Thread(() => drawRoute(truckstring, "red"));
 			drawRouteThread.Start();
 
-			//ThreadStart drawRouteThreadStart2 = new ThreadStart(drawRoute(ownlocstring, cinestring));
-			Thread drawRouteThread2 = new Thread(() => drawRoute(ownlocstring, cinestring, "blue"));
-			drawRouteThread2.Start();
-
 		}
+
+		public static void MQTTin(string mqttin)
+		{
+			Log.Debug("MQTTEST", mqttin);
+			varloc = mqttin;
+		}
+	
 
         protected override void OnCreate(Bundle bundle)
         {
@@ -79,6 +97,7 @@ namespace ROADIT
             SetContentView(Resource.Layout.MapLayout);
             InitMapFragment();
 			SetupAnimateToButton();
+			ConfigMQTT();
         }
 
         protected override void OnResume()
@@ -100,6 +119,25 @@ namespace ROADIT
 				Toast.MakeText (this, "The Network Provider does not exist or is not enabled!", ToastLength.Long).Show ();
 			}
         }
+
+		void ConfigMQTT()
+		{
+			try
+			{
+				Client.SetCallback(new MqttSubscribe());
+				Client.Connect();
+
+				Client.Subscribe("fin");
+				Toast.MakeText(this, "Subscribe(\"fin\")!", ToastLength.Long).Show();
+
+			}
+			catch (MqttException me)
+			{
+				Toast.MakeText(this, "Error: Subscribe(\"fin\")!\n" + me, ToastLength.Long).Show();
+
+			}
+		}
+
 
 		protected override void OnStart ()
 		{
@@ -130,7 +168,8 @@ namespace ROADIT
         {
             Button animateButton = FindViewById<Button>(Resource.Id.animateButton);
             animateButton.Click += (sender, e) =>{
-				ZoomOnLoc();
+				Thread drawRouteThread2 = new Thread(() => drawRoute(varloc, "blue"));
+				drawRouteThread2.Start();
 			};
         }
 
@@ -231,7 +270,7 @@ namespace ROADIT
 			//drawRoute(ownlocstring,truckstring);
 		}
 
-		private void drawRoute(string origin, string destination, string color)
+		private void drawRoute(string origin, string color)
 		{
 			System.Threading.Thread.Sleep(50);
 
@@ -251,7 +290,7 @@ namespace ROADIT
 
 			polylineOptions.InvokeWidth(9);
 
-			string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + destination + "&sensor=false";
+			string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + ownlocstring + "&sensor=false";
 			string requesturl = url; string content = fileGetJSON(requesturl);
 			JObject _Jobjdraw = JObject.Parse(content);
 			string polyPoints;
