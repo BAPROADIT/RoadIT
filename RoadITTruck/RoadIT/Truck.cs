@@ -30,14 +30,14 @@ namespace RoadIT
 	[Activity(Label = "Truck")]
 	public class Truck : Activity, ILocationListener
 	{
-		private static readonly LatLng truck1loc = new LatLng(51.229241, 4.404648);
+		private static LatLng finisherloc = new LatLng(51.229241, 4.404648);
 		private static LatLng cineloc = new LatLng(51.2354242, 4.4105663);
-		private LatLng finisherloc = new LatLng(0, 0);
+		private static LatLng truckloc = new LatLng(0, 0);
 		private GoogleMap map;
 		private MapFragment mapFragment;
 		private LocationManager locMgr;
 		string ownlocstring;
-		string truckstring;
+		static string finisherstring;
 		string cinestring;
 		static string varloc = "";
 		string durationString;
@@ -54,10 +54,29 @@ namespace RoadIT
 
 		bool firstloc = true;
 
+		public static void MQTTupdate(string mqttmessage){
+			Char delimiter = ',';
+			String[] substrings = mqttmessage.Split(delimiter);
+			if (substrings.Length == 3) {
+					try{
+					if (Convert.ToDouble (substrings [2]) == 0) {
+						finisherloc.Latitude = Convert.ToDouble (substrings [0]);
+						finisherloc.Longitude = Convert.ToDouble (substrings [1]);
+						finisherstring = mqttmessage;
+						Log.Debug ("MQTTinput", "Accept");
+					}
+					} 
+					catch{
+						Log.Debug ("MQTTinput", "input not right");
+					}
+
+			}
+		}
+
 		public void OnLocationChanged(Android.Locations.Location location)
 		{
 			//Toast.MakeText(this, "Location changed", ToastLength.Long).Show();
-			finisherloc = new LatLng(location.Latitude, location.Longitude);
+			truckloc = new LatLng(location.Latitude, location.Longitude);
 			if (firstloc == true)
 			{
 				InitMarkers();
@@ -78,7 +97,7 @@ namespace RoadIT
 			getDurationThread.Start();
 
 			//ThreadStart drawRouteThreadStart = new ThreadStart(drawRoute(ownlocstring,truckstring));
-			Thread drawRouteThread = new Thread(() => drawRoute(truckstring, "red"));
+			Thread drawRouteThread = new Thread(() => drawRoute(finisherstring, "red"));
 			drawRouteThread.Start();
 
 		}
@@ -135,7 +154,7 @@ namespace RoadIT
 			}
 			catch (MqttException me)
 			{
-				Log.Debug("MqttSubscribe", "(re)connect failed");
+				Log.Debug("MqttSubscribe", "(re)connect failed: "+me);
 				//Toast.MakeText(this, "Error: Subscribe(\"fin\")!\n" + me, ToastLength.Long).Show();
 
 			}
@@ -181,7 +200,7 @@ namespace RoadIT
 		private void ZoomOnLoc()
 		{
 			CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
-			builder.Target(finisherloc);
+			builder.Target(truckloc);
 			builder.Zoom(12);
 			builder.Bearing(0);
 			builder.Tilt(0);
@@ -195,8 +214,8 @@ namespace RoadIT
 		private void InitMarkers()
 		{
 			map = mapFragment.Map;
-			BitmapDescriptor truck = BitmapDescriptorFactory.FromResource(Resource.Drawable.truck);
-			markertruck.SetPosition(truck1loc);
+			BitmapDescriptor truck = BitmapDescriptorFactory.FromResource(Resource.Drawable.finisher);
+			markertruck.SetPosition(truckloc);
 			markertruck.SetTitle("Truck");
 			markertruck.SetIcon(truck);
 			map.AddMarker(markertruck);
@@ -208,7 +227,7 @@ namespace RoadIT
 		private void RefreshMarkers()
 		{
 			map.Clear();
-			markertruck.SetPosition(truck1loc);
+			markertruck.SetPosition(finisherloc);
 			map.AddMarker(markertruck);
 		}
 
@@ -227,15 +246,15 @@ namespace RoadIT
 
 		private void locsToString()
 		{
-			ownlocstring = finisherloc.Latitude.ToString() + "," + finisherloc.Longitude.ToString();
-			truckstring = truck1loc.Latitude.ToString() + "," + truck1loc.Longitude.ToString();
+			ownlocstring = truckloc.Latitude.ToString() + "," + truckloc.Longitude.ToString();
+			finisherstring = finisherloc.Latitude.ToString() + "," + finisherloc.Longitude.ToString();
 			cinestring = cineloc.Latitude.ToString() + "," + cineloc.Longitude.ToString();
 		}
 
 		private void getDuration()
 		{
-			//animateButton.Text = "Duration: " + getDistanceTo(ownlocstring,truckstring);
-			durationString = "Duration from truck to finisher: " + getDistanceTo(ownlocstring, truckstring) + "s";
+			//animateButton.Text = "Duration: " + getDistanceTo(ownlocstring,finisherstring);
+			durationString = "Duration from truck to finisher: " + getDistanceTo(ownlocstring, finisherstring) + "s";
 
 			TextView durationtextfield = FindViewById<TextView>(Resource.Id.durationText);
 
@@ -271,7 +290,7 @@ namespace RoadIT
 			_Jobj = JObject.Parse(content);
 
 			getDuration();
-			//drawRoute(ownlocstring,truckstring);
+			//drawRoute(ownlocstring,finisherstring);
 		}
 
 		private void drawRoute(string origin, string color)
@@ -368,6 +387,7 @@ namespace RoadIT
 			catch (Exception ex)
 			{
 				// logo it
+				Log.Debug("Main","Error: " + ex.ToString());
 			}
 			return poly;
 		}

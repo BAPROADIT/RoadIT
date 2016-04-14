@@ -35,7 +35,7 @@ namespace RoadIT
 			initLocationManager();
 			RequestInternetPermission();
 
-			SampleActivity activity = new SampleActivity(Resource.String.activity_label_truck, Resource.String.activity_description_truck, typeof(Truck));
+			SampleActivity activity = new SampleActivity(1,2, typeof(Truck));
 			activity.Start(this);
 
 			// Set our view from the "main" layout resource
