@@ -33,12 +33,16 @@ namespace Location
 		public void MessageArrived(string topic, MqttMessage message) {
 			string test = "Bericht: "+ message.ToString();
 			MainActivity.popup (test);
+			Log.Debug ("MQTT", test);
 		}
 
 		public void ConnectionLost(Throwable cause) {
+			Log.Debug ("MQTT", "ConnectionLost: "+cause.Message.ToString());
+			MainActivity.initmqtt ();
 		}
 
 		public void DeliveryComplete(IMqttDeliveryToken token) {
+			Log.Debug ("MQTT", "Delivery");
 		}
 
 	}

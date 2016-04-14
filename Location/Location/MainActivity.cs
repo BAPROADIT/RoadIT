@@ -21,7 +21,6 @@ namespace Location
 	public class MainActivity : Activity, ILocationListener
 	{
 		LocationManager locMgr;
-		string tag = "MainActivity";
 		Button button;
 		TextView latitude;
 		TextView longitude;
@@ -33,9 +32,7 @@ namespace Location
 		public static MemoryPersistence persistence = new MemoryPersistence();
 		public static MqttClient Client=new MqttClient(broker, clientId, persistence);
 		static string messagebutton  = null;
-		int test= 0;
-
-
+		string locationstring= "Leeg";
 		protected override void OnCreate (Bundle bundle)
 		{
 			base.OnCreate (bundle);
@@ -46,19 +43,20 @@ namespace Location
 			latitude = FindViewById<TextView> (Resource.Id.latitude);
 			longitude = FindViewById<TextView> (Resource.Id.longitude);
 			provider = FindViewById<TextView> (Resource.Id.provider);
-			try {
-				Client.SetCallback(new MqttSubscribe());
-				Client.Connect();
-
-				Client.Subscribe("fin");
-				Toast.MakeText (this, "Subscribe(\"fin\")!", ToastLength.Long).Show ();
-
-			} catch(MqttException me) {
-				Toast.MakeText (this, "Error: Subscribe(\"fin\")!\n"+me, ToastLength.Long).Show ();
-
-			}
+			Client.SetCallback(new MqttSubscribe());
+			initmqtt ();
 		}
+		public static void initmqtt(){
+			
+				Log.Debug ("MQTT", "init");
+				try {
+					Client.Connect ();
+					Client.Subscribe("fin");
+				} catch (MqttException me) {
+				Log.Debug ("MQTT init error: ", me.ToString());
 
+				}
+		}
 		protected override void OnStart ()
 		{
 			base.OnStart ();
@@ -69,14 +67,17 @@ namespace Location
 			locMgr = GetSystemService (Context.LocationService) as LocationManager;
 
 			button.Click += delegate {
-				test++;
-				button.Text =  messagebutton+ " Nummer: "+test.ToString();
+				button.Text =  messagebutton;
+
 				if (locMgr.AllProviders.Contains (LocationManager.NetworkProvider)
 					&& locMgr.IsProviderEnabled (LocationManager.NetworkProvider)) {
 					locMgr.RequestLocationUpdates (LocationManager.NetworkProvider, 2000, 1, this);
 				} else {
 					Toast.MakeText (this, "The Network Provider does not exist or is not enabled!", ToastLength.Long).Show ();
 				}
+
+
+				MQTTPublish (locationstring);
 			};
 		}
 
@@ -93,12 +94,12 @@ namespace Location
 
 		public void OnLocationChanged (Android.Locations.Location location)
 		{
-			Log.Debug (tag, "Location changed");
+			//Log.Debug (tag, "Location changed");
 			latitude.Text = "Latitude: " + location.Latitude.ToString();
 			longitude.Text = "Longitude: " + location.Longitude.ToString();
 			//provider.Text = "Provider: " + location.Provider.ToString();
-			string MQTTString = location.Latitude.ToString () +","+ location.Longitude.ToString ();
-			MQTTPublish (MQTTString);
+			locationstring = location.Latitude.ToString () +","+ location.Longitude.ToString ();
+
 		}
 
 		public void MQTTPublish(string content) {
@@ -111,13 +112,10 @@ namespace Location
 				byte[] bytes =  System.Text.Encoding.ASCII.GetBytes(content);
 				MqttMessage message = new MqttMessage(bytes);
 				message.Qos=qos;
-				Client.Connect();
 				Client.Publish(topic, message);
-				Client.Disconnect();
 			} catch(MqttException me) {
 				me.PrintStackTrace();
 			}
-
 		}
 
 		public void OnProviderDisabled (string provider)
