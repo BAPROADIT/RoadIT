@@ -171,7 +171,7 @@ namespace RoadIT
 			RouteButton.Click += (sender, e) =>
 			{
 				Toast.MakeText(this, "Button Pressed", ToastLength.Long).Show();
-				Thread drawRouteThread2 = new Thread(() => drawRoute(truckstring, "blue"));
+				Thread drawRouteThread2 = new Thread(() => drawRoute(varloc, "blue"));
 				drawRouteThread2.Start();
 			};
 		}
@@ -299,18 +299,20 @@ namespace RoadIT
 				Log.Debug("http", "httpstart");
 
 				string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + ownlocstring + "&sensor=false";
+				Log.Debug("httporigin", origin);
+				Log.Debug("httpownloc", ownlocstring);
 				string requesturl = url; string content = fileGetJSON(requesturl);
+				Log.Debug("httpcontent", content);
 				JObject _Jobjdraw = JObject.Parse(content);
 				string polyPoints;
 				polyPoints = (string)_Jobjdraw.SelectToken("routes[0].overview_polyline.points");
-
 				List<LatLng> drawCoordinates;
 				drawCoordinates = DecodePolylinePoints(polyPoints);
+				Log.Debug("http", "na decoder");
 				foreach (var position in drawCoordinates)
 				{
 					polylineOptions.Add(new LatLng(position.Latitude, position.Longitude));
 				}
-
 				Log.Debug("http", "httpsucces");
 			}
 
@@ -390,11 +392,15 @@ namespace RoadIT
 			string me = string.Empty;
 			try
 			{
+				Log.Debug("filegetJSON", "start");
 				if (fileName.ToLower().IndexOf("http:") > -1)
 				{
+					Log.Debug("filegetJSON", "webclientcreate");
 					System.Net.WebClient wc = new System.Net.WebClient();
 					byte[] response = wc.DownloadData(fileName);
+					Log.Debug("filegetJSON", "response");
 					_sData = System.Text.Encoding.ASCII.GetString(response);
+					Log.Debug("filegetJSON", "todataobj");
 
 				}
 				else
