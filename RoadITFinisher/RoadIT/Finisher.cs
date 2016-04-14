@@ -71,13 +71,12 @@ namespace RoadIT
 			//Thread MapsAPICallThread = new Thread(() => mapAPICall(ownlocstring,truckstring));
 			//MapsAPICallThread.Start();
 
-
-			//multithreaded method call, prevents app stutters
+			////multithreaded method call, prevents app stutters
 			ThreadStart getDurationThreadStart = new ThreadStart(getDuration);
 			Thread getDurationThread = new Thread(getDurationThreadStart);
 			getDurationThread.Start();
 
-			//ThreadStart drawRouteThreadStart = new ThreadStart(drawRoute(ownlocstring,truckstring));
+			////ThreadStart drawRouteThreadStart = new ThreadStart(drawRoute(ownlocstring,truckstring));
 			Thread drawRouteThread = new Thread(() => drawRoute(truckstring, "red"));
 			drawRouteThread.Start();
 
@@ -85,7 +84,6 @@ namespace RoadIT
 
 		public static void MQTTin(string mqttin)
 		{
-			Log.Debug("MQTTEST", mqttin);
 			varloc = mqttin;
 		}
 
@@ -96,7 +94,7 @@ namespace RoadIT
 			Log.Debug(tag, "OnCreate called");
 			SetContentView(Resource.Layout.Main);
 			InitMapFragment();
-			//SetupAnimateToButton();
+			SetupAnimateToButton();
 			Client.SetCallback(new MqttSubscribe());
 			ConfigMQTT();
 		}
@@ -172,7 +170,8 @@ namespace RoadIT
 			Button RouteButton = FindViewById<Button>(Resource.Id.routeButton);
 			RouteButton.Click += (sender, e) =>
 			{
-				Thread drawRouteThread2 = new Thread(() => drawRoute(varloc, "blue"));
+				Toast.MakeText(this, "Button Pressed", ToastLength.Long).Show();
+				Thread drawRouteThread2 = new Thread(() => drawRoute(truckstring, "blue"));
 				drawRouteThread2.Start();
 			};
 		}
@@ -276,7 +275,8 @@ namespace RoadIT
 
 		private void drawRoute(string origin, string color)
 		{
-			System.Threading.Thread.Sleep(50);
+			Log.Debug("http", "drawroutestart");
+			Thread.Sleep(50);
 
 			var polylineOptions = new PolylineOptions();
 			if (color == "blue")
@@ -294,22 +294,34 @@ namespace RoadIT
 
 			polylineOptions.InvokeWidth(9);
 
-			string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + ownlocstring + "&sensor=false";
-			string requesturl = url; string content = fileGetJSON(requesturl);
-			JObject _Jobjdraw = JObject.Parse(content);
-			string polyPoints;
-			polyPoints = (string)_Jobjdraw.SelectToken("routes[0].overview_polyline.points");
-
-			List<LatLng> drawCoordinates;
-			drawCoordinates = DecodePolylinePoints(polyPoints);
-			foreach (var position in drawCoordinates)
+			try
 			{
-				polylineOptions.Add(new LatLng(position.Latitude, position.Longitude));
+				Log.Debug("http", "httpstart");
+
+				string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + ownlocstring + "&sensor=false";
+				string requesturl = url; string content = fileGetJSON(requesturl);
+				JObject _Jobjdraw = JObject.Parse(content);
+				string polyPoints;
+				polyPoints = (string)_Jobjdraw.SelectToken("routes[0].overview_polyline.points");
+
+				List<LatLng> drawCoordinates;
+				drawCoordinates = DecodePolylinePoints(polyPoints);
+				foreach (var position in drawCoordinates)
+				{
+					polylineOptions.Add(new LatLng(position.Latitude, position.Longitude));
+				}
+
+				Log.Debug("http", "httpsucces");
+			}
+
+			catch
+			{
+				Log.Debug("http", "gefuckt");
+				//Toast.MakeText(this, "httpgefuckt", ToastLength.Long).Show();			
 			}
 
 			//draw route in main UI thread
 			RunOnUiThread(() => map.AddPolyline(polylineOptions));
-
 		}
 
 		private List<LatLng> DecodePolylinePoints(string encodedPoints)

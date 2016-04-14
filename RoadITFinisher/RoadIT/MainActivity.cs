@@ -1,20 +1,25 @@
 ﻿using Android.App;
 using Android.Widget;
+using Android.Hardware;
+using Android.Locations;
 using Android.OS;
 using Android.Gms.Common;
 using Android.Util;
 using System;
 using Android.Support.V4.App;
+using Android.Support.Design.Widget;
+using Android.Views;
 
 namespace RoadIT
 {
 	[Activity(Label = "RoadIT", MainLauncher = true, Icon = "@mipmap/icon")]
 	public class MainActivity : ListActivity
 	{
-		int count = 1;
 		public static readonly string Tag = "ROAD IT";
 		public static readonly int InstallGooglePlayServicesId = 1000;
 		private bool _isGooglePlayServicesInstalled;
+
+		View layout;
 
 		static readonly int REQUEST_COARSELOCATION = 0;
 		static readonly int REQUEST_FINELOCATION = 1;
@@ -22,20 +27,19 @@ namespace RoadIT
 
 		static string[] PERMISSIONS_CONTACT = {
 
-			Android.Manifest.Permission.Internet,
 			Android.Manifest.Permission.AccessCoarseLocation,
 			Android.Manifest.Permission.AccessFineLocation,
+			Android.Manifest.Permission.Internet
 		};
 
 		protected override void OnCreate(Bundle bundle)
 		{
 			base.OnCreate(bundle);
 			_isGooglePlayServicesInstalled = TestIfGooglePlayServicesIsInstalled();
-			//gps = new GPS((LocationManager)GetSystemService(LocationService), _gpsText);
 			initLocationManager();
 			RequestInternetPermission();
 
-			SampleActivity activity = new SampleActivity(Resource.String.activity_label_finisher, Resource.String.activity_description_finisher, typeof(Finisher));
+			SampleActivity activity = new SampleActivity(1, 2, typeof(Finisher));
 			activity.Start(this);
 
 			// Set our view from the "main" layout resource
@@ -109,13 +113,10 @@ namespace RoadIT
 				// For example if the user has previously denied the permission.
 				//Log.Info (TAG, "Displaying COARSE permission rationale to provide additional context.");
 
-				//Snackbar.Make(layout, Resource.String.hello,
-				//	Snackbar.LengthIndefinite).SetAction(Resource.String.hello, new Action<View>(delegate (View obj)
-				//	{
-				//		ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.AccessCoarseLocation }, REQUEST_COARSELOCATION);
-				//	})).Show();
-
-				ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.AccessCoarseLocation }, REQUEST_COARSELOCATION);
+				Snackbar
+					.Make(layout, "Message sent", Snackbar.LengthLong)
+  					.SetAction("OK", (view) => { ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.AccessCoarseLocation }, REQUEST_COARSELOCATION); })
+  					.Show(); 
 			}
 			else {
 				// Camera permission has not been granted yet. Request it directly.
@@ -132,21 +133,17 @@ namespace RoadIT
 		{
 			//Log.Info (TAG, "Fine permission has NOT been granted. Requesting permission.");
 
-			if (ActivityCompat.ShouldShowRequestPermissionRationale(this, Android.Manifest.Permission.AccessFineLocation))
+			if (ActivityCompat.ShouldShowRequestPermissionRationale(this, Android.Manifest.Permission.AccessCoarseLocation))
 			{
 				// Provide an additional rationale to the user if the permission was not granted
 				// and the user would benefit from additional context for the use of the permission.
 				// For example if the user has previously denied the permission.
 				//Log.Info (TAG, "Displaying Fine permission rationale to provide additional context.");
 
-				//Snackbar.Make(layout, Resource.String.hello,
-				//	Snackbar.LengthIndefinite).SetAction(Resource.String.hello, new Action<View>(delegate (View obj)
-				//	{
-				//		ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.AccessFineLocation }, REQUEST_FINELOCATION);
-				//	})).Show();
-
-				ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.AccessFineLocation }, REQUEST_FINELOCATION);
-
+				Snackbar
+					.Make(layout, "Message sent", Snackbar.LengthLong)
+  					.SetAction("OK", (view) => {ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.AccessFineLocation }, REQUEST_FINELOCATION); })
+  					.Show();
 			}
 			else {
 				// Camera permission has not been granted yet. Request it directly.
@@ -163,28 +160,25 @@ namespace RoadIT
 		{
 			//Log.Info (TAG, "Internet permission has NOT been granted. Requesting permission.");
 
-			ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.Internet }, REQUEST_INTERNET);
-
-			if (ActivityCompat.ShouldShowRequestPermissionRationale(this, Android.Manifest.Permission.Internet))
+			if (ActivityCompat.ShouldShowRequestPermissionRationale(this, Android.Manifest.Permission.AccessCoarseLocation))
 			{
 				// Provide an additional rationale to the user if the permission was not granted
 				// and the user would benefit from additional context for the use of the permission.
 				// For example if the user has previously denied the permission.
 				//Log.Info (TAG, "Displaying Intenet permission rationale to provide additional context.");
 
-				//Snackbar.Make(layout, Resource.String.hello,
-				//	Snackbar.LengthIndefinite).SetAction(Resource.String.hello, new Action<View>(delegate (View obj)
-				//	{
-				//		ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.Internet }, REQUEST_INTERNET);
-				//	})).Show();
-
-				ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.Internet }, REQUEST_INTERNET);
+				Snackbar
+					.Make(layout, "Message sent", Snackbar.LengthLong)
+  					.SetAction("OK", (view) => { ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.Internet }, REQUEST_INTERNET); })
+  					.Show();
 			}
 			else {
 				// Camera permission has not been granted yet. Request it directly.
 				ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.Internet }, REQUEST_INTERNET);
 			}
 		}
+
+
 	}
 }
 
