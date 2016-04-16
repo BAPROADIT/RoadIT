@@ -226,6 +226,7 @@ namespace RoadIT
 
 		private void locsToString()
 		{
+			//TODO , vervangen door punt
 			ownlocstring = finisherloc.Latitude.ToString() + "," + finisherloc.Longitude.ToString();
 			truckstring = truck1loc.Latitude.ToString() + "," + truck1loc.Longitude.ToString();
 			cinestring = cineloc.Latitude.ToString() + "," + cineloc.Longitude.ToString();
@@ -296,8 +297,6 @@ namespace RoadIT
 
 			try
 			{
-				Log.Debug("http", "httpstart");
-
 				string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + ownlocstring + "&sensor=false";
 				Log.Debug("httporigin", origin);
 				Log.Debug("httpownloc", ownlocstring);
@@ -308,19 +307,14 @@ namespace RoadIT
 				polyPoints = (string)_Jobjdraw.SelectToken("routes[0].overview_polyline.points");
 				List<LatLng> drawCoordinates;
 				drawCoordinates = DecodePolylinePoints(polyPoints);
-				Log.Debug("http", "na decoder");
 				foreach (var position in drawCoordinates)
 				{
 					polylineOptions.Add(new LatLng(position.Latitude, position.Longitude));
 				}
-				Log.Debug("http", "httpsucces");
 			}
 
 			catch
-			{
-				Log.Debug("http", "gefuckt");
-				//Toast.MakeText(this, "httpgefuckt", ToastLength.Long).Show();			
-			}
+			{}
 
 			//draw route in main UI thread
 			RunOnUiThread(() => map.AddPolyline(polylineOptions));
@@ -392,16 +386,11 @@ namespace RoadIT
 			string me = string.Empty;
 			try
 			{
-				Log.Debug("filegetJSON", "start");
 				if (fileName.ToLower().IndexOf("http:") > -1)
 				{
-					Log.Debug("filegetJSON", "webclientcreate");
 					System.Net.WebClient wc = new System.Net.WebClient();
 					byte[] response = wc.DownloadData(fileName);
-					Log.Debug("filegetJSON", "response");
 					_sData = System.Text.Encoding.ASCII.GetString(response);
-					Log.Debug("filegetJSON", "todataobj");
-
 				}
 				else
 				{
