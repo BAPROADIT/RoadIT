@@ -99,14 +99,30 @@ namespace RoadIT
 			//ThreadStart drawRouteThreadStart = new ThreadStart(drawRoute(ownlocstring,truckstring));
 			Thread drawRouteThread = new Thread(() => drawRoute(finisherstring, "red"));
 			drawRouteThread.Start();
+			MQTTPublish (location.Latitude.ToString () + "," + location.Longitude.ToString () + ",1");
 
 		}
 
-		public static void MQTTin(string mqttin)
+		public void MQTTPublish(string content) {
+
+			string topic        = "fin";
+			int qos             = 2;
+			MemoryPersistence persistence = new MemoryPersistence();
+
+			try {
+				byte[] bytes =  System.Text.Encoding.ASCII.GetBytes(content);
+				MqttMessage message = new MqttMessage(bytes);
+				message.Qos=qos;
+				Client.Publish(topic, message);
+			} catch(MqttException me) {
+				me.PrintStackTrace();
+			}
+		}
+		/*public static void MQTTin(string mqttin)
 		{
 			Log.Debug("MQTTEST", mqttin);
 			varloc = mqttin;
-		}
+		}*/
 
 
 		protected override void OnCreate(Bundle bundle)
