@@ -30,19 +30,20 @@ namespace RoadIT
 	[Activity(Label = "Truck")]
 	public class Truck : Activity, ILocationListener
 	{
-		private static LatLng finisherloc = new LatLng(51.229241, 4.404648);
-		private static LatLng cineloc = new LatLng(51.2354242, 4.4105663);
-		private static LatLng truckloc = new LatLng(0, 0);
-		private GoogleMap map;
-		private MapFragment mapFragment;
-		private LocationManager locMgr;
+		static LatLng finisherloc = new LatLng(51.229241, 4.404648);
+		static LatLng cineloc = new LatLng(51.2354242, 4.4105663);
+		static LatLng truckloc = new LatLng(0, 0);
+		GoogleMap map;
+		MapFragment mapFragment;
+		LocationManager locMgr;
 		string ownlocstring;
 		static string finisherstring;
 		string cinestring;
 		static string varloc = "";
 		string durationString;
-		private JObject _Jobj;
+		JObject _Jobj;
 		string tag = "MainActivity";
+		PolylineOptions polylineOptions = new PolylineOptions();
 
 		MarkerOptions markerfinisher = new MarkerOptions();
 		MarkerOptions markertruck = new MarkerOptions();
@@ -87,19 +88,19 @@ namespace RoadIT
 			locsToString();
 			RefreshMarkers();
 
-			//Thread MapsAPICallThread = new Thread(() => mapAPICall(ownlocstring,truckstring));
-			//MapsAPICallThread.Start();
+			Thread MapsAPICallThread = new Thread(() => mapAPICall(finisherstring, "red"));
+			MapsAPICallThread.Start();
 
 
-			//multithreaded method call, prevents app stutters
-			ThreadStart getDurationThreadStart = new ThreadStart(getDuration);
-			Thread getDurationThread = new Thread(getDurationThreadStart);
-			getDurationThread.Start();
+			////multithreaded method call, prevents app stutters
+			//ThreadStart getDurationThreadStart = new ThreadStart(getDuration);
+			//Thread getDurationThread = new Thread(getDurationThreadStart);
+			//getDurationThread.Start();
 
-			//ThreadStart drawRouteThreadStart = new ThreadStart(drawRoute(ownlocstring,truckstring));
-			Thread drawRouteThread = new Thread(() => drawRoute(finisherstring, "red"));
-			drawRouteThread.Start();
-			MQTTPublish (location.Latitude.ToString () + "," + location.Longitude.ToString () + ",1");
+			////ThreadStart drawRouteThreadStart = new ThreadStart(drawRoute(ownlocstring,truckstring));
+			//Thread drawRouteThread = new Thread(() => drawRoute(finisherstring, "red"));
+			//drawRouteThread.Start();
+			//MQTTPublish (location.Latitude.ToString () + "," + location.Longitude.ToString () + ",1");
 
 		}
 
@@ -114,16 +115,11 @@ namespace RoadIT
 				MqttMessage message = new MqttMessage(bytes);
 				message.Qos=qos;
 				Client.Publish(topic, message);
+				Log.Debug("MQTTPublish", message.ToString());
 			} catch(MqttException me) {
 				me.PrintStackTrace();
 			}
 		}
-		/*public static void MQTTin(string mqttin)
-		{
-			Log.Debug("MQTTEST", mqttin);
-			varloc = mqttin;
-		}*/
-
 
 		protected override void OnCreate(Bundle bundle)
 		{
@@ -207,8 +203,8 @@ namespace RoadIT
 			Button RouteButton = FindViewById<Button>(Resource.Id.routeButton);
 			RouteButton.Click += (sender, e) =>
 			{
-				Thread drawRouteThread2 = new Thread(() => drawRoute(varloc, "blue"));
-				drawRouteThread2.Start();
+				Thread mapAPICall2 = new Thread(() => mapAPICall(varloc, "blue"));
+				mapAPICall2.Start();
 			};
 		}
 
@@ -270,7 +266,7 @@ namespace RoadIT
 		private void getDuration()
 		{
 			//animateButton.Text = "Duration: " + getDistanceTo(ownlocstring,finisherstring);
-			durationString = "Duration from truck to finisher: " + getDistanceTo(ownlocstring, finisherstring) + "s";
+			durationString = "Duration to finisher: " + getDistanceTo(ownlocstring, finisherstring) + "s";
 
 			TextView durationtextfield = FindViewById<TextView>(Resource.Id.durationText);
 
@@ -283,9 +279,6 @@ namespace RoadIT
 			System.Threading.Thread.Sleep(50);
 
 			int duration = -1;
-			string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + destination + "&sensor=false";
-			string requesturl = url; string content = fileGetJSON(requesturl);
-			_Jobj = JObject.Parse(content);
 			try
 			{
 				duration = (int)_Jobj.SelectToken("routes[0].legs[0].duration.value");
@@ -297,23 +290,38 @@ namespace RoadIT
 			}
 		}
 
-		private void mapAPICall(string origin, string destination)
+		void updateUI()
 		{
-			System.Threading.Thread.Sleep(50);
-
-			string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + destination + "&sensor=false";
-			string requesturl = url; string content = fileGetJSON(requesturl);
-			_Jobj = JObject.Parse(content);
-
-			getDuration();
-			//drawRoute(ownlocstring,finisherstring);
+			map.Clear();
+			map.AddMarker(markertruck);
+			map.AddPolyline(polylineOptions);
 		}
 
-		private void drawRoute(string origin, string color)
+		void mapAPICall(string destination, string color)
 		{
 			System.Threading.Thread.Sleep(50);
 
-			var polylineOptions = new PolylineOptions();
+			try
+			{
+				string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + ownlocstring + "&destination=" + destination + "&sensor=false";
+				string requesturl = url; string content = fileGetJSON(requesturl);
+				//Log.Debug("httpcontent", content);
+				_Jobj = JObject.Parse(content);
+			}
+			catch { }
+
+			getDuration();
+			drawRoute(color);
+			//draw route in main UI thread
+			RunOnUiThread(() => updateUI());
+		}
+
+		void drawRoute(string color)
+		{
+			Log.Debug("http", "drawroutestart");
+
+			//TODO zorgen dat andere routes niet weggaa
+			polylineOptions = new PolylineOptions();
 			if (color == "blue")
 			{
 				polylineOptions.InvokeColor(0x66000099);
@@ -328,22 +336,19 @@ namespace RoadIT
 			}
 
 			polylineOptions.InvokeWidth(9);
-
-			string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + ownlocstring + "&sensor=false";
-			string requesturl = url; string content = fileGetJSON(requesturl);
-			JObject _Jobjdraw = JObject.Parse(content);
-			string polyPoints;
-			polyPoints = (string)_Jobjdraw.SelectToken("routes[0].overview_polyline.points");
-
-			List<LatLng> drawCoordinates;
-			drawCoordinates = DecodePolylinePoints(polyPoints);
-			foreach (var position in drawCoordinates)
+			try
 			{
-				polylineOptions.Add(new LatLng(position.Latitude, position.Longitude));
+				string polyPoints = (string)_Jobj.SelectToken("routes[0].overview_polyline.points");
+				List<LatLng> drawCoordinates;
+				drawCoordinates = DecodePolylinePoints(polyPoints);
+				foreach (var position in drawCoordinates)
+				{
+					polylineOptions.Add(new LatLng(position.Latitude, position.Longitude));
+				}
 			}
+			catch
+			{ }
 
-			//draw route in main UI thread
-			RunOnUiThread(() => map.AddPolyline(polylineOptions));
 
 		}
 

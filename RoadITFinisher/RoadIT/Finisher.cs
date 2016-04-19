@@ -98,6 +98,7 @@ namespace RoadIT
 				MqttMessage message = new MqttMessage(bytes);
 				message.Qos = qos;
 				Client.Publish(topic, message);
+				Log.Debug("MQTTPublish", message.ToString());
 			}
 			catch (MqttException me)
 			{
@@ -212,8 +213,8 @@ namespace RoadIT
 			{
 				Toast.MakeText(this, "Button Pressed", ToastLength.Long).Show();
 				//Thread drawRouteThread2 = new Thread(() => drawRoute(varloc, "blue"));
-				Thread drawRouteThread2 = new Thread(() => mapAPICall(varloc, "blue"));
-				drawRouteThread2.Start();
+				Thread mapAPICall2 = new Thread(() => mapAPICall(varloc, "blue"));
+				mapAPICall2.Start();
 			};
 		}
 
@@ -323,10 +324,12 @@ namespace RoadIT
 			catch { }
 
 			getDuration();
-			drawRoute(ownlocstring,color);
+			drawRoute(color);
+			//draw route in main UI thread
+			RunOnUiThread(() => updateUI());
 		}
 
-		private void drawRoute(string origin, string color)
+		void drawRoute(string color)
 		{
 			Log.Debug("http", "drawroutestart");
 
@@ -358,9 +361,6 @@ namespace RoadIT
 			}
 			catch
 			{}
-
-			//draw route in main UI thread
-			RunOnUiThread(() => updateUI());
 		}
 
 		private List<LatLng> DecodePolylinePoints(string encodedPoints)
