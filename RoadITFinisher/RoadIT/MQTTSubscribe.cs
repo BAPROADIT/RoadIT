@@ -9,6 +9,7 @@ namespace RoadIT
 	[Activity(Label = "MqttSubscribe")]
 	public class MqttSubscribe : Activity, IMqttCallback
 	{
+		Finisher fin = new Finisher();
 		protected override void OnCreate(Bundle savedInstanceState)
 		{
 			base.OnCreate(savedInstanceState);
@@ -19,7 +20,7 @@ namespace RoadIT
 		{
 			Log.Debug("MqttSubscribe", message.ToString());
 			string test = message.ToString();
-			Finisher.MQTTupdate(test);
+			fin.MQTTupdate(test);
 		}
 
 		public void ConnectionLost(Throwable cause)

@@ -7,45 +7,36 @@ using Android.Locations;
 using Android.Util;
 using Android.Widget;
 using Android.Content;
-using Android.Runtime;
-using Android.Views;
-//using System.Json;
-using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-//using Java.Lang;
-
 using Org.Eclipse.Paho.Client.Mqttv3;
-using Org.Eclipse.Paho.Client.Mqttv3.Internal;
-using Org.Eclipse.Paho.Client.Mqttv3.Logging;
 using Org.Eclipse.Paho.Client.Mqttv3.Persist;
-using Org.Eclipse.Paho.Client.Mqttv3.Util;
 
 namespace RoadIT
 {
 	[Activity(Label = "Finisher")]
 	public class Finisher : Activity, ILocationListener
 	{
-		static readonly LatLng truck1loc = new LatLng(51.229241, 4.404648);
-		static LatLng cineloc = new LatLng(51.2354242, 4.4105663);
+		//static readonly LatLng truck1loc = new LatLng(51.229241, 4.404648);
 		LatLng finisherloc = new LatLng(0, 0);
 		GoogleMap map;
 		MapFragment mapFragment;
 		LocationManager locMgr;
 		string ownlocstring;
-		string truckstring;
-		string cinestring;
-		static string varloc = "";
+		//string truckstring;
+		//string cinestring;
+		//static string varloc = "";
 		string durationString;
 		JObject _Jobj;
 		string tag = "MainActivity";
+		Truck trucktoadd;
+
 		PolylineOptions polylineOptions = new PolylineOptions();
 
-		MarkerOptions markerfinisher = new MarkerOptions();
+		List<Truck> trucklist;
+
 		MarkerOptions markertruck = new MarkerOptions();
 		public static string broker = "tcp://iot.eclipse.org:1883";
 		public static string clientId = "JavaSample";
@@ -57,7 +48,7 @@ namespace RoadIT
 
 		public void OnLocationChanged(Android.Locations.Location location)
 		{
-			Toast.MakeText(this, "Location changed", ToastLength.Long).Show();
+			//Toast.MakeText(this, "Location changed", ToastLength.Long).Show();
 			finisherloc = new LatLng(location.Latitude, location.Longitude);
 			if (firstloc == true)
 			{
@@ -69,20 +60,18 @@ namespace RoadIT
 			locsToString();
 			RefreshMarkers();
 
-			Thread MapsAPICallThread = new Thread(() => mapAPICall(truckstring,"red"));
-			MapsAPICallThread.Start();
+			//Thread MapsAPICallThread = new Thread(() => mapAPICall(truckstring,"red"));
+			//MapsAPICallThread.Start();
 
-			//////multithreaded method call, prevents app stutters
-			//ThreadStart getDurationThreadStart = new ThreadStart(getDuration);
-			//Thread getDurationThread = new Thread(getDurationThreadStart);
-			//getDurationThread.Start();
+			ownlocstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".");
 
-			//////ThreadStart drawRouteThreadStart = new ThreadStart(drawRoute(ownlocstring,truckstring));
-			//Thread drawRouteThread = new Thread(() => drawRoute(truckstring, "red"));
-			//drawRouteThread.Start();
+			Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring + ",0"));
+			PublishMQTT.Start();
+		}
 
-			MQTTPublish(location.Latitude.ToString() + "," + location.Longitude.ToString() + ",0");
-
+		public void addToList(Truck truck)
+		{
+			trucklist.Add(truck);
 		}
 
 		public void MQTTPublish(string content)
@@ -106,7 +95,7 @@ namespace RoadIT
 			}
 		}
 
-		public static void MQTTupdate(string mqttmessage)
+		public void MQTTupdate(string mqttmessage)
 		{
 			Char delimiter = ',';
 			String[] substrings = mqttmessage.Split(delimiter);
@@ -116,8 +105,18 @@ namespace RoadIT
 				{
 					if (Convert.ToDouble(substrings[2]) != 0)
 					{
-						truck1loc.Latitude = Convert.ToDouble(substrings[0]);
-						truck1loc.Longitude = Convert.ToDouble(substrings[1]);
+						//truck1loc.Latitude = Convert.ToDouble(substrings[0]);
+						//truck1loc.Longitude = Convert.ToDouble(substrings[1]);
+						//TODO todouble kapot nederlands?? punten verdwijnen?
+						Log.Debug("mqttsubstring0", Convert.ToDouble(substrings[0]).ToString());
+						Log.Debug("mqttsubstring1", Convert.ToDouble(substrings[1]).ToString());
+						trucktoadd = new Truck(new LatLng(Convert.ToDouble(substrings[0]), Convert.ToDouble(substrings[1])), "red", Int32.Parse(substrings[2]));
+						trucktoadd.display();
+						trucklist.Add(trucktoadd);
+						Log.Debug("mqttupdate", "truck added");
+
+						//trucklist.Add(new Truck(new LatLng(Convert.ToDouble(substrings[0]), Convert.ToDouble(substrings[1])), "red", Int32.Parse(substrings[2])));
+						Log.Debug("trucklist", trucklist.ToString());
 						Log.Debug("MQTTinput", "Accept");
 					}
 				}
@@ -187,7 +186,7 @@ namespace RoadIT
 			Log.Debug(tag, "OnStart called");
 		}
 
-		private void InitMapFragment()
+		void InitMapFragment()
 		{
 			mapFragment = FragmentManager.FindFragmentByTag("map") as MapFragment;
 
@@ -197,7 +196,7 @@ namespace RoadIT
 					.InvokeMapType(GoogleMap.MapTypeNormal)
 					.InvokeZoomControlsEnabled(true)
 					.InvokeCompassEnabled(true);
-
+				
 				FragmentTransaction fragTx = FragmentManager.BeginTransaction();
 				mapFragment = MapFragment.NewInstance(mapOptions);
 				fragTx.Add(Resource.Id.map, mapFragment, "map");
@@ -206,20 +205,39 @@ namespace RoadIT
 
 		}
 
-		private void SetupAnimateToButton()
+		void SetupAnimateToButton()
 		{
 			Button RouteButton = FindViewById<Button>(Resource.Id.routeButton);
 			RouteButton.Click += (sender, e) =>
 			{
-				Toast.MakeText(this, "Button Pressed", ToastLength.Long).Show();
+				//Toast.MakeText(this, "Button Pressed", ToastLength.Long).Show();
 				//Thread drawRouteThread2 = new Thread(() => drawRoute(varloc, "blue"));
-				Thread mapAPICall2 = new Thread(() => mapAPICall(varloc, "blue"));
-				mapAPICall2.Start();
+
+				//trucklist.Add(trucktoadd);
+				if (trucklist != null)
+				{
+					if (trucklist.Count() != 0)
+					{
+						foreach (Truck aTruck in trucklist)
+						{
+							Thread mapAPICall2 = new Thread(() => mapAPICall(aTruck.getlocstring(), "blue"));
+							mapAPICall2.Start();
+						}
+					}
+					else {
+						Toast.MakeText(this, "List empty", ToastLength.Long).Show();
+					}
+				}
+				else {
+					Toast.MakeText(this, "List null", ToastLength.Long).Show();
+				}
+
+
 			};
 		}
 
 		//niet meer nodig
-		private void ZoomOnLoc()
+		void ZoomOnLoc()
 		{
 			CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
 			builder.Target(finisherloc);
@@ -233,22 +251,22 @@ namespace RoadIT
 			map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
 		}
 
-		private void InitMarkers()
+		void InitMarkers()
 		{
 			map = mapFragment.Map;
 			BitmapDescriptor truck = BitmapDescriptorFactory.FromResource(Resource.Drawable.truck);
-			markertruck.SetPosition(truck1loc);
+			//markertruck.SetPosition(truck1loc);
 			markertruck.SetTitle("Truck");
 			markertruck.SetIcon(truck);
-			map.AddMarker(markertruck);
+			//map.AddMarker(markertruck);
 
 			//blue location
 			map.MyLocationEnabled = true;
 		}
 
-		private void RefreshMarkers()
+		void RefreshMarkers()
 		{
-			markertruck.SetPosition(truck1loc);
+			//markertruck.SetPosition(truck1loc);
 		}
 
 		public void OnProviderDisabled(string provider)
@@ -264,18 +282,17 @@ namespace RoadIT
 			Log.Debug(tag, provider + " availability has changed to " + status.ToString());
 		}
 
-		private void locsToString()
+		void locsToString()
 		{
 			//TODO , vervangen door punt
-			ownlocstring = finisherloc.Latitude.ToString() + "," + finisherloc.Longitude.ToString();
-			truckstring = truck1loc.Latitude.ToString() + "," + truck1loc.Longitude.ToString();
-			cinestring = cineloc.Latitude.ToString() + "," + cineloc.Longitude.ToString();
+			//truckstring = truck1loc.Latitude.ToString().Replace(",",".") + "," + truck1loc.Longitude.ToString().Replace(",",".");
+			//cinestring = cineloc.Latitude.ToString().Replace(",",".") + "," + cineloc.Longitude.ToString().Replace(",",".");
 		}
 
-		private void getDuration()
+		void getDuration()
 		{
 			//animateButton.Text = "Duration: " + getDistanceTo(ownlocstring,truckstring);
-			durationString = "ETA of nearest truck: " + getDistanceTo(ownlocstring, truckstring) + "s";
+			durationString = "ETA of nearest truck: " + getDistanceTo() + "s";
 
 			TextView durationtextfield = FindViewById<TextView>(Resource.Id.durationText);
 
@@ -286,19 +303,15 @@ namespace RoadIT
 		void updateUI()
 		{
 			map.Clear();
-			map.AddMarker(markertruck);
+			//map.AddMarker(markertruck);
 			map.AddPolyline(polylineOptions);
 		}
 
-		public int getDistanceTo(string origin, string destination)
+		public int getDistanceTo()
 		{
 			//System.Threading.Thread.Sleep(50);
 
 			int duration = -1;
-			//string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + destination + "&sensor=false";
-			//string requesturl = url; string content = fileGetJSON(requesturl);
-			//Log.Debug("httpcontent", content);
-			//_Jobj = JObject.Parse(content);
 			try
 			{
 				duration = (int)_Jobj.SelectToken("routes[0].legs[0].duration.value");
@@ -310,9 +323,9 @@ namespace RoadIT
 			}
 		}
 
-		private void mapAPICall(string origin, string color)
+		void mapAPICall(string origin, string color)
 		{
-			System.Threading.Thread.Sleep(50);
+			//System.Threading.Thread.Sleep(50);
 
 			try
 			{
@@ -323,10 +336,14 @@ namespace RoadIT
 			}
 			catch { }
 
-			getDuration();
-			drawRoute(color);
-			//draw route in main UI thread
-			RunOnUiThread(() => updateUI());
+			Thread durationThread = new Thread(() => getDuration());
+			durationThread.Start();
+
+			Thread drawRouteThread = new Thread(() => drawRoute(color));
+			drawRouteThread.Start();
+
+			////draw route in main UI thread
+			//RunOnUiThread(() => updateUI());
 		}
 
 		void drawRoute(string color)
@@ -361,9 +378,11 @@ namespace RoadIT
 			}
 			catch
 			{}
+			//draw route in main UI thread
+			RunOnUiThread(() => updateUI());
 		}
 
-		private List<LatLng> DecodePolylinePoints(string encodedPoints)
+		List<LatLng> DecodePolylinePoints(string encodedPoints)
 		{
 			if (encodedPoints == null || encodedPoints == "") return null;
 			List<LatLng> poly = new List<LatLng>();
@@ -445,7 +464,6 @@ namespace RoadIT
 			catch { _sData = "unable to connect to server "; }
 			return _sData;
 		}
-		
 	}
 }
 

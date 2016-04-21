@@ -100,8 +100,11 @@ namespace RoadIT
 			////ThreadStart drawRouteThreadStart = new ThreadStart(drawRoute(ownlocstring,truckstring));
 			//Thread drawRouteThread = new Thread(() => drawRoute(finisherstring, "red"));
 			//drawRouteThread.Start();
-			//MQTTPublish (location.Latitude.ToString () + "," + location.Longitude.ToString () + ",1");
 
+			ownlocstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".");
+
+			Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring + ",1"));
+			PublishMQTT.Start();
 		}
 
 		public void MQTTPublish(string content) {
@@ -258,9 +261,8 @@ namespace RoadIT
 
 		private void locsToString()
 		{
-			ownlocstring = truckloc.Latitude.ToString() + "," + truckloc.Longitude.ToString();
-			finisherstring = finisherloc.Latitude.ToString() + "," + finisherloc.Longitude.ToString();
-			cinestring = cineloc.Latitude.ToString() + "," + cineloc.Longitude.ToString();
+			finisherstring = finisherloc.Latitude.ToString().Replace(",",".") + "," + finisherloc.Longitude.ToString().Replace(",",".");
+			cinestring = cineloc.Latitude.ToString().Replace(",",".") + "," + cineloc.Longitude.ToString().Replace(",",".");
 		}
 
 		private void getDuration()

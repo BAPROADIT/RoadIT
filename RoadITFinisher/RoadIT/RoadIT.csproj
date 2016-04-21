@@ -79,6 +79,7 @@
     <Compile Include="MQTTSubscribe.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
     <Compile Include="PermissionUtil.cs" />
+    <Compile Include="Truck.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
