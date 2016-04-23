@@ -8,17 +8,20 @@ namespace RoadIT
 	{
 		private LatLng location;
 		private string color;
+		private int duration;
 		private int id;
 		private string locstring;
 		private PolylineOptions polylineOptions;
 		private MarkerOptions marker;
+		private string[] colorarray = new string[] { "red", "blue" };
 
-		public Truck(LatLng location, string color, int id)
+		public Truck(LatLng location, int id)
 		{
 			this.location = location;
-			this.color = color;
+			color = colorarray[id-1];
 			this.id = id;
-			locstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".") + "," + id;
+			locstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".");//+ "," + id;
+			polylineOptions = new PolylineOptions();
 		}
 
 		public string getcolor()
@@ -31,9 +34,34 @@ namespace RoadIT
 			return id;
 		}
 
+		public void setDuration(int duration)
+		{
+			this.duration = duration;
+		}
+
+		public int getDuration()
+		{
+			return duration;
+		}
+
 		public string getlocstring()
 		{
 			return locstring;
+		}
+
+		public void setPolylineOptions(PolylineOptions poly)
+		{
+			polylineOptions = poly;
+		}
+
+		public PolylineOptions getPolylineOptions()
+		{
+			return polylineOptions;
+		}
+
+		public MarkerOptions getMarker()
+		{
+			return marker;
 		}
 
 		public void display()

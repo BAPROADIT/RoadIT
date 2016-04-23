@@ -39,8 +39,10 @@ namespace RoadIT
 			initLocationManager();
 			RequestInternetPermission();
 
-			SampleActivity activity = new SampleActivity(1, 2, typeof(Finisher));
-			activity.Start(this);
+
+
+			SampleActivity activityfin = new SampleActivity(1, 2, typeof(Finisher));
+			activityfin.Start(this);
 
 			// Set our view from the "main" layout resource
 			//SetContentView(Resource.Layout.Main);

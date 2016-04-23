@@ -6,10 +6,15 @@ using Org.Eclipse.Paho.Client.Mqttv3;
 
 namespace RoadIT
 {
-	[Activity(Label = "MqttSubscribe")]
+	//[Activity(Label = "MqttSubscribe")]
 	public class MqttSubscribe : Activity, IMqttCallback
 	{
-		Finisher fin = new Finisher();
+		Finisher fin;
+		public MqttSubscribe(Finisher myfin)
+		{
+			fin = myfin;
+		}
+
 		protected override void OnCreate(Bundle savedInstanceState)
 		{
 			base.OnCreate(savedInstanceState);
@@ -20,6 +25,7 @@ namespace RoadIT
 		{
 			Log.Debug("MqttSubscribe", message.ToString());
 			string test = message.ToString();
+			//Finisher.MQTTupdate(test);
 			fin.MQTTupdate(test);
 		}
 

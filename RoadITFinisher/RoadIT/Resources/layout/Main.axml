@@ -7,7 +7,7 @@
         android:id="@+id/routeButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Press to show MQQTroute" />
+        android:text="Press to show MQTTroute" />
     <TextView
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_width="match_parent"
