@@ -33,7 +33,6 @@ namespace RoadIT
 
 		List<Truck> trucklist = new List<Truck>();
 
-		//MarkerOptions markertruck = new MarkerOptions();
 		public static string broker = "tcp://iot.eclipse.org:1883";
 		public static string clientId = "JavaSample";
 
@@ -56,12 +55,9 @@ namespace RoadIT
 			}
 			locsToString();
 			RefreshMarkers();
-			InitMarkers();
 
 
 			updateUI();
-			//Thread MapsAPICallThread = new Thread(() => mapAPICall(truckstring,"red"));
-			//MapsAPICallThread.Start();
 
 			ownlocstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".");
 
@@ -100,8 +96,6 @@ namespace RoadIT
 				{
 					if (Convert.ToDouble(substrings[2]) != 0)
 					{
-						//truck1loc.Latitude = Convert.ToDouble(substrings[0]);
-						//truck1loc.Longitude = Convert.ToDouble(substrings[1]);
 						//TODO todouble kapot nederlands?? punten verdwijnen?
 						Log.Debug("mqttsubstring0", Convert.ToDouble(substrings[0]).ToString());
 						Log.Debug("mqttsubstring1", Convert.ToDouble(substrings[1]).ToString());
@@ -117,20 +111,13 @@ namespace RoadIT
 								aTruck.display();
 								Thread mapAPICall2 = new Thread(() => mapAPICall(aTruck));
 								mapAPICall2.Start();
-								//mapAPICall(aTruck);
 							}
-
-							//TODO update ui
-							Log.Debug("uishit", "voor");
 							RunOnUiThread(() => updateUI());
-							Log.Debug("uishit", "na");
 
 						}
 						else {
 							Toast.MakeText(this, "List empty", ToastLength.Long).Show();
 						}
-
-
 					}
 				}
 				catch
@@ -213,7 +200,7 @@ namespace RoadIT
 				FragmentTransaction fragTx = FragmentManager.BeginTransaction();
 				mapFragment = MapFragment.NewInstance(mapOptions);
 				fragTx.Add(Resource.Id.map, mapFragment, "map");
-				fragTx.Commit();
+					fragTx.Commit();
 			}
 
 		}
@@ -223,12 +210,10 @@ namespace RoadIT
 			Button RouteButton = FindViewById<Button>(Resource.Id.routeButton);
 			RouteButton.Click += (sender, e) =>
 			{
-				Toast.MakeText(this, "Button Pressed", ToastLength.Long).Show();
-				//Thread drawRouteThread2 = new Thread(() => drawRoute(varloc, "blue"));
-				//Thread PublishMQTTtest = new Thread(() => MQTTPublish(ownlocstring + ",1"));
-				//PublishMQTTtest.Start();
-
-				RunOnUiThread(() => map.Clear());
+				Thread PublishMQTT = new Thread(() => MQTTPublish("51.2074277,4.2935036,1"));
+				PublishMQTT.Start();
+				Thread PublishMQTT2 = new Thread(() => MQTTPublish("51.1074277,5.935036,2"));
+				PublishMQTT2.Start();
 			};
 		}
 
@@ -250,7 +235,6 @@ namespace RoadIT
 		public void InitMarkers()
 		{
 			map = mapFragment.Map;
-			BitmapDescriptor truck = BitmapDescriptorFactory.FromResource(Resource.Drawable.truck);
 			//markertruck.SetPosition(truck1loc);
 			//markertruck.SetTitle("Truck");
 			//markertruck.SetIcon(truck);
@@ -301,12 +285,16 @@ namespace RoadIT
 
 		public void updateUI()
 		{
-			
+			BitmapDescriptor truck = BitmapDescriptorFactory.FromResource(Resource.Drawable.truck);
 			map.Clear();
 			foreach (Truck aTruck in trucklist)
 			{
-				//map.AddMarker(aTruck.getMarker());
 				map.AddPolyline(aTruck.getPolylineOptions());
+				MarkerOptions markertruck = new MarkerOptions();
+				markertruck.SetPosition(aTruck.getLocation());
+				markertruck.SetTitle("Truck");
+				markertruck.SetIcon(truck);
+				map.AddMarker(markertruck);
 			}
 		}
 

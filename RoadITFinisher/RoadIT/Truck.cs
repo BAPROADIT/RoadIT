@@ -64,6 +64,11 @@ namespace RoadIT
 			return marker;
 		}
 
+		public LatLng getLocation()
+		{
+			return location;
+		}
+
 		public void display()
 		{
 			Log.Debug("truckdisploc", locstring);
