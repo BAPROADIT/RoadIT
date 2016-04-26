@@ -6,9 +6,15 @@ using Org.Eclipse.Paho.Client.Mqttv3;
 
 namespace RoadIT
 {
-	[Activity(Label = "MqttSubscribe")]
+	//[Activity(Label = "MqttSubscribe")]
 	public class MqttSubscribe : Activity, IMqttCallback
 	{
+		Truck truck;
+		public MqttSubscribe(Truck mytruck)
+		{
+			truck = mytruck;
+		}
+
 		protected override void OnCreate(Bundle savedInstanceState)
 		{
 			base.OnCreate(savedInstanceState);
@@ -20,7 +26,7 @@ namespace RoadIT
 			Log.Debug("MqttSubscribe", message.ToString());
 			string test = message.ToString();
 			//Truck.MQTTin(test);
-			Truck.MQTTupdate(test);
+			truck.MQTTupdate(test);
 		}
 
 		public void ConnectionLost(Throwable cause)

@@ -55,7 +55,7 @@ namespace RoadIT
 
 		bool firstloc = true;
 
-		public static void MQTTupdate(string mqttmessage){
+		public void MQTTupdate(string mqttmessage){
 			Char delimiter = ',';
 			String[] substrings = mqttmessage.Split(delimiter);
 			if (substrings.Length == 3) {
@@ -64,6 +64,9 @@ namespace RoadIT
 						finisherloc.Latitude = Convert.ToDouble (substrings [0]);
 						finisherloc.Longitude = Convert.ToDouble (substrings [1]);
 						finisherstring = mqttmessage;
+						Thread mapAPICall2 = new Thread(() => mapAPICall(finisherstring, "blue"));
+						mapAPICall2.Start();
+						RunOnUiThread(() => updateUI());
 						Log.Debug ("MQTTinput", "Accept");
 					}
 					} 
@@ -105,6 +108,7 @@ namespace RoadIT
 
 			Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring + ",1"));
 			PublishMQTT.Start();
+			//updateUI();
 		}
 
 		public void MQTTPublish(string content) {
@@ -131,7 +135,7 @@ namespace RoadIT
 			SetContentView(Resource.Layout.Main);
 			InitMapFragment();
 			//SetupAnimateToButton();
-			Client.SetCallback(new MqttSubscribe());
+			Client.SetCallback(new MqttSubscribe(this));
 			ConfigMQTT();
 		}
 
