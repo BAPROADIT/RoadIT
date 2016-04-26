@@ -91,8 +91,8 @@ namespace RoadIT
 			locsToString();
 			RefreshMarkers();
 
-			Thread MapsAPICallThread = new Thread(() => mapAPICall(finisherstring, "red"));
-			MapsAPICallThread.Start();
+			//Thread MapsAPICallThread = new Thread(() => mapAPICall(finisherstring, "red"));
+			//MapsAPICallThread.Start();
 
 
 			////multithreaded method call, prevents app stutters

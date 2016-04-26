@@ -25,7 +25,6 @@ namespace RoadIT
 		{
 			Log.Debug("MqttSubscribe", message.ToString());
 			string test = message.ToString();
-			//Finisher.MQTTupdate(test);
 			fin.MQTTupdate(test);
 		}
 

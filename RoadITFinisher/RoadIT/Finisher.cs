@@ -19,7 +19,6 @@ namespace RoadIT
 	[Activity(Label = "Finisher")]
 	public class Finisher : Activity, ILocationListener
 	{
-		//static readonly LatLng truck1loc = new LatLng(51.229241, 4.404648);
 		LatLng finisherloc = new LatLng(0, 0);
 		public GoogleMap map;
 		MapFragment mapFragment;
@@ -28,8 +27,7 @@ namespace RoadIT
 		string durationString;
 		JObject _Jobj;
 		string tag = "MainActivity";
-
-		//PolylineOptions polylineOptions = new PolylineOptions();
+		int min = 10000000;
 
 		List<Truck> trucklist = new List<Truck>();
 
@@ -55,7 +53,6 @@ namespace RoadIT
 			}
 			locsToString();
 			RefreshMarkers();
-
 
 			updateUI();
 
@@ -100,7 +97,22 @@ namespace RoadIT
 						Log.Debug("mqttsubstring0", Convert.ToDouble(substrings[0]).ToString());
 						Log.Debug("mqttsubstring1", Convert.ToDouble(substrings[1]).ToString());
 
-						trucklist.Add(new Truck(new LatLng(Convert.ToDouble(substrings[0]), Convert.ToDouble(substrings[1])), Int32.Parse(substrings[2])));
+						int id = Int32.Parse(substrings[2]);
+						bool exists = false;
+						foreach (Truck aTruck in trucklist)
+						{
+							if (aTruck.getid() == id)
+							{
+								exists = true;
+								aTruck.setLocation(new LatLng(Convert.ToDouble(substrings[0]), Convert.ToDouble(substrings[1])));
+							}
+						}
+						if (exists == false)
+						{
+							trucklist.Add(new Truck(new LatLng(Convert.ToDouble(substrings[0]), Convert.ToDouble(substrings[1])), id));
+						}
+
+
 						Log.Debug("trucklistelements", trucklist.Count().ToString());
 						Log.Debug("MQTTinput", "Accept");
 
@@ -212,12 +224,18 @@ namespace RoadIT
 			{
 				Thread PublishMQTT = new Thread(() => MQTTPublish("51.2074277,4.2935036,1"));
 				PublishMQTT.Start();
-				Thread PublishMQTT2 = new Thread(() => MQTTPublish("51.1074277,5.935036,2"));
+				Thread PublishMQTT2 = new Thread(() => MQTTPublish("51.1074277,5.135036,2"));
 				PublishMQTT2.Start();
+				Thread PublishMQTT3 = new Thread(() => MQTTPublish("51.0074277,5.335036,3"));
+				PublishMQTT3.Start();
+				Thread PublishMQTT4 = new Thread(() => MQTTPublish("50.8074277,4.555036,4"));
+				PublishMQTT4.Start();
+
+				//map.Clear();
+				//updateUI();
 			};
 		}
 
-		//niet meer nodig
 		void ZoomOnLoc()
 		{
 			CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
@@ -272,12 +290,24 @@ namespace RoadIT
 		public void getDuration(Truck truck)
 		{
 			//animateButton.Text = "Duration: " + getDistanceTo(ownlocstring,truckstring);
+
 			int dur = getDistanceTo();
 			truck.setDuration(dur);
+			foreach (Truck aTruck in trucklist)
+			{
+				if (aTruck.getDuration() < min)
+				{
+					min = aTruck.getDuration();
+					aTruck.setNearest(true);
+				}
+				else
+				{
+					aTruck.setNearest(false);
+				}
+			}
+
 			durationString = "ETA of nearest truck: " + dur + "s";
-
 			TextView durationtextfield = FindViewById<TextView>(Resource.Id.durationText);
-
 
 			//update textfield in main UI thread
 			RunOnUiThread(() => durationtextfield.Text = durationString);
@@ -347,7 +377,13 @@ namespace RoadIT
 
 			PolylineOptions temppoly = new PolylineOptions();
 
-			if (truck.getcolor() == "blue")
+
+			//green for nearest truck
+			if (truck.getNearest() == true)
+			{
+				temppoly.InvokeColor(0x6600cc00);
+			}
+			else if (truck.getcolor() == "blue")
 			{
 				temppoly.InvokeColor(0x66000099);
 			}
@@ -355,10 +391,19 @@ namespace RoadIT
 			{
 				temppoly.InvokeColor(0x66ff0000);
 			}
+			else if (truck.getcolor() == "orange")
+			{
+				temppoly.InvokeColor(0x66ff9900);
+			}
+			else if (truck.getcolor() == "purple")
+			{
+				temppoly.InvokeColor(0x669933ff);
+			}
 			else
 			{
 				temppoly.InvokeColor(0x66000099);
 			}
+			
 
 			temppoly.InvokeWidth(9);
 			try
