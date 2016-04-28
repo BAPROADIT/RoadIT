@@ -16,7 +16,8 @@ using Org.Eclipse.Paho.Client.Mqttv3.Persist;
 
 namespace RoadIT
 {
-	[Activity(Label = "Finisher")]
+	//prevents activity from restarting when screen orientation changes
+	[Activity(Label = "Finisher", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation)]
 	public class Finisher : Activity, ILocationListener
 	{
 		LatLng finisherloc = new LatLng(0, 0);
@@ -27,11 +28,12 @@ namespace RoadIT
 		string durationString;
 		JObject _Jobj;
 		string tag = "MainActivity";
-		int min = 10000000;
 
 		List<Truck> trucklist = new List<Truck>();
 
 		public static string broker = "tcp://iot.eclipse.org:1883";
+		//public static string broker = "tcp://nasdenys.synology.me:1883";
+
 		public static string clientId = "JavaSample";
 
 		public static MemoryPersistence persistence = new MemoryPersistence();
@@ -51,13 +53,9 @@ namespace RoadIT
 				locsToString();
 				firstloc = false;
 			}
-			locsToString();
+
 			RefreshMarkers();
-
-			updateUI();
-
 			ownlocstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".");
-
 			Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring + ",0"));
 			PublishMQTT.Start();
 		}
@@ -105,31 +103,33 @@ namespace RoadIT
 							{
 								exists = true;
 								aTruck.setLocation(new LatLng(Convert.ToDouble(substrings[0]), Convert.ToDouble(substrings[1])));
+								Thread mapAPICall2 = new Thread(() => mapAPICall(aTruck));
+								mapAPICall2.Start();
 							}
 						}
 						if (exists == false)
 						{
 							trucklist.Add(new Truck(new LatLng(Convert.ToDouble(substrings[0]), Convert.ToDouble(substrings[1])), id));
+
+							Thread mapAPICall3 = new Thread(() => mapAPICall(trucklist.Find(t => t.getid() == id)));
+							mapAPICall3.Start();
 						}
 
 
 						Log.Debug("trucklistelements", trucklist.Count().ToString());
 						Log.Debug("MQTTinput", "Accept");
 
-						if (trucklist.Count() != 0)
-						{
-							foreach (Truck aTruck in trucklist)
-							{
-								aTruck.display();
-								Thread mapAPICall2 = new Thread(() => mapAPICall(aTruck));
-								mapAPICall2.Start();
-							}
-							RunOnUiThread(() => updateUI());
-
-						}
-						else {
-							Toast.MakeText(this, "List empty", ToastLength.Long).Show();
-						}
+						//if (trucklist.Count() != 0)
+						//{
+						//	foreach (Truck aTruck in trucklist)
+						//	{
+						//		Thread mapAPICall2 = new Thread(() => mapAPICall(aTruck));
+						//		mapAPICall2.Start();
+						//	}
+						//}
+						//else {
+						//	Toast.MakeText(this, "List empty", ToastLength.Long).Show();
+						//}
 					}
 				}
 				catch
@@ -224,12 +224,16 @@ namespace RoadIT
 			{
 				Thread PublishMQTT = new Thread(() => MQTTPublish("51.2074277,4.2935036,1"));
 				PublishMQTT.Start();
+				Thread.Sleep(50);
 				Thread PublishMQTT2 = new Thread(() => MQTTPublish("51.1074277,5.135036,2"));
 				PublishMQTT2.Start();
+				Thread.Sleep(50);
 				Thread PublishMQTT3 = new Thread(() => MQTTPublish("51.0074277,5.335036,3"));
 				PublishMQTT3.Start();
+				Thread.Sleep(50);
 				Thread PublishMQTT4 = new Thread(() => MQTTPublish("50.8074277,4.555036,4"));
 				PublishMQTT4.Start();
+				Thread.Sleep(50);
 
 				//map.Clear();
 				//updateUI();
@@ -289,40 +293,53 @@ namespace RoadIT
 
 		public void getDuration(Truck truck)
 		{
-			//animateButton.Text = "Duration: " + getDistanceTo(ownlocstring,truckstring);
-
 			int dur = getDistanceTo();
-			truck.setDuration(dur);
+			int min = int.MaxValue;
+
+			truck.setDur(dur);
+
+			Log.Debug("durationmin", min.ToString());
+			Log.Debug("durationdur", dur.ToString());
+
 			foreach (Truck aTruck in trucklist)
 			{
-				if (aTruck.getDuration() < min)
-				{
-					min = aTruck.getDuration();
-					aTruck.setNearest(true);
-				}
-				else
-				{
-					aTruck.setNearest(false);
-				}
+				aTruck.setNearest(false);
 			}
 
-			durationString = "ETA of nearest truck: " + dur + "s";
+			//sort on duration -> nearest truck first in list
+			trucklist.Sort((x, y) => x.getDur().CompareTo(y.getDur()));
+
+			trucklist.First().setNearest(true);
+
+			durationString = "ETA of nearest truck: " + trucklist.First().getDur() + "s";
 			TextView durationtextfield = FindViewById<TextView>(Resource.Id.durationText);
 
 			//update textfield in main UI thread
 			RunOnUiThread(() => durationtextfield.Text = durationString);
+
+			Thread drawRouteThread = new Thread(() => drawRoute(truck));
+			drawRouteThread.Start();
+
+
 		}
 
 		public void updateUI()
 		{
 			BitmapDescriptor truck = BitmapDescriptorFactory.FromResource(Resource.Drawable.truck);
 			map.Clear();
-			foreach (Truck aTruck in trucklist)
+
+			//temp variable -> no chance of changes in foreach
+			List<Truck> listtemp = trucklist;
+
+			Log.Debug("updateUI", "list of trucks");
+
+			foreach (Truck aTruck in listtemp)
 			{
+				aTruck.display();
 				map.AddPolyline(aTruck.getPolylineOptions());
 				MarkerOptions markertruck = new MarkerOptions();
 				markertruck.SetPosition(aTruck.getLocation());
-				markertruck.SetTitle("Truck");
+				markertruck.SetTitle("Truck " + aTruck.getid() + " arrives in: " + aTruck.getDur() + "s");
 				markertruck.SetIcon(truck);
 				map.AddMarker(markertruck);
 			}
@@ -364,8 +381,8 @@ namespace RoadIT
 			Thread durationThread = new Thread(() => getDuration(truck));
 			durationThread.Start();
 
-			Thread drawRouteThread = new Thread(() => drawRoute(truck));
-			drawRouteThread.Start();
+			//Thread drawRouteThread = new Thread(() => drawRoute(truck));
+			//drawRouteThread.Start();
 
 			////draw route in main UI thread
 			//RunOnUiThread(() => updateUI());
@@ -377,33 +394,38 @@ namespace RoadIT
 
 			PolylineOptions temppoly = new PolylineOptions();
 
-
 			//green for nearest truck
 			if (truck.getNearest() == true)
 			{
+				Log.Debug("drawroute", "nearest");
 				temppoly.InvokeColor(0x6600cc00);
 			}
 			else if (truck.getcolor() == "blue")
 			{
+				Log.Debug("drawroute", truck.getid() + truck.getcolor() + "moet blue zijn");
 				temppoly.InvokeColor(0x66000099);
 			}
 			else if (truck.getcolor() == "red")
 			{
+				Log.Debug("drawroute", truck.getid() + truck.getcolor() + "moet red zijn");
 				temppoly.InvokeColor(0x66ff0000);
 			}
 			else if (truck.getcolor() == "orange")
 			{
+				Log.Debug("drawroute", truck.getid() + truck.getcolor() + "moet orange zijn");
 				temppoly.InvokeColor(0x66ff9900);
 			}
 			else if (truck.getcolor() == "purple")
 			{
+				Log.Debug("drawroute", truck.getid() + truck.getcolor() + "moet purple zijn");
 				temppoly.InvokeColor(0x669933ff);
 			}
 			else
 			{
+				//blue
+				Log.Debug("drawroute", "else");
 				temppoly.InvokeColor(0x66000099);
 			}
-			
 
 			temppoly.InvokeWidth(9);
 			try

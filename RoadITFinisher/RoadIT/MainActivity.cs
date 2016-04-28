@@ -12,8 +12,8 @@ using Android.Views;
 
 namespace RoadIT
 {
-	[Activity(Label = "RoadIT", MainLauncher = true, Icon = "@mipmap/icon")]
-	public class MainActivity : ListActivity
+	[Activity(Label = "MainActivity", MainLauncher = true, Icon = "@mipmap/icon")]
+	public class MainActivity : Activity//ListActivity
 	{
 		public static readonly string Tag = "ROAD IT";
 		public static readonly int InstallGooglePlayServicesId = 1000;
@@ -38,8 +38,6 @@ namespace RoadIT
 			_isGooglePlayServicesInstalled = TestIfGooglePlayServicesIsInstalled();
 			initLocationManager();
 			RequestInternetPermission();
-
-
 
 			SampleActivity activityfin = new SampleActivity(1, 2, typeof(Finisher));
 			activityfin.Start(this);

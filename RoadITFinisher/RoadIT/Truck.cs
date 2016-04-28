@@ -50,12 +50,12 @@ namespace RoadIT
 			return id;
 		}
 
-		public void setDuration(int duration)
+		public void setDur(int duration)
 		{
 			this.duration = duration;
 		}
 
-		public int getDuration()
+		public int getDur()
 		{
 			return duration;
 		}
@@ -89,8 +89,9 @@ namespace RoadIT
 		public void display()
 		{
 			Log.Debug("truckdisploc", locstring);
-			Log.Debug("truckdispcoolor", color);
-			Log.Debug("truckdsipid", id.ToString());
+			Log.Debug("truckdispnearest", nearest.ToString());
+			Log.Debug("truckdispcolor", color);
+			Log.Debug("truckdispid", id.ToString());
 		}
 
 
