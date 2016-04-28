@@ -8,7 +8,7 @@ using Android.Support.V4.App;
 
 namespace RoadIT
 {
-	[Activity(Label = "Truck", MainLauncher = true, Icon = "@mipmap/icon")]
+	[Activity(Label = "RoadIT", MainLauncher = true, Icon = "@mipmap/icon")]
 	public class MainActivity : ListActivity
 	{
 		//int count = 1;

@@ -12,8 +12,8 @@ using Android.Views;
 
 namespace RoadIT
 {
-	[Activity(Label = "Finisher", MainLauncher = true, Icon = "@mipmap/icon")]
-	public class MainActivity : Activity
+	[Activity(Label = "MainActivity", MainLauncher = true, Icon = "@mipmap/icon")]
+	public class MainActivity : Activity//ListActivity
 	{
 		public static readonly string Tag = "ROAD IT";
 		public static readonly int InstallGooglePlayServicesId = 1000;

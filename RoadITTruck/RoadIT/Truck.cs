@@ -27,7 +27,7 @@ using Org.Eclipse.Paho.Client.Mqttv3.Util;
 
 namespace RoadIT
 {
-	[Activity(Label = "Truck", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation)]
+	[Activity(Label = "Truck")]
 	public class Truck : Activity, ILocationListener
 	{
 		static LatLng finisherloc = new LatLng(51.229241, 4.404648);
@@ -66,6 +66,7 @@ namespace RoadIT
 						finisherstring = mqttmessage;
 						Thread mapAPICall2 = new Thread(() => mapAPICall(finisherstring, "blue"));
 						mapAPICall2.Start();
+						RunOnUiThread(() => updateUI());
 						Log.Debug ("MQTTinput", "Accept");
 					}
 					} 
