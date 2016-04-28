@@ -11,7 +11,7 @@
 	<AndroidResgenClass>Resource</AndroidResgenClass>
 	<RootNamespace>RoadIT</RootNamespace>
     <AssemblyName>RoadIT</AssemblyName>
-    <TargetFrameworkVersion>v6.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v6.0.99</TargetFrameworkVersion>
     <AndroidApplication>True</AndroidApplication>
     <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>	
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
@@ -96,6 +96,7 @@
     <AndroidResource Include="Resources\mipmap-xxhdpi\Icon.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\Icon.png" />
     <AndroidResource Include="Resources\drawable\truck.png" />
+    <AndroidResource Include="Resources\layout\Finisher.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
