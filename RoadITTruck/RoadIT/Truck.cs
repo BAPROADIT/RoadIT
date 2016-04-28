@@ -105,7 +105,7 @@ namespace RoadIT
 
 			ownlocstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".");
 
-			Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring + ",1"));
+			Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring + ",8"));
 			PublishMQTT.Start();
 			//updateUI();
 		}
@@ -113,7 +113,7 @@ namespace RoadIT
 		public void MQTTPublish(string content) {
 
 			string topic        = "fin";
-			int qos             = 2;
+			int qos             = 0;
 			MemoryPersistence persistence = new MemoryPersistence();
 
 			try {

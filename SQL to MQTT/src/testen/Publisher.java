@@ -1,14 +1,6 @@
 package testen;
-
-import java.util.*;
-import java.time.*;
 //import java.io.File;
 import java.io.IOException;
-//import java.io.PrintWriter;
-//import java.nio.file.Files;
-//import java.nio.file.Paths;
-//import java.nio.file.StandardOpenOption;
-//import deleteFiles.*;
 import org.eclipse.paho.client.mqttv3.*;
 import de.dobermai.eclipsemagazin.paho.client.util.Utils;
 import java.sql.Connection;
@@ -17,7 +9,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Time;
 //import java.sql.Time;
 
 public class Publisher {
@@ -26,7 +17,6 @@ public class Publisher {
 
 	private static void publish(String message) throws MqttException {
 		final MqttTopic topic = client.getTopic(Topic); // Set topic
-		//System.out.println("Published data. Topic: " + topic.getName() + "  Message: " + message);
 		MqttMessage test = new MqttMessage();
 		test.setQos(0);
 		test.setPayload(message.getBytes());
@@ -63,52 +53,15 @@ public class Publisher {
 			System.out.println("SQLState: " + ex.getSQLState());
 			System.out.println("VendorError: " + ex.getErrorCode());
 		}
-
-		/*String clientId = Utils.getMacAddress() + "-pub"; // get unique ID try
-		try {
-			client = new MqttClient("tcp://iot.eclipse.org:1883", clientId);
-			// initiliaze MQTTClient
-
-		} catch (MqttException e) {
-			e.printStackTrace();
-			System.exit(1);
-		}*/
-		/*try {
-			MqttConnectOptions options = new MqttConnectOptions();
-			options.setCleanSession(false);
-			options.setUserName("username");
-			options.setPassword("password".toCharArray());
-			client.connect(options); // connect to client
-
-			// Publish data forever
-			while (true) {
-
-				Thread.sleep(500);
-				publish("test");
-			}
-		} catch (MqttException e) {
-			e.printStackTrace();
-			System.exit(1);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}*/
-
 	}
 
 	private static void writeData(ResultSet resultSet) throws SQLException, InterruptedException {
-		//System.out.println("The columns in the table are: ");
-
-		//System.out.println("Table: " + resultSet.getMetaData().getTableName(1));
-		//for (int i = 1; i <= resultSet.getMetaData().getColumnCount(); i++) {
-		//	System.out.println("Column " + i + " " + resultSet.getMetaData().getColumnName(i));
-
-		//}
 		float time;
 		float oldtime = 0;
 		boolean first = true;
 		String clientId = Utils.getMacAddress() + "-pub"; // get unique ID try
 		try {
-			client = new MqttClient("tcp://iot.eclipse.org:1883", clientId);
+			client = new MqttClient("tcp://nasdenys.synology.me:1883", clientId);
 			// initiliaze MQTTClient
 
 		} catch (MqttException e) {
@@ -143,8 +96,8 @@ public class Publisher {
 			try {
 				MqttConnectOptions options = new MqttConnectOptions();
 				options.setCleanSession(false);
-				options.setUserName("username");
-				options.setPassword("password".toCharArray());
+				options.setUserName("fin");
+				options.setPassword("fin".toCharArray());
 				client.connect(options); // connect to client
 					publish(resultSet.getString("string"));
 				client.disconnect();

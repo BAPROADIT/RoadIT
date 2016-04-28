@@ -19,7 +19,8 @@ public class Subscriber {
 
         try {
 
-        	mqttClient = new MqttClient("tcp://iot.eclipse.org:1883", clientId);
+        	//mqttClient = new MqttClient("tcp://iot.eclipse.org:1883", clientId);
+        	mqttClient = new MqttClient("tcp://nasdenys.synology.me:1883", clientId);
         } catch (MqttException e) {
             e.printStackTrace();
             System.exit(1);
@@ -34,8 +35,8 @@ public class Subscriber {
             MqttConnectOptions options = new MqttConnectOptions();
             options.setCleanSession(true); 
             options.setKeepAliveInterval(180); 
-            options.setUserName("jef"); 
-            options.setPassword("test".toCharArray()); 
+            options.setUserName("fin"); 
+            options.setPassword("fin".toCharArray()); 
         	mqttClient.connect(options);
             mqttClient.subscribe(topic);
             test = 1; //test is 1 so it will pass the if-statement
