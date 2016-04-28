@@ -7,8 +7,7 @@
         android:id="@+id/routeButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="MQTTtestpublish"
-        android:background="#ffffffff" />
+        android:text="MQTTtestpublish" />
     <TextView
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_width="match_parent"

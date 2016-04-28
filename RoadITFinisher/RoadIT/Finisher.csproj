@@ -6,16 +6,16 @@
     <ProjectGuid>{D7C8E08D-918F-4C9B-A808-6046C0254A93}</ProjectGuid>
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-    <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
-    <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
-    <AndroidResgenClass>Resource</AndroidResgenClass>
-    <RootNamespace>RoadIT</RootNamespace>
+	<MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
+	<AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
+	<AndroidResgenClass>Resource</AndroidResgenClass>
+	<RootNamespace>RoadIT</RootNamespace>
     <AssemblyName>RoadIT</AssemblyName>
-    <TargetFrameworkVersion>v6.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v6.0.99</TargetFrameworkVersion>
     <AndroidApplication>True</AndroidApplication>
-    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
+    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>	
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
-    <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
+    <AndroidUseLatestPlatformSdk>true</AndroidUseLatestPlatformSdk>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -96,6 +96,7 @@
     <AndroidResource Include="Resources\mipmap-xxhdpi\Icon.png" />
     <AndroidResource Include="Resources\mipmap-xxxhdpi\Icon.png" />
     <AndroidResource Include="Resources\drawable\truck.png" />
+    <AndroidResource Include="Resources\layout\Finisher.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />
