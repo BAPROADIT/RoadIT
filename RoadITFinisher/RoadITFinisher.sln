@@ -1,7 +1,7 @@
 
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RoadIT", "RoadIT\RoadIT.csproj", "{D7C8E08D-918F-4C9B-A808-6046C0254A93}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Finisher", "RoadIT\Finisher.csproj", "{D7C8E08D-918F-4C9B-A808-6046C0254A93}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
