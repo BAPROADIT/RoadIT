@@ -1021,32 +1021,32 @@ namespace RoadIT
 		public partial class Color
 		{
 			
-			// aapt resource value: 0x7f080054
-			public const int abc_background_cache_hint_selector_material_dark = 2131230804;
-			
 			// aapt resource value: 0x7f080055
-			public const int abc_background_cache_hint_selector_material_light = 2131230805;
+			public const int abc_background_cache_hint_selector_material_dark = 2131230805;
 			
 			// aapt resource value: 0x7f080056
-			public const int abc_color_highlight_material = 2131230806;
+			public const int abc_background_cache_hint_selector_material_light = 2131230806;
+			
+			// aapt resource value: 0x7f080057
+			public const int abc_color_highlight_material = 2131230807;
 			
 			// aapt resource value: 0x7f080011
 			public const int abc_input_method_navigation_guard = 2131230737;
 			
-			// aapt resource value: 0x7f080057
-			public const int abc_primary_text_disable_only_material_dark = 2131230807;
-			
 			// aapt resource value: 0x7f080058
-			public const int abc_primary_text_disable_only_material_light = 2131230808;
+			public const int abc_primary_text_disable_only_material_dark = 2131230808;
 			
 			// aapt resource value: 0x7f080059
-			public const int abc_primary_text_material_dark = 2131230809;
+			public const int abc_primary_text_disable_only_material_light = 2131230809;
 			
 			// aapt resource value: 0x7f08005a
-			public const int abc_primary_text_material_light = 2131230810;
+			public const int abc_primary_text_material_dark = 2131230810;
 			
 			// aapt resource value: 0x7f08005b
-			public const int abc_search_url_text = 2131230811;
+			public const int abc_primary_text_material_light = 2131230811;
+			
+			// aapt resource value: 0x7f08005c
+			public const int abc_search_url_text = 2131230812;
 			
 			// aapt resource value: 0x7f080012
 			public const int abc_search_url_text_normal = 2131230738;
@@ -1057,11 +1057,11 @@ namespace RoadIT
 			// aapt resource value: 0x7f080014
 			public const int abc_search_url_text_selected = 2131230740;
 			
-			// aapt resource value: 0x7f08005c
-			public const int abc_secondary_text_material_dark = 2131230812;
-			
 			// aapt resource value: 0x7f08005d
-			public const int abc_secondary_text_material_light = 2131230813;
+			public const int abc_secondary_text_material_dark = 2131230813;
+			
+			// aapt resource value: 0x7f08005e
+			public const int abc_secondary_text_material_light = 2131230814;
 			
 			// aapt resource value: 0x7f080015
 			public const int accent_material_dark = 2131230741;
@@ -1108,8 +1108,8 @@ namespace RoadIT
 			// aapt resource value: 0x7f080008
 			public const int common_action_bar_splitter = 2131230728;
 			
-			// aapt resource value: 0x7f08005e
-			public const int common_google_signin_btn_text_dark = 2131230814;
+			// aapt resource value: 0x7f08005f
+			public const int common_google_signin_btn_text_dark = 2131230815;
 			
 			// aapt resource value: 0x7f080009
 			public const int common_google_signin_btn_text_dark_default = 2131230729;
@@ -1123,8 +1123,8 @@ namespace RoadIT
 			// aapt resource value: 0x7f08000a
 			public const int common_google_signin_btn_text_dark_pressed = 2131230730;
 			
-			// aapt resource value: 0x7f08005f
-			public const int common_google_signin_btn_text_light = 2131230815;
+			// aapt resource value: 0x7f080060
+			public const int common_google_signin_btn_text_light = 2131230816;
 			
 			// aapt resource value: 0x7f08000d
 			public const int common_google_signin_btn_text_light_default = 2131230733;
@@ -1138,8 +1138,8 @@ namespace RoadIT
 			// aapt resource value: 0x7f08000e
 			public const int common_google_signin_btn_text_light_pressed = 2131230734;
 			
-			// aapt resource value: 0x7f080060
-			public const int common_plus_signin_btn_text_dark = 2131230816;
+			// aapt resource value: 0x7f080061
+			public const int common_plus_signin_btn_text_dark = 2131230817;
 			
 			// aapt resource value: 0x7f080000
 			public const int common_plus_signin_btn_text_dark_default = 2131230720;
@@ -1153,8 +1153,8 @@ namespace RoadIT
 			// aapt resource value: 0x7f080001
 			public const int common_plus_signin_btn_text_dark_pressed = 2131230721;
 			
-			// aapt resource value: 0x7f080061
-			public const int common_plus_signin_btn_text_light = 2131230817;
+			// aapt resource value: 0x7f080062
+			public const int common_plus_signin_btn_text_light = 2131230818;
 			
 			// aapt resource value: 0x7f080004
 			public const int common_plus_signin_btn_text_light_default = 2131230724;
@@ -1309,17 +1309,20 @@ namespace RoadIT
 			// aapt resource value: 0x7f080048
 			public const int switch_thumb_disabled_material_light = 2131230792;
 			
-			// aapt resource value: 0x7f080062
-			public const int switch_thumb_material_dark = 2131230818;
-			
 			// aapt resource value: 0x7f080063
-			public const int switch_thumb_material_light = 2131230819;
+			public const int switch_thumb_material_dark = 2131230819;
+			
+			// aapt resource value: 0x7f080064
+			public const int switch_thumb_material_light = 2131230820;
 			
 			// aapt resource value: 0x7f080049
 			public const int switch_thumb_normal_material_dark = 2131230793;
 			
 			// aapt resource value: 0x7f08004a
 			public const int switch_thumb_normal_material_light = 2131230794;
+			
+			// aapt resource value: 0x7f080054
+			public const int theme_devicedefault_background = 2131230804;
 			
 			static Color()
 			{
@@ -3563,6 +3566,9 @@ namespace RoadIT
 			
 			// aapt resource value: 0x7f0c00e9
 			public const int Theme_AppCompat_NoActionBar = 2131493097;
+			
+			// aapt resource value: 0x7f0c0144
+			public const int Theme_Custom = 2131493188;
 			
 			// aapt resource value: 0x7f0c00ea
 			public const int ThemeOverlay_AppCompat = 2131493098;

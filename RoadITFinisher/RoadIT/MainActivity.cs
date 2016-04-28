@@ -43,7 +43,7 @@ namespace RoadIT
 			activityfin.Start(this);
 
 			// Set our view from the "main" layout resource
-			//SetContentView(Resource.Layout.Main);
+			SetContentView(Resource.Layout.Finisher);
 
 			// Get our button from the layout resource,
 			// and attach an event to it
