@@ -13,6 +13,7 @@ namespace RoadIT
 		private string locstring;
 		private PolylineOptions polylineOptions;
 		private bool nearest = false;
+		private bool toReDraw = false;
 		private Random rnd = new Random();
 		private string[] colorarray = new string[] { "red", "blue", "orange", "purple" };
 
@@ -33,6 +34,16 @@ namespace RoadIT
 		public bool getNearest()
 		{
 			return nearest;
+		}
+
+		public void setToReDraw(bool toReDraw)
+		{
+			this.toReDraw = toReDraw;
+		}
+
+		public bool getToReDraw()
+		{
+			return toReDraw;
 		}
 
 		public string getcolor()
@@ -90,6 +101,7 @@ namespace RoadIT
 		{
 			Log.Debug("truckdisploc", locstring);
 			Log.Debug("truckdispnearest", nearest.ToString());
+			Log.Debug("truckdisptodraw", toReDraw.ToString());
 			Log.Debug("truckdispcolor", color);
 			Log.Debug("truckdispid", id.ToString());
 		}

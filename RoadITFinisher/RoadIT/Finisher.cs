@@ -43,7 +43,6 @@ namespace RoadIT
 
 		public void OnLocationChanged(Android.Locations.Location location)
 		{
-			//Toast.MakeText(this, "Location changed", ToastLength.Long).Show();
 			finisherloc = new LatLng(location.Latitude, location.Longitude);
 			if (firstloc == true)
 			{
@@ -53,8 +52,6 @@ namespace RoadIT
 				locsToString();
 				firstloc = false;
 			}
-
-			RefreshMarkers();
 			ownlocstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".");
 			Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring + ",0"));
 			PublishMQTT.Start();
@@ -266,11 +263,6 @@ namespace RoadIT
 			map.MyLocationEnabled = true;
 		}
 
-		void RefreshMarkers()
-		{
-			//markertruck.SetPosition(truck1loc);
-		}
-
 		public void OnProviderDisabled(string provider)
 		{
 			Log.Debug(tag, provider + " disabled by user");
@@ -298,9 +290,12 @@ namespace RoadIT
 
 			truck.setDur(dur);
 
+			//TODO CLEANUP
+
 			Log.Debug("durationmin", min.ToString());
 			Log.Debug("durationdur", dur.ToString());
 
+			//set nearest to false for every truck
 			foreach (Truck aTruck in trucklist)
 			{
 				aTruck.setNearest(false);
@@ -308,8 +303,22 @@ namespace RoadIT
 
 			//sort on duration -> nearest truck first in list
 			trucklist.Sort((x, y) => x.getDur().CompareTo(y.getDur()));
-
 			trucklist.First().setNearest(true);
+
+			////redraw
+			//foreach (Truck aTruck2 in trucklist)
+			//{
+			//	//truck was previously the nearest-> has to be redrawn in original color
+			//	if (aTruck2.getNearest() == false && aTruck2.getToReDraw() == true)
+			//	{
+			//		aTruck2.setToReDraw(false);
+			//		Thread drawRouteThread2 = new Thread(() => drawRoute(aTruck2));
+			//		drawRouteThread2.Start();
+			//	}
+			//}
+
+			////true for first element
+			//trucklist.First().setToReDraw(true);
 
 			durationString = "ETA of nearest truck: " + trucklist.First().getDur() + "s";
 			TextView durationtextfield = FindViewById<TextView>(Resource.Id.durationText);
