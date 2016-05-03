@@ -45,11 +45,6 @@ namespace RoadIT
 			// Set our view from the "main" layout resource
 			SetContentView(Resource.Layout.Finisher);
 
-			// Get our button from the layout resource,
-			// and attach an event to it
-			//Button button = FindViewById<Button>(Resource.Id.myButton);
-
-			//button.Click += delegate { button.Text = string.Format("{0} clicks!", count++); };
 		}
 
 		private bool TestIfGooglePlayServicesIsInstalled()
@@ -75,6 +70,7 @@ namespace RoadIT
 
 		public void initLocationManager()
 		{
+			
 			if (ActivityCompat.CheckSelfPermission(this, Android.Manifest.Permission.AccessCoarseLocation) != (int)Android.Content.PM.Permission.Granted)
 			{
 
@@ -93,8 +89,6 @@ namespace RoadIT
 				// Internet permission has not been granted
 				RequestInternetPermission();
 			}
-
-			//gps.InitializeLocationManager();
 		}
 
 		/**

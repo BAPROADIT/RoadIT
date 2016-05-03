@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="be.ua.roadit.roadit">
-	<uses-sdk android:minSdkVersion="21" />
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionCode="1" android:versionName="1.0" package="be.ua.roadit.Truck">
+	<uses-sdk android:minSdkVersion="14" />
 	<uses-feature android:glEsVersion="0x00020000" android:required="true" />
 	<!-- We need to be able to download map tiles and access Google Play Services-->
 	<uses-permission android:name="android.permission.INTERNET" />
@@ -31,7 +31,7 @@
 	<uses-permission android:name="android.permission.ACCESS_MOCK_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 	<permission android:name="be.ua.roadit.roadit.permission.MAPS_RECEIVE" android:protectionLevel="signature" />
-	<application android:allowBackup="true" android:icon="@mipmap/icon" android:label="Truck" android:theme="@android:style/Theme.Material">
+	<application android:allowBackup="true" android:icon="@mipmap/icon" android:label="Truck" android:theme="@android:style/Theme.Material.Light.NoActionBar.TranslucentDecor">
 		<!-- Put your Google Maps V2 API Key here. This key will not work for you.-->
 		<!-- See https://developers.google.com/maps/documentation/android/start#obtaining_an_api_key -->
 		<meta-data android:name="com.google.android.geo.API_KEY" android:value="AIzaSyCR1v1H-ZtTuYi9U00eEqa6OgR0u6QrpdI" />

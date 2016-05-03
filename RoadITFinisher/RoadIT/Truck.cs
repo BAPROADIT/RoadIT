@@ -15,7 +15,7 @@ namespace RoadIT
 		private bool nearest = false;
 		private bool toReDraw = false;
 		private Random rnd = new Random();
-		private string[] colorarray = new string[] { "red", "blue", "orange", "purple" };
+		private string[] colorarray = new string[] { "red", "blue", "black", "purple" };
 
 		public Truck(LatLng location, int id)
 		{

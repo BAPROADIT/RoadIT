@@ -131,7 +131,7 @@ namespace RoadIT
 		{
 			base.OnCreate(bundle);
 			Log.Debug(tag, "OnCreate called");
-			SetContentView(Resource.Layout.Main);
+			SetContentView(Resource.Layout.truck);
 			InitMapFragment();
 			//SetupAnimateToButton();
 			Client.SetCallback(new MqttSubscribe(this));

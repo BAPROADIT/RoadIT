@@ -31,8 +31,8 @@ namespace RoadIT
 
 		List<Truck> trucklist = new List<Truck>();
 
-		public static string broker = "tcp://iot.eclipse.org:1883";
-		//public static string broker = "tcp://nasdenys.synology.me:1883";
+		//public static string broker = "tcp://iot.eclipse.org:1883";
+		public static string broker = "tcp://nasdenys.synology.me:1883";
 
 		public static string clientId = "JavaSample";
 
@@ -49,7 +49,6 @@ namespace RoadIT
 				InitMapFragment();
 				InitMarkers();
 				ZoomOnLoc();
-				locsToString();
 				firstloc = false;
 			}
 			ownlocstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".");
@@ -111,29 +110,14 @@ namespace RoadIT
 							Thread mapAPICall3 = new Thread(() => mapAPICall(trucklist.Find(t => t.getid() == id)));
 							mapAPICall3.Start();
 						}
-
-
 						Log.Debug("trucklistelements", trucklist.Count().ToString());
 						Log.Debug("MQTTinput", "Accept");
-
-						//if (trucklist.Count() != 0)
-						//{
-						//	foreach (Truck aTruck in trucklist)
-						//	{
-						//		Thread mapAPICall2 = new Thread(() => mapAPICall(aTruck));
-						//		mapAPICall2.Start();
-						//	}
-						//}
-						//else {
-						//	Toast.MakeText(this, "List empty", ToastLength.Long).Show();
-						//}
 					}
 				}
 				catch
 				{
 					Log.Debug("MQTTinput", "input not right");
 				}
-
 			}
 		}
 
@@ -177,14 +161,10 @@ namespace RoadIT
 				Client.Connect();
 				Client.Subscribe("fin");
 				Log.Debug("MqttSubscribe", "connect");
-				//Toast.MakeText(this, "Subscribe(\"fin\")!", ToastLength.Long).Show();
-
 			}
 			catch (MqttException me)
 			{
 				Log.Debug("MqttSubscribe", "(re)connect failed");
-				//Toast.MakeText(this, "Error: Subscribe(\"fin\")!\n" + me, ToastLength.Long).Show();
-
 			}
 		}
 
@@ -231,9 +211,6 @@ namespace RoadIT
 				Thread PublishMQTT4 = new Thread(() => MQTTPublish("50.8074277,4.555036,4"));
 				PublishMQTT4.Start();
 				Thread.Sleep(50);
-
-				//map.Clear();
-				//updateUI();
 			};
 		}
 
@@ -254,12 +231,6 @@ namespace RoadIT
 		public void InitMarkers()
 		{
 			map = mapFragment.Map;
-			//markertruck.SetPosition(truck1loc);
-			//markertruck.SetTitle("Truck");
-			//markertruck.SetIcon(truck);
-			//map.AddMarker(markertruck);
-
-			//blue location
 			map.MyLocationEnabled = true;
 		}
 
@@ -267,20 +238,15 @@ namespace RoadIT
 		{
 			Log.Debug(tag, provider + " disabled by user");
 		}
+
 		public void OnProviderEnabled(string provider)
 		{
 			Log.Debug(tag, provider + " enabled by user");
 		}
+
 		public void OnStatusChanged(string provider, Availability status, Bundle extras)
 		{
 			Log.Debug(tag, provider + " availability has changed to " + status.ToString());
-		}
-
-		void locsToString()
-		{
-			//TODO , vervangen door punt
-			//truckstring = truck1loc.Latitude.ToString().Replace(",",".") + "," + truck1loc.Longitude.ToString().Replace(",",".");
-			//cinestring = cineloc.Latitude.ToString().Replace(",",".") + "," + cineloc.Longitude.ToString().Replace(",",".");
 		}
 
 		public void getDuration(Truck truck)
@@ -372,16 +338,11 @@ namespace RoadIT
 
 		void mapAPICall(Truck truck)
 		{
-			//System.Threading.Thread.Sleep(50);
 			string origin = truck.getlocstring();
-			//Log.Debug("apicallorigin", origin);
 			try
-			{
-				//string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + ownlocstring + "&key=AIzaSyA4TlQ5a4FMKvcxIIg2wdEuK9Q6JAlFcCE";
+			{	
 				string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + ownlocstring + "&sensor=false";
-
-				string requesturl = url; string content = fileGetJSON(requesturl);
-				//Log.Debug("httpcontent", content);
+				string requesturl = url; string content = fileGetJSON(requesturl);;
 				_Jobj = JObject.Parse(content);
 				Log.Debug("apicall", content.ToString());
 			}
@@ -389,12 +350,6 @@ namespace RoadIT
 
 			Thread durationThread = new Thread(() => getDuration(truck));
 			durationThread.Start();
-
-			//Thread drawRouteThread = new Thread(() => drawRoute(truck));
-			//drawRouteThread.Start();
-
-			////draw route in main UI thread
-			//RunOnUiThread(() => updateUI());
 		}
 
 		void drawRoute(Truck truck)
@@ -419,10 +374,10 @@ namespace RoadIT
 				Log.Debug("drawroute", truck.getid() + truck.getcolor() + "moet red zijn");
 				temppoly.InvokeColor(0x66ff0000);
 			}
-			else if (truck.getcolor() == "orange")
+			else if (truck.getcolor() == "black")
 			{
-				Log.Debug("drawroute", truck.getid() + truck.getcolor() + "moet orange zijn");
-				temppoly.InvokeColor(0x66ff9900);
+				Log.Debug("drawroute", truck.getid() + truck.getcolor() + "moet black zijn");
+				temppoly.InvokeColor(0x66000000);
 			}
 			else if (truck.getcolor() == "purple")
 			{
@@ -436,7 +391,8 @@ namespace RoadIT
 				temppoly.InvokeColor(0x66000099);
 			}
 
-			temppoly.InvokeWidth(9);
+			temppoly.InvokeWidth(13);
+
 			try
 			{
 				string polyPoints;

@@ -18,8 +18,7 @@ namespace RoadIT
 		protected override void OnCreate(Bundle savedInstanceState)
 		{
 			base.OnCreate(savedInstanceState);
-			Log.Debug("MqttSubscribe", "create");
-			// Create your application here
+			Log.Debug("MqttSubscribe", "create");	
 		}
 		public void MessageArrived(string topic, MqttMessage message)
 		{
