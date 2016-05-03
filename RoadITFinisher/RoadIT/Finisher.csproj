@@ -6,16 +6,16 @@
     <ProjectGuid>{D7C8E08D-918F-4C9B-A808-6046C0254A93}</ProjectGuid>
     <ProjectTypeGuids>{EFBA0AD7-5A72-4C68-AF49-83D382785DCF};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
-	<MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
-	<AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
-	<AndroidResgenClass>Resource</AndroidResgenClass>
-	<RootNamespace>RoadIT</RootNamespace>
+    <MonoAndroidResourcePrefix>Resources</MonoAndroidResourcePrefix>
+    <AndroidResgenFile>Resources\Resource.designer.cs</AndroidResgenFile>
+    <AndroidResgenClass>Resource</AndroidResgenClass>
+    <RootNamespace>RoadIT</RootNamespace>
     <AssemblyName>RoadIT</AssemblyName>
     <TargetFrameworkVersion>v6.0</TargetFrameworkVersion>
     <AndroidApplication>True</AndroidApplication>
-    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>	
+    <AndroidManifest>Properties\AndroidManifest.xml</AndroidManifest>
     <MonoAndroidAssetsPrefix>Assets</MonoAndroidAssetsPrefix>
-    <AndroidUseLatestPlatformSdk>true</AndroidUseLatestPlatformSdk>
+    <AndroidUseLatestPlatformSdk>True</AndroidUseLatestPlatformSdk>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -56,7 +56,7 @@
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Json" />
     <Reference Include="MQTT">
-      <HintPath>..\..\..\..\School\Bachelorproef\MQTT.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Documents\Projects\Location\Location\bin\Debug\MQTT.dll</HintPath>
     </Reference>
     <Reference Include="Xamarin.Android.Support.v4">
       <HintPath>..\packages\Xamarin.Android.Support.v4.23.3.0\lib\MonoAndroid403\Xamarin.Android.Support.v4.dll</HintPath>
@@ -104,6 +104,7 @@
     <AndroidResource Include="Resources\drawable\truck.png" />
     <AndroidResource Include="Resources\layout\Finisher.axml" />
     <AndroidResource Include="Resources\values\theme.xml" />
+    <AndroidResource Include="Resources\layout\Settings.axml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

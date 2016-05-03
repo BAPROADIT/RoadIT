@@ -12,7 +12,7 @@ using Android.Views;
 
 namespace RoadIT
 {
-	[Activity(Label = "Finisher", MainLauncher = true, Icon = "@mipmap/icon")]
+	[Activity(Label = "Roadit", MainLauncher = true, Icon = "@mipmap/icon")]
 	public class MainActivity : Activity
 	{
 		public static readonly string Tag = "ROAD IT";
@@ -42,8 +42,12 @@ namespace RoadIT
 			SampleActivity activityfin = new SampleActivity(1, 2, typeof(Finisher));
 			activityfin.Start(this);
 
+
 			// Set our view from the "main" layout resource
-			SetContentView(Resource.Layout.Finisher);
+			//SetContentView(Resource.Layout.Finisher);
+
+
+			SetContentView(Resource.Layout.Settings);
 
 		}
 

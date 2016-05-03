@@ -3,6 +3,7 @@ using Android.App;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.OS;
+
 using Android.Locations;
 using Android.Util;
 using Android.Widget;
@@ -40,7 +41,7 @@ namespace RoadIT
 		public static MqttClient Client = new MqttClient(broker, clientId, persistence);
 
 		bool firstloc = true;
-
+		
 		public void OnLocationChanged(Android.Locations.Location location)
 		{
 			finisherloc = new LatLng(location.Latitude, location.Longitude);
@@ -144,13 +145,14 @@ namespace RoadIT
 			// the minimum time between updates (in seconds),
 			// the minimum distance the user needs to move to generate an update (in meters),
 			// and an ILocationListener (recall that this class impletents the ILocationListener interface)
+
 			if (locMgr.AllProviders.Contains(LocationManager.NetworkProvider)
 				&& locMgr.IsProviderEnabled(LocationManager.NetworkProvider))
 			{
 				locMgr.RequestLocationUpdates(LocationManager.NetworkProvider, 2000, 1, this);
 			}
 			else {
-				Toast.MakeText(this, "The Network Provider does not exist or is not enabled!", ToastLength.Long).Show();
+				Toast.MakeText(this, "Please switch on your location service!", ToastLength.Long).Show();
 			}
 		}
 

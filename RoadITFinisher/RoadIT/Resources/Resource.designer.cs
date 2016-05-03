@@ -2155,6 +2155,18 @@ namespace RoadIT
 			// aapt resource value: 0x7f0a007c
 			public const int durationText = 2131361916;
 			
+			// aapt resource value: 0x7f0a008c
+			public const int editText1 = 2131361932;
+			
+			// aapt resource value: 0x7f0a008e
+			public const int editText2 = 2131361934;
+			
+			// aapt resource value: 0x7f0a0090
+			public const int editText4 = 2131361936;
+			
+			// aapt resource value: 0x7f0a0092
+			public const int editText5 = 2131361938;
+			
 			// aapt resource value: 0x7f0a0067
 			public const int edit_query = 2131361895;
 			
@@ -2281,6 +2293,15 @@ namespace RoadIT
 			// aapt resource value: 0x7f0a005f
 			public const int radio = 2131361887;
 			
+			// aapt resource value: 0x7f0a0095
+			public const int radioButton1 = 2131361941;
+			
+			// aapt resource value: 0x7f0a0094
+			public const int radioButton3 = 2131361940;
+			
+			// aapt resource value: 0x7f0a0093
+			public const int radioGroup1 = 2131361939;
+			
 			// aapt resource value: 0x7f0a003b
 			public const int right = 2131361851;
 			
@@ -2403,6 +2424,18 @@ namespace RoadIT
 			
 			// aapt resource value: 0x7f0a0058
 			public const int textSpacerNoButtons = 2131361880;
+			
+			// aapt resource value: 0x7f0a008b
+			public const int textView1 = 2131361931;
+			
+			// aapt resource value: 0x7f0a0091
+			public const int textView15 = 2131361937;
+			
+			// aapt resource value: 0x7f0a008d
+			public const int textView2 = 2131361933;
+			
+			// aapt resource value: 0x7f0a008f
+			public const int textView3 = 2131361935;
 			
 			// aapt resource value: 0x7f0a0084
 			public const int time = 2131361924;
@@ -2632,7 +2665,10 @@ namespace RoadIT
 			public const int select_dialog_singlechoice_material = 2130968624;
 			
 			// aapt resource value: 0x7f040031
-			public const int support_simple_spinner_dropdown_item = 2130968625;
+			public const int Settings = 2130968625;
+			
+			// aapt resource value: 0x7f040032
+			public const int support_simple_spinner_dropdown_item = 2130968626;
 			
 			static Layout()
 			{
