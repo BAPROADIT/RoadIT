@@ -22,7 +22,7 @@ namespace RoadIT
 		}
 		public void MessageArrived(string topic, MqttMessage message)
 		{
-			Log.Debug("MqttSubscribe", message.ToString());
+			Log.Debug("MqttSubscribe", "Topic: "+topic+"Msg: "+ message.ToString());
 			string messagestring = message.ToString();
 			fin.MQTTupdate(messagestring, topic);
 		}
