@@ -49,7 +49,7 @@ namespace RoadIT
 		public void confirmSettings()
 		{
 			Button startButton = FindViewById<Button>(Resource.Id.startButton);
-			startButton.Click += (sender, e1) =>
+			startButton.Click += (sender, e) =>
 			{
 				EditText broker = FindViewById<EditText>(Resource.Id.editText1);
 				string brokerstring = broker.Text;
@@ -64,6 +64,7 @@ namespace RoadIT
 				string passtring = username.Text;
 
 				SampleActivity activityfin = new SampleActivity(1, 2, typeof(Finisher));
+				activityfin.Start(this);
 			};
 		}
 
