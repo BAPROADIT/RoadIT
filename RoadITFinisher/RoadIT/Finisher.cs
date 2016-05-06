@@ -32,7 +32,7 @@ namespace RoadIT
 		string durationString;
 		const string tag = "Finisher";
 		JObject _Jobj;
-		public static string broker = "", topic="", username="", pass="";
+		public static string broker = "", topicpub="", topicsub="", username="", pass="";
 
 		List<Truck> trucklist = new List<Truck>();
 
@@ -58,8 +58,6 @@ namespace RoadIT
 
 		public void MQTTPublish(string content)
 		{
-
-			string topic = "fin";
 			int qos = 2;
 			MemoryPersistence persistence = new MemoryPersistence();
 
@@ -68,7 +66,7 @@ namespace RoadIT
 				byte[] bytes = System.Text.Encoding.ASCII.GetBytes(content);
 				MqttMessage message = new MqttMessage(bytes);
 				message.Qos = qos;
-				Client.Publish(topic, message);
+				Client.Publish(topicpub, message);
 				Log.Debug("MQTTPublish", message.ToString());
 			}
 			catch (MqttException me)
@@ -130,8 +128,20 @@ namespace RoadIT
 			broker = "tcp://" + temp + ":1883";
 			string name = Intent.GetStringExtra ("name") ?? null;
 			string truck = Intent.GetStringExtra("truck") ?? null;
-			Console.WriteLine(truck);
-			topic = name;
+			//string titlestring="";
+			if (truck == "true") {
+				//titlestring = "Truck";
+				topicpub="roadit/truck/"+name+"/"+15;
+				topicsub="roadit/fin/"+name;
+			} else {
+				topicpub="roadit/fin/"+name;
+				topicsub="roadit/truck/"+name+"/#";
+				//titlestring = "Finisher";
+			}
+			TextView title = FindViewById<TextView>(Resource.Id.textView1);
+			//update textfield in main UI thread
+			//RunOnUiThread(() => title.Text= titlestring);
+
 			username = Intent.GetStringExtra ("username") ?? null;
 			pass = Intent.GetStringExtra ("pass") ?? null;
 			Console.WriteLine (broker + " "+ name+ " "+ username+" "+ pass);
@@ -179,8 +189,8 @@ namespace RoadIT
 			try
 			{
 				Client.Connect();
-				Client.Subscribe("fin");
-				Log.Debug("MqttSubscribe", "connect");
+				Client.Subscribe(topicsub);
+				Log.Debug("MqttSubscribe", "connect topic: "+topicsub);
 			}
 			catch (MqttException me)
 			{

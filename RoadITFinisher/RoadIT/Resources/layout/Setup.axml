@@ -81,8 +81,4 @@
             android:text="Finisher"
             android:id="@+id/radioButton1" />
     </RadioGroup>
-    <Spinner
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/spinner1" />
 </LinearLayout>

@@ -66,19 +66,19 @@ namespace RoadIT
 				string passtring = username.Text;
 
 				RadioButton truckfin = FindViewById<RadioButton>(Resource.Id.radiotruck);
-				/*if (truckfin.checked()==true){
-					bool truckbool = true;
+				string truck;
+				if (truckfin.Checked==true){
+					truck = "true";
 				}else{
-					bool truckbool = false;
-				}*/
-				bool truck =true;
+					truck="false";
+				}
 				SampleActivity activityfin = new SampleActivity(1, 2, typeof(Finisher));
 				var finisher = new Intent(this, typeof(Finisher));
 				finisher.PutExtra("broker",brokerstring );
 				finisher.PutExtra("name",namestring );
 				finisher.PutExtra("username",usernamestring );
 				finisher.PutExtra("pass",passtring );
-				finisher.PutExtra("truckfin",truck);
+				finisher.PutExtra("truck",truck);
 				StartActivity(finisher);
 
 			};
