@@ -52,7 +52,7 @@ namespace RoadIT
 				firstloc = false;
 			}
 			ownlocstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".");
-			Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring + ",0"));
+			Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring));
 			PublishMQTT.Start();
 		}
 
@@ -131,7 +131,7 @@ namespace RoadIT
 			//string titlestring="";
 			if (truck == "true") {
 				//titlestring = "Truck";
-				topicpub="roadit/truck/"+name+"/"+15;
+				topicpub="roadit/truck/"+name+"/"+15;//unieke nummer
 				topicsub="roadit/fin/"+name;
 			} else {
 				topicpub="roadit/fin/"+name;
@@ -161,15 +161,14 @@ namespace RoadIT
 			Log.Debug(tag, "OnResume called");
 
 
-			/*Button stopbutton = FindViewById<Button>(Resource.Id.stopbutton);
+			Button stopbutton = FindViewById<Button>(Resource.Id.stopbutton);
 			stopbutton.Click += (sender, e) =>
 			{
+				//TODO send kill me signal
+				Client.Disconnect;
 				SampleActivity activitysetup = new SampleActivity(1, 2, typeof(MainActivity));
 				activitysetup.Start(this);
-
-				//Thread Stopmain = new Thread(() => OnStop());
-				//Stopmain.Start();
-			};*/
+			};
 			// initialize location manager
 			locMgr = GetSystemService(Context.LocationService) as LocationManager;
 
@@ -185,7 +184,6 @@ namespace RoadIT
 
 		public static void ConfigMQTT()
 		{
-			
 			try
 			{
 				Client.Connect();
@@ -229,7 +227,7 @@ namespace RoadIT
 			Button RouteButton = FindViewById<Button>(Resource.Id.routeButton);
 			RouteButton.Click += (sender, e) =>
 			{
-				Thread PublishMQTT = new Thread(() => MQTTPublish("51.2074277,4.2935036,1"));
+				/*Thread PublishMQTT = new Thread(() => MQTTPublish("51.2074277,4.2935036,1"));
 				PublishMQTT.Start();
 				Thread.Sleep(50);
 				Thread PublishMQTT2 = new Thread(() => MQTTPublish("51.1074277,5.135036,2"));
@@ -240,7 +238,7 @@ namespace RoadIT
 				Thread.Sleep(50);
 				Thread PublishMQTT4 = new Thread(() => MQTTPublish("50.8074277,4.555036,4"));
 				PublishMQTT4.Start();
-				Thread.Sleep(50);
+				Thread.Sleep(50);*/
 			};
 		}
 
