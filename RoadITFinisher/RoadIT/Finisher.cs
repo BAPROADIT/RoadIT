@@ -34,6 +34,7 @@ namespace RoadIT
 		const string tag = "Finisher";
 		JObject _Jobj;
 		public static string broker = "", topicpub="", topicsub="", username="", pass="";
+		bool truckbool;
 
 		List<Truck> trucklist = new List<Truck>();
 
@@ -80,43 +81,43 @@ namespace RoadIT
 		{
 			Char delimiter = ',';
 			String[] substrings = mqttmessage.Split(delimiter);
-			if (substrings.Length == 3)
-			{
-				try
-				{
-					if (Convert.ToDouble(substrings[2]) != 0)
-					{
-						//TODO todouble kapot nederlands?? punten verdwijnen?
-						Log.Debug("mqttsubstring0", Convert.ToDouble(substrings[0]).ToString());
-						Log.Debug("mqttsubstring1", Convert.ToDouble(substrings[1]).ToString());
 
-						int id = Int32.Parse(substrings[2]);
-						bool exists = false;
-						foreach (Truck aTruck in trucklist)
-						{
-							if (aTruck.getid() == id)
-							{
-								exists = true;
-								aTruck.setLocation(new LatLng(Convert.ToDouble(substrings[0]), Convert.ToDouble(substrings[1])));
-								Thread mapAPICall2 = new Thread(() => mapAPICall(aTruck));
-								mapAPICall2.Start();
-							}
-						}
-						if (exists == false)
-						{
-							trucklist.Add(new Truck(new LatLng(Convert.ToDouble(substrings[0]), Convert.ToDouble(substrings[1])), id));
-
-							Thread mapAPICall3 = new Thread(() => mapAPICall(trucklist.Find(t => t.getid() == id)));
-							mapAPICall3.Start();
-						}
-						Log.Debug("trucklistelements", trucklist.Count().ToString());
-						Log.Debug("MQTTinput", "Accept");
+			if (substrings.Length == 2) {
+				try {
+					//TODO todouble kapot nederlands?? punten verdwijnen?
+					Log.Debug ("mqttsubstring0", Convert.ToDouble (substrings [0]).ToString ());
+					Log.Debug ("mqttsubstring1", Convert.ToDouble (substrings [1]).ToString ());
+					//topic for finisher: roadit/truck/name/#
+					//topic for truck: roadit/fin/name
+					int id = 0;
+					if (truckbool == false) {
+						Char delimitertopic = '/';
+						String[] subtopics = topic.Split (delimitertopic);
+						id = Int32.Parse (subtopics [3]);
 					}
-				}
-				catch
-				{
+					Console.WriteLine ("id: " + id);
+					bool exists = false;
+					foreach (Truck aTruck in trucklist) {
+						if (aTruck.getid () == id) {
+							exists = true;
+							aTruck.setLocation (new LatLng (Convert.ToDouble (substrings [0]), Convert.ToDouble (substrings [1])));
+							Thread mapAPICall2 = new Thread (() => mapAPICall (aTruck));
+							mapAPICall2.Start ();
+						}
+					}
+					if (exists == false) {
+						trucklist.Add (new Truck (new LatLng (Convert.ToDouble (substrings [0]), Convert.ToDouble (substrings [1])), id));
+
+						Thread mapAPICall3 = new Thread (() => mapAPICall (trucklist.Find (t => t.getid () == id)));
+						mapAPICall3.Start ();
+					}
+					Log.Debug ("trucklistelements", trucklist.Count ().ToString ());
+					Log.Debug ("MQTTinput", "Accept");
+				} catch {
 					Log.Debug("MQTTinput", "input not right");
 				}
+			} else {
+				Log.Debug("MQTTinput", "input not right");
 			}
 		}
 
@@ -134,10 +135,12 @@ namespace RoadIT
 				//titlestring = "Truck";
 				topicpub="roadit/truck/"+name+"/"+15;//unieke nummer
 				topicsub="roadit/fin/"+name;
+				truckbool = true;
 			} else {
 				topicpub="roadit/fin/"+name;
 				topicsub="roadit/truck/"+name+"/#";
 				//titlestring = "Finisher";
+				truckbool = false;
 			}
 			TextView title = FindViewById<TextView>(Resource.Id.textView1);
 			//update textfield in main UI thread
