@@ -2,6 +2,7 @@
 using Android.Widget;
 using Android.Hardware;
 using Android.Locations;
+using Android.Content;
 using Android.OS;
 using Android.Gms.Common;
 using Android.Util;
@@ -9,6 +10,8 @@ using System;
 using Android.Support.V4.App;
 using Android.Support.Design.Widget;
 using Android.Views;
+
+using System.Threading;
 
 namespace RoadIT
 {
@@ -19,7 +22,7 @@ namespace RoadIT
 		public static readonly int InstallGooglePlayServicesId = 1000;
 		private bool _isGooglePlayServicesInstalled;
 
-		View layout;
+		//View layout;
 
 		static readonly int REQUEST_COARSELOCATION = 0;
 		static readonly int REQUEST_FINELOCATION = 1;
@@ -49,22 +52,35 @@ namespace RoadIT
 		public void confirmSettings()
 		{
 			Button startButton = FindViewById<Button>(Resource.Id.startButton);
-			startButton.Click += (sender, e) =>
-			{
-				EditText broker = FindViewById<EditText>(Resource.Id.editText1);
+			startButton.Click += delegate {
+				EditText broker = FindViewById<EditText>(Resource.Id.editTextbroker);
 				string brokerstring = broker.Text;
 
-				EditText name = FindViewById<EditText>(Resource.Id.editText2);
+				EditText name = FindViewById<EditText>(Resource.Id.editTextname);
 				string namestring = name.Text;
 
-				EditText username = FindViewById<EditText>(Resource.Id.editText4);
+				EditText username = FindViewById<EditText>(Resource.Id.editTextusername);
 				string usernamestring = username.Text;
 
-				EditText pass = FindViewById<EditText>(Resource.Id.editText5);
+				EditText pass = FindViewById<EditText>(Resource.Id.editTextpassword);
 				string passtring = username.Text;
 
+				RadioButton truckfin = FindViewById<RadioButton>(Resource.Id.radiotruck);
+				/*if (truckfin.checked()==true){
+					bool truckbool = true;
+				}else{
+					bool truckbool = false;
+				}*/
+				bool truck =true;
 				SampleActivity activityfin = new SampleActivity(1, 2, typeof(Finisher));
-				activityfin.Start(this);
+				var finisher = new Intent(this, typeof(Finisher));
+				finisher.PutExtra("broker",brokerstring );
+				finisher.PutExtra("name",namestring );
+				finisher.PutExtra("username",usernamestring );
+				finisher.PutExtra("pass",passtring );
+				finisher.PutExtra("truckfin",truck);
+				StartActivity(finisher);
+
 			};
 		}
 
@@ -128,10 +144,10 @@ namespace RoadIT
 				// For example if the user has previously denied the permission.
 				//Log.Info (TAG, "Displaying COARSE permission rationale to provide additional context.");
 
-				Snackbar
+				/*Snackbar
 					.Make(layout, "Message sent", Snackbar.LengthLong)
   					.SetAction("OK", (view) => { ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.AccessCoarseLocation }, REQUEST_COARSELOCATION); })
-  					.Show(); 
+  					.Show(); */
 			}
 			else {
 				// Camera permission has not been granted yet. Request it directly.
@@ -155,10 +171,10 @@ namespace RoadIT
 				// For example if the user has previously denied the permission.
 				//Log.Info (TAG, "Displaying Fine permission rationale to provide additional context.");
 
-				Snackbar
+				/*Snackbar
 					.Make(layout, "Message sent", Snackbar.LengthLong)
   					.SetAction("OK", (view) => {ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.AccessFineLocation }, REQUEST_FINELOCATION); })
-  					.Show();
+  					.Show();*/
 			}
 			else {
 				// Camera permission has not been granted yet. Request it directly.
@@ -182,10 +198,10 @@ namespace RoadIT
 				// For example if the user has previously denied the permission.
 				//Log.Info (TAG, "Displaying Intenet permission rationale to provide additional context.");
 
-				Snackbar
+				/*Snackbar
 					.Make(layout, "Message sent", Snackbar.LengthLong)
   					.SetAction("OK", (view) => { ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.Internet }, REQUEST_INTERNET); })
-  					.Show();
+  					.Show();*/
 			}
 			else {
 				// Camera permission has not been granted yet. Request it directly.

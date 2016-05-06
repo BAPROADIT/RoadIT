@@ -1,16 +1,19 @@
-﻿using System;
-using Android.App;
+﻿using Android.App;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.OS;
-
+using Android.Runtime; 
 using Android.Locations;
 using Android.Util;
 using Android.Widget;
 using Android.Content;
+using Android.Views;
 using System.Threading;
-using System.Collections.Generic;
-using System.Linq;
+using System; 
+using System.Collections.Generic; 
+using System.Linq; 
+using System.Text; 
+
 using Newtonsoft.Json.Linq;
 using Org.Eclipse.Paho.Client.Mqttv3;
 using Org.Eclipse.Paho.Client.Mqttv3.Persist;
@@ -18,41 +21,25 @@ using Org.Eclipse.Paho.Client.Mqttv3.Persist;
 namespace RoadIT
 {
 	//prevents activity from restarting when screen orientation changes
-	[Activity(Label = "Finisher", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation)]
+	[Activity(Label = "Road_it", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation)]
 	public class Finisher : Activity, ILocationListener
 	{
 		LatLng finisherloc = new LatLng(0, 0);
-		public GoogleMap map;
+		GoogleMap map;
 		MapFragment mapFragment;
 		LocationManager locMgr;
 		string ownlocstring;
 		string durationString;
+		const string tag = "Finisher";
 		JObject _Jobj;
-		string tag = "MainActivity";
-		//string broker, name, username, pass;
+		public static string broker = "", topic="", username="", pass="";
 
 		List<Truck> trucklist = new List<Truck>();
 
-		public static string broker = "tcp://iot.eclipse.org:1883";
-		//public static string broker = "tcp://nasdenys.synology.me:1883";
-
-		public static string clientId = "JavaSample";
-
 		public static MemoryPersistence persistence = new MemoryPersistence();
 
-		public static MqttClient Client = new MqttClient(broker, clientId, persistence);
-
-
+		public static MqttClient Client;
 		bool firstloc = true;
-
-		//public Finisher(string broker, string name, string username, string pass)
-		//{
-		//	this.broker = broker;
-		//	this.name = name;
-		//	this.username = username;
-		//	this.pass = pass;
-		//	Client = new MqttClient(broker, clientId, persistence);
-		//}
 		
 		public void OnLocationChanged(Android.Locations.Location location)
 		{
@@ -90,7 +77,7 @@ namespace RoadIT
 			}
 		}
 
-		public void MQTTupdate(string mqttmessage)
+		public void MQTTupdate(string mqttmessage, string topic)
 		{
 			Char delimiter = ',';
 			String[] substrings = mqttmessage.Split(delimiter);
@@ -136,27 +123,45 @@ namespace RoadIT
 
 		protected override void OnCreate(Bundle bundle)
 		{
+			
 			base.OnCreate(bundle);
 			Log.Debug(tag, "OnCreate called");
+			string temp = Intent.GetStringExtra ("broker") ?? null;
+			broker = "tcp://" + temp + ":1883";
+			string name = Intent.GetStringExtra ("name") ?? null;
+			string truck = Intent.GetStringExtra("truck") ?? null;
+			Console.WriteLine(truck);
+			topic = name;
+			username = Intent.GetStringExtra ("username") ?? null;
+			pass = Intent.GetStringExtra ("pass") ?? null;
+			Console.WriteLine (broker + " "+ name+ " "+ username+" "+ pass);
 			SetContentView(Resource.Layout.Finisher);
 			InitMapFragment();
 			SetupAnimateToButton();
+			Client = makeClient ();
 			Client.SetCallback(new MqttSubscribe(this));
 			ConfigMQTT();
 		}
-
+		public MqttClient makeClient(){
+			return new MqttClient(broker, username, persistence);
+		}
 		protected override void OnResume()
 		{
 			base.OnResume();
 			Log.Debug(tag, "OnResume called");
 
+
+			/*Button stopbutton = FindViewById<Button>(Resource.Id.stopbutton);
+			stopbutton.Click += (sender, e) =>
+			{
+				SampleActivity activitysetup = new SampleActivity(1, 2, typeof(MainActivity));
+				activitysetup.Start(this);
+
+				//Thread Stopmain = new Thread(() => OnStop());
+				//Stopmain.Start();
+			};*/
 			// initialize location manager
 			locMgr = GetSystemService(Context.LocationService) as LocationManager;
-
-			// pass in the provider (GPS),
-			// the minimum time between updates (in seconds),
-			// the minimum distance the user needs to move to generate an update (in meters),
-			// and an ILocationListener (recall that this class impletents the ILocationListener interface)
 
 			if (locMgr.AllProviders.Contains(LocationManager.NetworkProvider)
 				&& locMgr.IsProviderEnabled(LocationManager.NetworkProvider))
@@ -170,6 +175,7 @@ namespace RoadIT
 
 		public static void ConfigMQTT()
 		{
+			
 			try
 			{
 				Client.Connect();
@@ -178,7 +184,7 @@ namespace RoadIT
 			}
 			catch (MqttException me)
 			{
-				Log.Debug("MqttSubscribe", "(re)connect failed");
+				Log.Debug("MqttSubscribe", "(re)connect failed"+ me.ToString());
 			}
 		}
 
@@ -186,7 +192,7 @@ namespace RoadIT
 		protected override void OnStart()
 		{
 			base.OnStart();
-			Log.Debug(tag, "OnStart called");
+			Log.Debug(tag, "OnStart called: ");
 		}
 
 		public void InitMapFragment()
@@ -481,7 +487,7 @@ namespace RoadIT
 			}
 			catch (Exception ex)
 			{
-				// logo it
+				Log.Debug("Polyline", ex.ToString());// logo it
 			}
 			return poly;
 		}
@@ -510,4 +516,3 @@ namespace RoadIT
 		}
 	}
 }
-

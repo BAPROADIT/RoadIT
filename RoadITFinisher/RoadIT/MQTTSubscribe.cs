@@ -23,8 +23,8 @@ namespace RoadIT
 		public void MessageArrived(string topic, MqttMessage message)
 		{
 			Log.Debug("MqttSubscribe", message.ToString());
-			string test = message.ToString();
-			fin.MQTTupdate(test);
+			string messagestring = message.ToString();
+			fin.MQTTupdate(messagestring, topic);
 		}
 
 		public void ConnectionLost(Throwable cause)

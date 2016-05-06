@@ -3,13 +3,29 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <Button
-        android:id="@+id/routeButton"
+    <TableLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:id="@+id/tableLayout1"
+        android:minWidth="25px"
+        android:minHeight="25px" />
+    <Button
+        android:id="@+id/routeButton"
         android:text="MQTTtestpublish"
         android:drawableTint="#ffffffff"
-        android:translationY="25dp" />
+        android:translationY="25dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginRight="0.0dp" />
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/space1" />
+    <Button
+        android:text="Stop"
+        android:id="@+id/stopbutton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
     <TextView
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_width="match_parent"

@@ -2020,8 +2020,8 @@ namespace RoadIT
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f0a007e
-			public const int action0 = 2131361918;
+			// aapt resource value: 0x7f0a0081
+			public const int action0 = 2131361921;
 			
 			// aapt resource value: 0x7f0a0065
 			public const int action_bar = 2131361893;
@@ -2047,8 +2047,8 @@ namespace RoadIT
 			// aapt resource value: 0x7f0a0066
 			public const int action_context_bar = 2131361894;
 			
-			// aapt resource value: 0x7f0a0082
-			public const int action_divider = 2131361922;
+			// aapt resource value: 0x7f0a0085
+			public const int action_divider = 2131361925;
 			
 			// aapt resource value: 0x7f0a0003
 			public const int action_menu_divider = 2131361795;
@@ -2092,8 +2092,8 @@ namespace RoadIT
 			// aapt resource value: 0x7f0a004f
 			public const int buttonPanel = 2131361871;
 			
-			// aapt resource value: 0x7f0a007f
-			public const int cancel_action = 2131361919;
+			// aapt resource value: 0x7f0a0082
+			public const int cancel_action = 2131361922;
 			
 			// aapt resource value: 0x7f0a0036
 			public const int center = 2131361846;
@@ -2107,8 +2107,8 @@ namespace RoadIT
 			// aapt resource value: 0x7f0a005d
 			public const int checkbox = 2131361885;
 			
-			// aapt resource value: 0x7f0a0085
-			public const int chronometer = 2131361925;
+			// aapt resource value: 0x7f0a0088
+			public const int chronometer = 2131361928;
 			
 			// aapt resource value: 0x7f0a003e
 			public const int clip_horizontal = 2131361854;
@@ -2152,20 +2152,20 @@ namespace RoadIT
 			// aapt resource value: 0x7f0a001a
 			public const int disableHome = 2131361818;
 			
-			// aapt resource value: 0x7f0a007c
-			public const int durationText = 2131361916;
+			// aapt resource value: 0x7f0a007f
+			public const int durationText = 2131361919;
 			
-			// aapt resource value: 0x7f0a008d
-			public const int editText1 = 2131361933;
+			// aapt resource value: 0x7f0a0090
+			public const int editTextbroker = 2131361936;
 			
-			// aapt resource value: 0x7f0a008f
-			public const int editText2 = 2131361935;
+			// aapt resource value: 0x7f0a0092
+			public const int editTextname = 2131361938;
 			
-			// aapt resource value: 0x7f0a0091
-			public const int editText4 = 2131361937;
+			// aapt resource value: 0x7f0a0096
+			public const int editTextpassword = 2131361942;
 			
-			// aapt resource value: 0x7f0a0093
-			public const int editText5 = 2131361939;
+			// aapt resource value: 0x7f0a0094
+			public const int editTextusername = 2131361940;
 			
 			// aapt resource value: 0x7f0a0067
 			public const int edit_query = 2131361895;
@@ -2173,8 +2173,8 @@ namespace RoadIT
 			// aapt resource value: 0x7f0a0026
 			public const int end = 2131361830;
 			
-			// aapt resource value: 0x7f0a008a
-			public const int end_padder = 2131361930;
+			// aapt resource value: 0x7f0a008d
+			public const int end_padder = 2131361933;
 			
 			// aapt resource value: 0x7f0a002e
 			public const int enterAlways = 2131361838;
@@ -2224,8 +2224,8 @@ namespace RoadIT
 			// aapt resource value: 0x7f0a004a
 			public const int image = 2131361866;
 			
-			// aapt resource value: 0x7f0a0089
-			public const int info = 2131361929;
+			// aapt resource value: 0x7f0a008c
+			public const int info = 2131361932;
 			
 			// aapt resource value: 0x7f0a0000
 			public const int item_touch_helper_previous_elevation = 2131361792;
@@ -2236,11 +2236,11 @@ namespace RoadIT
 			// aapt resource value: 0x7f0a0017
 			public const int light = 2131361815;
 			
-			// aapt resource value: 0x7f0a0083
-			public const int line1 = 2131361923;
+			// aapt resource value: 0x7f0a0086
+			public const int line1 = 2131361926;
 			
-			// aapt resource value: 0x7f0a0087
-			public const int line3 = 2131361927;
+			// aapt resource value: 0x7f0a008a
+			public const int line3 = 2131361930;
 			
 			// aapt resource value: 0x7f0a0018
 			public const int listMode = 2131361816;
@@ -2248,11 +2248,11 @@ namespace RoadIT
 			// aapt resource value: 0x7f0a004c
 			public const int list_item = 2131361868;
 			
-			// aapt resource value: 0x7f0a007d
-			public const int map = 2131361917;
+			// aapt resource value: 0x7f0a0080
+			public const int map = 2131361920;
 			
-			// aapt resource value: 0x7f0a0081
-			public const int media_actions = 2131361921;
+			// aapt resource value: 0x7f0a0084
+			public const int media_actions = 2131361924;
 			
 			// aapt resource value: 0x7f0a0027
 			public const int middle = 2131361831;
@@ -2293,20 +2293,20 @@ namespace RoadIT
 			// aapt resource value: 0x7f0a005f
 			public const int radio = 2131361887;
 			
-			// aapt resource value: 0x7f0a0096
-			public const int radioButton1 = 2131361942;
+			// aapt resource value: 0x7f0a0099
+			public const int radioButton1 = 2131361945;
 			
-			// aapt resource value: 0x7f0a0095
-			public const int radioButton3 = 2131361941;
+			// aapt resource value: 0x7f0a0097
+			public const int radioGroup1 = 2131361943;
 			
-			// aapt resource value: 0x7f0a0094
-			public const int radioGroup1 = 2131361940;
+			// aapt resource value: 0x7f0a0098
+			public const int radiotruck = 2131361944;
 			
 			// aapt resource value: 0x7f0a003b
 			public const int right = 2131361851;
 			
-			// aapt resource value: 0x7f0a007b
-			public const int routeButton = 2131361915;
+			// aapt resource value: 0x7f0a007c
+			public const int routeButton = 2131361916;
 			
 			// aapt resource value: 0x7f0a000e
 			public const int satellite = 2131361806;
@@ -2383,8 +2383,14 @@ namespace RoadIT
 			// aapt resource value: 0x7f0a0032
 			public const int snap = 2131361842;
 			
+			// aapt resource value: 0x7f0a007d
+			public const int space1 = 2131361917;
+			
 			// aapt resource value: 0x7f0a0050
 			public const int spacer = 2131361872;
+			
+			// aapt resource value: 0x7f0a009a
+			public const int spinner1 = 2131361946;
 			
 			// aapt resource value: 0x7f0a0008
 			public const int split_action_bar = 2131361800;
@@ -2404,11 +2410,14 @@ namespace RoadIT
 			// aapt resource value: 0x7f0a003c
 			public const int start = 2131361852;
 			
-			// aapt resource value: 0x7f0a008b
-			public const int startButton = 2131361931;
+			// aapt resource value: 0x7f0a008e
+			public const int startButton = 2131361934;
 			
-			// aapt resource value: 0x7f0a0080
-			public const int status_bar_latest_event_content = 2131361920;
+			// aapt resource value: 0x7f0a0083
+			public const int status_bar_latest_event_content = 2131361923;
+			
+			// aapt resource value: 0x7f0a007e
+			public const int stopbutton = 2131361918;
 			
 			// aapt resource value: 0x7f0a0070
 			public const int submit_area = 2131361904;
@@ -2416,32 +2425,35 @@ namespace RoadIT
 			// aapt resource value: 0x7f0a0019
 			public const int tabMode = 2131361817;
 			
+			// aapt resource value: 0x7f0a007b
+			public const int tableLayout1 = 2131361915;
+			
 			// aapt resource value: 0x7f0a000f
 			public const int terrain = 2131361807;
 			
-			// aapt resource value: 0x7f0a0088
-			public const int text = 2131361928;
+			// aapt resource value: 0x7f0a008b
+			public const int text = 2131361931;
 			
-			// aapt resource value: 0x7f0a0086
-			public const int text2 = 2131361926;
+			// aapt resource value: 0x7f0a0089
+			public const int text2 = 2131361929;
 			
 			// aapt resource value: 0x7f0a0058
 			public const int textSpacerNoButtons = 2131361880;
 			
-			// aapt resource value: 0x7f0a008c
-			public const int textView1 = 2131361932;
+			// aapt resource value: 0x7f0a008f
+			public const int textView1 = 2131361935;
 			
-			// aapt resource value: 0x7f0a0092
-			public const int textView15 = 2131361938;
+			// aapt resource value: 0x7f0a0095
+			public const int textView15 = 2131361941;
 			
-			// aapt resource value: 0x7f0a008e
-			public const int textView2 = 2131361934;
+			// aapt resource value: 0x7f0a0091
+			public const int textView2 = 2131361937;
 			
-			// aapt resource value: 0x7f0a0090
-			public const int textView3 = 2131361936;
+			// aapt resource value: 0x7f0a0093
+			public const int textView3 = 2131361939;
 			
-			// aapt resource value: 0x7f0a0084
-			public const int time = 2131361924;
+			// aapt resource value: 0x7f0a0087
+			public const int time = 2131361927;
 			
 			// aapt resource value: 0x7f0a004e
 			public const int title = 2131361870;
@@ -2632,46 +2644,43 @@ namespace RoadIT
 			public const int Finisher = 2130968612;
 			
 			// aapt resource value: 0x7f040025
-			public const int Main = 2130968613;
+			public const int notification_media_action = 2130968613;
 			
 			// aapt resource value: 0x7f040026
-			public const int notification_media_action = 2130968614;
+			public const int notification_media_cancel_action = 2130968614;
 			
 			// aapt resource value: 0x7f040027
-			public const int notification_media_cancel_action = 2130968615;
+			public const int notification_template_big_media = 2130968615;
 			
 			// aapt resource value: 0x7f040028
-			public const int notification_template_big_media = 2130968616;
+			public const int notification_template_big_media_narrow = 2130968616;
 			
 			// aapt resource value: 0x7f040029
-			public const int notification_template_big_media_narrow = 2130968617;
+			public const int notification_template_lines = 2130968617;
 			
 			// aapt resource value: 0x7f04002a
-			public const int notification_template_lines = 2130968618;
+			public const int notification_template_media = 2130968618;
 			
 			// aapt resource value: 0x7f04002b
-			public const int notification_template_media = 2130968619;
+			public const int notification_template_part_chronometer = 2130968619;
 			
 			// aapt resource value: 0x7f04002c
-			public const int notification_template_part_chronometer = 2130968620;
+			public const int notification_template_part_time = 2130968620;
 			
 			// aapt resource value: 0x7f04002d
-			public const int notification_template_part_time = 2130968621;
+			public const int select_dialog_item_material = 2130968621;
 			
 			// aapt resource value: 0x7f04002e
-			public const int select_dialog_item_material = 2130968622;
+			public const int select_dialog_multichoice_material = 2130968622;
 			
 			// aapt resource value: 0x7f04002f
-			public const int select_dialog_multichoice_material = 2130968623;
+			public const int select_dialog_singlechoice_material = 2130968623;
 			
 			// aapt resource value: 0x7f040030
-			public const int select_dialog_singlechoice_material = 2130968624;
+			public const int Setup = 2130968624;
 			
 			// aapt resource value: 0x7f040031
-			public const int Setup = 2130968625;
-			
-			// aapt resource value: 0x7f040032
-			public const int support_simple_spinner_dropdown_item = 2130968626;
+			public const int support_simple_spinner_dropdown_item = 2130968625;
 			
 			static Layout()
 			{

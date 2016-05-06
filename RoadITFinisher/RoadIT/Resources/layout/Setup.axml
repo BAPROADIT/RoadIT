@@ -20,8 +20,9 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editText1"
-        android:translationY="25dp" />
+        android:id="@+id/editTextbroker"
+        android:translationY="25dp"
+        android:text="nasdenys.synology.me" />
     <TextView
         android:text="Name finisher"
         android:textAppearance="?android:attr/textAppearanceMedium"
@@ -32,8 +33,9 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editText2"
-        android:translationY="25dp" />
+        android:id="@+id/editTextname"
+        android:translationY="25dp"
+        android:text="finisher1" />
     <TextView
         android:text="Username"
         android:textAppearance="?android:attr/textAppearanceMedium"
@@ -44,8 +46,9 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editText4"
-        android:translationY="25dp" />
+        android:id="@+id/editTextusername"
+        android:translationY="25dp"
+        android:text="fin" />
     <TextView
         android:text="Password"
         android:textAppearance="?android:attr/textAppearanceMedium"
@@ -57,8 +60,9 @@
         android:inputType="textPassword"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editText5"
-        android:translationY="25dp" />
+        android:id="@+id/editTextpassword"
+        android:translationY="25dp"
+        android:text="fin" />
     <RadioGroup
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -68,7 +72,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Truck"
-            android:id="@+id/radioButton3"
+            android:id="@+id/radiotruck"
             android:checked="true" />
         <RadioButton
             android:layout_width="wrap_content"
@@ -77,4 +81,8 @@
             android:text="Finisher"
             android:id="@+id/radioButton1" />
     </RadioGroup>
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner1" />
 </LinearLayout>
