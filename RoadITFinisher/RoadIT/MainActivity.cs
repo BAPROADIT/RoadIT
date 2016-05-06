@@ -36,19 +36,35 @@ namespace RoadIT
 		{
 			base.OnCreate(bundle);
 			_isGooglePlayServicesInstalled = TestIfGooglePlayServicesIsInstalled();
+
+			SetContentView(Resource.Layout.Setup);
+
 			initLocationManager();
 			RequestInternetPermission();
-
-			SampleActivity activityfin = new SampleActivity(1, 2, typeof(Finisher));
-			activityfin.Start(this);
+			confirmSettings();
 
 
-			// Set our view from the "main" layout resource
-			//SetContentView(Resource.Layout.Finisher);
+		}
 
+		public void confirmSettings()
+		{
+			Button startButton = FindViewById<Button>(Resource.Id.startButton);
+			startButton.Click += (sender, e1) =>
+			{
+				EditText broker = FindViewById<EditText>(Resource.Id.editText1);
+				string brokerstring = broker.Text;
 
-			SetContentView(Resource.Layout.Settings);
+				EditText name = FindViewById<EditText>(Resource.Id.editText2);
+				string namestring = name.Text;
 
+				EditText username = FindViewById<EditText>(Resource.Id.editText4);
+				string usernamestring = username.Text;
+
+				EditText pass = FindViewById<EditText>(Resource.Id.editText5);
+				string passtring = username.Text;
+
+				SampleActivity activityfin = new SampleActivity(1, 2, typeof(Finisher));
+			};
 		}
 
 		private bool TestIfGooglePlayServicesIsInstalled()

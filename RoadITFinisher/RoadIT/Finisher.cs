@@ -29,18 +29,30 @@ namespace RoadIT
 		string durationString;
 		JObject _Jobj;
 		string tag = "MainActivity";
+		//string broker, name, username, pass;
 
 		List<Truck> trucklist = new List<Truck>();
 
-		//public static string broker = "tcp://iot.eclipse.org:1883";
-		public static string broker = "tcp://nasdenys.synology.me:1883";
+		public static string broker = "tcp://iot.eclipse.org:1883";
+		//public static string broker = "tcp://nasdenys.synology.me:1883";
 
 		public static string clientId = "JavaSample";
 
 		public static MemoryPersistence persistence = new MemoryPersistence();
+
 		public static MqttClient Client = new MqttClient(broker, clientId, persistence);
 
+
 		bool firstloc = true;
+
+		//public Finisher(string broker, string name, string username, string pass)
+		//{
+		//	this.broker = broker;
+		//	this.name = name;
+		//	this.username = username;
+		//	this.pass = pass;
+		//	Client = new MqttClient(broker, clientId, persistence);
+		//}
 		
 		public void OnLocationChanged(Android.Locations.Location location)
 		{
