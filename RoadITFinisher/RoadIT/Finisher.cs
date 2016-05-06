@@ -165,7 +165,7 @@ namespace RoadIT
 			stopbutton.Click += (sender, e) =>
 			{
 				//TODO send kill me signal
-				Client.Disconnect;
+				//Client.Disconnect;
 				SampleActivity activitysetup = new SampleActivity(1, 2, typeof(MainActivity));
 				activitysetup.Start(this);
 			};
