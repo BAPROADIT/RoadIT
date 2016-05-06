@@ -21,7 +21,8 @@ using Org.Eclipse.Paho.Client.Mqttv3.Persist;
 namespace RoadIT
 {
 	//prevents activity from restarting when screen orientation changes
-	[Activity(Label = "Road_it", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation)]
+	[Activity(Label = "Roadit", MainLauncher = true, Icon = "@mipmap/icon", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation)]
+	//[Activity(Label = "Road_it", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation)]
 	public class Finisher : Activity, ILocationListener
 	{
 		LatLng finisherloc = new LatLng(0, 0);
