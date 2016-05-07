@@ -148,9 +148,19 @@ namespace RoadIT
 			username = Intent.GetStringExtra ("username") ?? null;
 			pass = Intent.GetStringExtra ("pass") ?? null;
 			Console.WriteLine (broker + " "+ name+ " "+ username+" "+ pass);
-			SetContentView(Resource.Layout.Finisher);
+			SetContentView(Resource.Layout.Map);
+			//indication truck/finisher
+			TextView ind = FindViewById<TextView>(Resource.Id.durationText);
+			if (truckbool == true)
+			{
+				ind.Text = "Truck";
+			}
+			else
+			{
+				ind.Text = "Finisher";
+			}
+
 			InitMapFragment();
-			SetupAnimateToButton();
 			Client = makeClient ();
 			Client.SetCallback(new MqttSubscribe(this));
 			ConfigMQTT();
@@ -227,26 +237,6 @@ namespace RoadIT
 
 		}
 
-		public void SetupAnimateToButton()
-		{
-			Button RouteButton = FindViewById<Button>(Resource.Id.routeButton);
-			RouteButton.Click += (sender, e) =>
-			{
-				/*Thread PublishMQTT = new Thread(() => MQTTPublish("51.2074277,4.2935036,1"));
-				PublishMQTT.Start();
-				Thread.Sleep(50);
-				Thread PublishMQTT2 = new Thread(() => MQTTPublish("51.1074277,5.135036,2"));
-				PublishMQTT2.Start();
-				Thread.Sleep(50);
-				Thread PublishMQTT3 = new Thread(() => MQTTPublish("51.0074277,5.335036,3"));
-				PublishMQTT3.Start();
-				Thread.Sleep(50);
-				Thread PublishMQTT4 = new Thread(() => MQTTPublish("50.8074277,4.555036,4"));
-				PublishMQTT4.Start();
-				Thread.Sleep(50);*/
-			};
-		}
-
 		void ZoomOnLoc()
 		{
 			CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
@@ -319,7 +309,16 @@ namespace RoadIT
 			////true for first element
 			//trucklist.First().setToReDraw(true);
 
-			durationString = "ETA of nearest truck: " + partnerlist.First().getDur() + "s";
+			if (truckbool == true)
+			{
+				durationString = "ETA of nearest truck: " + partnerlist.First().getDur() + "s";
+			}
+			else
+			{
+				durationString = "ETA at finisher: " + partnerlist.First().getDur() + "s";
+			}
+
+			
 			TextView durationtextfield = FindViewById<TextView>(Resource.Id.durationText);
 
 			//update textfield in main UI thread
@@ -334,22 +333,32 @@ namespace RoadIT
 		public void updateUI()
 		{
 			BitmapDescriptor truck = BitmapDescriptorFactory.FromResource(Resource.Drawable.truck);
+			BitmapDescriptor finisher = BitmapDescriptorFactory.FromResource(Resource.Drawable.finisher);
 			map.Clear();
 
 			//temp variable -> no chance of changes in foreach
 			List<PartnerVehicle> listtemp = partnerlist;
 
-			Log.Debug("updateUI", "list of trucks");
+			Log.Debug("updateUI", "list of partners");
 
 			foreach (PartnerVehicle aPartnerVehicle in listtemp)
 			{
 				aPartnerVehicle.display();
 				map.AddPolyline(aPartnerVehicle.getPolylineOptions());
-				MarkerOptions markertruck = new MarkerOptions();
-				markertruck.SetPosition(aPartnerVehicle.getLocation());
-				markertruck.SetTitle("Truck " + aPartnerVehicle.getid() + " arrives in: " + aPartnerVehicle.getDur() + "s");
-				markertruck.SetIcon(truck);
-				map.AddMarker(markertruck);
+				MarkerOptions markerpartner = new MarkerOptions();
+				markerpartner.SetPosition(aPartnerVehicle.getLocation());
+				if (truckbool == true)
+				{
+					markerpartner.SetIcon(truck);
+					markerpartner.SetTitle("Truck " + aPartnerVehicle.getid() + " arrives in: " + aPartnerVehicle.getDur() + "s");
+				}
+				else
+				{
+					markerpartner.SetIcon(finisher);
+					markerpartner.SetTitle("Arriving at Finisher" + aPartnerVehicle.getid() + "in: " + aPartnerVehicle.getDur() + "s");
+				}
+
+				map.AddMarker(markerpartner);
 			}
 		}
 
@@ -391,36 +400,47 @@ namespace RoadIT
 
 			PolylineOptions temppoly = new PolylineOptions();
 
-			//green for nearest truck
-			if (partnervehicle.getNearest() == true)
+			if (truckbool == false)
 			{
-				Log.Debug("drawroute", "nearest");
-				temppoly.InvokeColor(0x6600cc00);
+				//variable colours for different trucks
+
+				//green for nearest truck
+				if (partnervehicle.getNearest() == true)
+				{
+					Log.Debug("drawroute", "nearest");
+					temppoly.InvokeColor(0x6600cc00);
+				}
+				else if (partnervehicle.getcolor() == "blue")
+				{
+					Log.Debug("drawroute", partnervehicle.getid() + partnervehicle.getcolor() + "moet blue zijn");
+					temppoly.InvokeColor(0x66000099);
+				}
+				else if (partnervehicle.getcolor() == "red")
+				{
+					Log.Debug("drawroute", partnervehicle.getid() + partnervehicle.getcolor() + "moet red zijn");
+					temppoly.InvokeColor(0x66ff0000);
+				}
+				else if (partnervehicle.getcolor() == "black")
+				{
+					Log.Debug("drawroute", partnervehicle.getid() + partnervehicle.getcolor() + "moet black zijn");
+					temppoly.InvokeColor(0x66000000);
+				}
+				else if (partnervehicle.getcolor() == "purple")
+				{
+					Log.Debug("drawroute", partnervehicle.getid() + partnervehicle.getcolor() + "moet purple zijn");
+					temppoly.InvokeColor(0x669933ff);
+				}
+				else
+				{
+					//blue
+					Log.Debug("drawroute", "else");
+					temppoly.InvokeColor(0x66000099);
+				}
 			}
-			else if (partnervehicle.getcolor() == "blue")
-			{
-				Log.Debug("drawroute", partnervehicle.getid() + partnervehicle.getcolor() + "moet blue zijn");
-				temppoly.InvokeColor(0x66000099);
-			}
-			else if (partnervehicle.getcolor() == "red")
-			{
-				Log.Debug("drawroute", partnervehicle.getid() + partnervehicle.getcolor() + "moet red zijn");
-				temppoly.InvokeColor(0x66ff0000);
-			}
-			else if (partnervehicle.getcolor() == "black")
-			{
-				Log.Debug("drawroute", partnervehicle.getid() + partnervehicle.getcolor() + "moet black zijn");
-				temppoly.InvokeColor(0x66000000);
-			}
-			else if (partnervehicle.getcolor() == "purple")
-			{
-				Log.Debug("drawroute", partnervehicle.getid() + partnervehicle.getcolor() + "moet purple zijn");
-				temppoly.InvokeColor(0x669933ff);
-			}
+
 			else
 			{
-				//blue
-				Log.Debug("drawroute", "else");
+				//route from truck to finisher in blue
 				temppoly.InvokeColor(0x66000099);
 			}
 
