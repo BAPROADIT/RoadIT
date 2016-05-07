@@ -9,10 +9,10 @@ namespace RoadIT
 	//[Activity(Label = "MqttSubscribe")]
 	public class MqttSubscribe : Activity, IMqttCallback
 	{
-		Finisher fin;
-		public MqttSubscribe(Finisher myfin)
+		OwnVehicle ownvec;
+		public MqttSubscribe(OwnVehicle myvec)
 		{
-			fin = myfin;
+			ownvec = myvec;
 		}
 
 		protected override void OnCreate(Bundle savedInstanceState)
@@ -24,13 +24,13 @@ namespace RoadIT
 		{
 			Log.Debug("MqttSubscribe", "Topic: "+topic+"Msg: "+ message.ToString());
 			string messagestring = message.ToString();
-			fin.MQTTupdate(messagestring, topic);
+			ownvec.MQTTupdate(messagestring, topic);
 		}
 
 		public void ConnectionLost(Throwable cause)
 		{
 			Log.Debug("MqttSubscribe", "connectionlost");
-			Finisher.ConfigMQTT();
+			ownvec.ConfigMQTT();
 		}
 
 		public void DeliveryComplete(IMqttDeliveryToken token)

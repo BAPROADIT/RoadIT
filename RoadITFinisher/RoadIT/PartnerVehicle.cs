@@ -4,7 +4,7 @@ using Android.Util;
 
 namespace RoadIT
 {
-	public class Truck
+	public class PartnerVehicle
 	{
 		private LatLng location;
 		private string color;
@@ -17,7 +17,7 @@ namespace RoadIT
 		private Random rnd = new Random();
 		private string[] colorarray = new string[] { "red", "blue", "black", "purple" };
 
-		public Truck(LatLng location, int id)
+		public PartnerVehicle(LatLng location, int id)
 		{
 			this.location = location;
 			color = colorarray[rnd.Next(0, colorarray.Length)];

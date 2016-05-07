@@ -91,7 +91,7 @@
     <Compile Include="Finisher.cs" />
     <Compile Include="MQTTSubscribe.cs" />
     <Compile Include="PermissionUtil.cs" />
-    <Compile Include="Truck.cs" />
+    <Compile Include="PartnerVehicle.cs" />
     <Compile Include="Resources\Resource.designer.cs" />
   </ItemGroup>
   <ItemGroup>

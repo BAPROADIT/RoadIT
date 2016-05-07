@@ -15,7 +15,7 @@ using System.Threading;
 
 namespace RoadIT
 {
-	[Activity(Label = "Roadit", MainLauncher = true, Icon = "@mipmap/icon")]
+	[Activity(Label = "Roadit", MainLauncher = true, Icon = "@mipmap/icon", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation)]
 	public class MainActivity : Activity
 	{
 		public static readonly string Tag = "ROAD IT";
@@ -72,14 +72,14 @@ namespace RoadIT
 				}else{
 					truck="false";
 				}
-				SampleActivity activityfin = new SampleActivity(1, 2, typeof(Finisher));
-				var finisher = new Intent(this, typeof(Finisher));
-				finisher.PutExtra("broker",brokerstring );
-				finisher.PutExtra("name",namestring );
-				finisher.PutExtra("username",usernamestring );
-				finisher.PutExtra("pass",passtring );
-				finisher.PutExtra("truck",truck);
-				StartActivity(finisher);
+				SampleActivity activityfin = new SampleActivity(1, 2, typeof(OwnVehicle));
+				var ownvec = new Intent(this, typeof(OwnVehicle));
+				ownvec.PutExtra("broker",brokerstring );
+				ownvec.PutExtra("name",namestring );
+				ownvec.PutExtra("username",usernamestring );
+				ownvec.PutExtra("pass",passtring );
+				ownvec.PutExtra("truck",truck);
+				StartActivity(ownvec);
 
 			};
 		}
