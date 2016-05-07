@@ -17,6 +17,7 @@ using System.Text;
 using Newtonsoft.Json.Linq;
 using Org.Eclipse.Paho.Client.Mqttv3;
 using Org.Eclipse.Paho.Client.Mqttv3.Persist;
+using System.Net.NetworkInformation;
 
 namespace RoadIT
 {
@@ -39,6 +40,7 @@ namespace RoadIT
 
 		public static MemoryPersistence persistence = new MemoryPersistence();
 
+
 		public static MqttClient Client;
 		bool firstloc = true;
 		
@@ -60,7 +62,6 @@ namespace RoadIT
 		public void MQTTPublish(string content)
 		{
 			int qos = 2;
-			MemoryPersistence persistence = new MemoryPersistence();
 
 			try
 			{
@@ -132,7 +133,7 @@ namespace RoadIT
 			//string titlestring="";
 			if (truck == "true") {
 				//titlestring = "Truck";
-				topicpub="roadit/truck/"+name+"/"+15;//unieke nummer
+				topicpub="roadit/truck/"+name+"/"+15;//TODO unieke nummer
 				topicsub="roadit/fin/"+name;
 				truckbool = true;
 			} else {
@@ -142,10 +143,10 @@ namespace RoadIT
 				truckbool = false;
 			}
 			TextView title = FindViewById<TextView>(Resource.Id.textView1);
-			//update textfield in main UI thread
-			//RunOnUiThread(() => title.Text= titlestring);
 
 			username = Intent.GetStringExtra ("username") ?? null;
+			username = GetMacAddress();
+
 			pass = Intent.GetStringExtra ("pass") ?? null;
 			Console.WriteLine (broker + " "+ name+ " "+ username+" "+ pass);
 			SetContentView(Resource.Layout.Map);
@@ -161,6 +162,7 @@ namespace RoadIT
 			}
 
 			InitMapFragment();
+
 			Client = makeClient ();
 			Client.SetCallback(new MqttSubscribe(this));
 			ConfigMQTT();
@@ -546,6 +548,21 @@ namespace RoadIT
 			}
 			catch { _sData = "unable to connect to server "; }
 			return _sData;
+		}
+		public string GetMacAddress()
+		{
+			foreach (var netInterface in NetworkInterface.GetAllNetworkInterfaces()) 
+			{
+				if (netInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 ||
+					netInterface.NetworkInterfaceType == NetworkInterfaceType.Ethernet) 
+				{
+					var address = netInterface.GetPhysicalAddress();
+					return BitConverter.ToString(address.GetAddressBytes());
+
+				}
+			}
+
+			return "NoMac";
 		}
 	}
 }
