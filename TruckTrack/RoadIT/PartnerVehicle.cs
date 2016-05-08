@@ -22,7 +22,7 @@ namespace RoadIT
 			this.location = location;
 			color = colorarray[rnd.Next(0, colorarray.Length)];
 			this.id = id;
-			locstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".");//+ "," + id;
+			locstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".");
 			polylineOptions = new PolylineOptions();
 		}
 
@@ -99,11 +99,11 @@ namespace RoadIT
 
 		public void display()
 		{
-			Log.Debug("truckdisploc", locstring);
-			Log.Debug("truckdispnearest", nearest.ToString());
-			Log.Debug("truckdisptodraw", toReDraw.ToString());
-			Log.Debug("truckdispcolor", color);
-			Log.Debug("truckdispid", id.ToString());
+			Log.Debug("disploc", locstring);
+			Log.Debug("dispnearest", nearest.ToString());
+			Log.Debug("disptodraw", toReDraw.ToString());
+			Log.Debug("dispcolor", color);
+			Log.Debug("dispid", id.ToString());
 		}
 
 

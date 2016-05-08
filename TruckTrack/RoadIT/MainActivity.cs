@@ -15,10 +15,9 @@ using System.Threading;
 
 namespace RoadIT
 {
-	[Activity(Label = "Roadit", MainLauncher = true, Icon = "@mipmap/icon", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation)]
+	[Activity(Label = "TruckTrack", MainLauncher = true, Icon = "@mipmap/icon", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation)]
 	public class MainActivity : Activity
 	{
-		public static readonly string Tag = "ROAD IT";
 		public static readonly int InstallGooglePlayServicesId = 1000;
 		private bool _isGooglePlayServicesInstalled;
 
@@ -28,12 +27,12 @@ namespace RoadIT
 		static readonly int REQUEST_FINELOCATION = 1;
 		static readonly int REQUEST_INTERNET = 2;
 
-		static string[] PERMISSIONS_CONTACT = {
+		//static string[] PERMISSIONS_CONTACT = {
 
-			Android.Manifest.Permission.AccessCoarseLocation,
-			Android.Manifest.Permission.AccessFineLocation,
-			Android.Manifest.Permission.Internet
-		};
+		//	Android.Manifest.Permission.AccessCoarseLocation,
+		//	Android.Manifest.Permission.AccessFineLocation,
+		//	Android.Manifest.Permission.Internet
+		//};
 
 		protected override void OnCreate(Bundle bundle)
 		{
@@ -89,14 +88,14 @@ namespace RoadIT
 			int queryResult = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(this);
 			if (queryResult == ConnectionResult.Success)
 			{
-				Log.Info(Tag, "Google Play Services is installed on this device.");
+				Log.Info("Road IT", "Google Play Services is installed on this device.");
 				return true;
 			}
 
 			if (GoogleApiAvailability.Instance.IsUserResolvableError(queryResult))
 			{
 				string errorString = GoogleApiAvailability.Instance.GetErrorString(queryResult);
-				Log.Error(Tag, "There is a problem with Google Play Services on this device: {0} - {1}", queryResult, errorString);
+				Log.Error("Road IT", "There is a problem with Google Play Services on this device: {0} - {1}", queryResult, errorString);
 				Dialog errorDialog = GoogleApiAvailability.Instance.GetErrorDialog(this, queryResult, InstallGooglePlayServicesId);
 				//ErrorDialogFragment dialogFrag = new ErrorDialogFragment(errorDialog);
 
