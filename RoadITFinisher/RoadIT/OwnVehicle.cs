@@ -311,7 +311,7 @@ namespace RoadIT
 			////true for first element
 			//trucklist.First().setToReDraw(true);
 
-			if (truckbool == true)
+			if (truckbool == false)
 			{
 				durationString = "ETA of nearest truck: " + partnerlist.First().getDur() + "s";
 			}
