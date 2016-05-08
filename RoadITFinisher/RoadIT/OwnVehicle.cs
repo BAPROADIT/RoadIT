@@ -349,7 +349,7 @@ namespace RoadIT
 				map.AddPolyline(aPartnerVehicle.getPolylineOptions());
 				MarkerOptions markerpartner = new MarkerOptions();
 				markerpartner.SetPosition(aPartnerVehicle.getLocation());
-				if (truckbool == true)
+				if (truckbool == false)
 				{
 					markerpartner.SetIcon(truck);
 					markerpartner.SetTitle("Truck " + aPartnerVehicle.getid() + " arrives in: " + aPartnerVehicle.getDur() + "s");
