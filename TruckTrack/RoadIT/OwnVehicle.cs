@@ -159,8 +159,25 @@ namespace RoadIT
 				ind.Text = "Finisher";
 			}
 
-			InitMapFragment();
+			// initialize location manager
+			locMgr = GetSystemService(Context.LocationService) as LocationManager;
 
+			if (locMgr.AllProviders.Contains(LocationManager.NetworkProvider)
+				&& locMgr.IsProviderEnabled(LocationManager.NetworkProvider))
+			{
+				//TODO
+				//ACCURACY OF LOCATIONUPDATE
+
+				//parameters LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, mLocationListener);
+				//mintime in sec*1000 
+				//mindistance in meters (float)
+				locMgr.RequestLocationUpdates(LocationManager.NetworkProvider, 20000, 30, this);
+			}
+			else {
+				Toast.MakeText(this, "Please switch on your location service!", ToastLength.Long).Show();
+			}
+
+			InitMapFragment();
 			Client = makeClient ();
 			Client.SetCallback(new MqttSubscribe(this));
 			ConfigMQTT();
@@ -184,17 +201,6 @@ namespace RoadIT
 				SampleActivity activitysetup = new SampleActivity(1, 2, typeof(MainActivity));
 				activitysetup.Start(this);
 			};
-			// initialize location manager
-			locMgr = GetSystemService(Context.LocationService) as LocationManager;
-
-			if (locMgr.AllProviders.Contains(LocationManager.NetworkProvider)
-				&& locMgr.IsProviderEnabled(LocationManager.NetworkProvider))
-			{
-				locMgr.RequestLocationUpdates(LocationManager.NetworkProvider, 2000, 1, this);
-			}
-			else {
-				Toast.MakeText(this, "Please switch on your location service!", ToastLength.Long).Show();
-			}
 		}
 
 		public 	void ConfigMQTT()

@@ -81,7 +81,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="MQTT">
-      <HintPath>..\..\..\..\School\Bachelorproef\MQTT.dll</HintPath>
+      <HintPath>..\packages\MQTT.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -103,16 +103,12 @@
   </ItemGroup>
   <ItemGroup>
     <AndroidResource Include="Resources\values\Strings.xml" />
-    <AndroidResource Include="Resources\mipmap-hdpi\Icon.png" />
-    <AndroidResource Include="Resources\mipmap-mdpi\Icon.png" />
-    <AndroidResource Include="Resources\mipmap-xhdpi\Icon.png" />
-    <AndroidResource Include="Resources\mipmap-xxhdpi\Icon.png" />
-    <AndroidResource Include="Resources\mipmap-xxxhdpi\Icon.png" />
     <AndroidResource Include="Resources\drawable\truck.png" />
     <AndroidResource Include="Resources\layout\Map.axml" />
     <AndroidResource Include="Resources\values\theme.xml" />
     <AndroidResource Include="Resources\layout\Setup.axml" />
     <AndroidResource Include="Resources\drawable\finisher.png" />
+    <AndroidResource Include="Resources\drawable\trucktrackicon.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

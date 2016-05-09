@@ -15,7 +15,7 @@ using System.Threading;
 
 namespace RoadIT
 {
-	[Activity(Label = "TruckTrack", MainLauncher = true, Icon = "@mipmap/icon", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation)]
+	[Activity(Label = "TruckTrack", MainLauncher = true, Icon = "@drawable/trucktrackicon", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation)]
 	public class MainActivity : Activity
 	{
 		public static readonly int InstallGooglePlayServicesId = 1000;
