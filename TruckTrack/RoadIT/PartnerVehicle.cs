@@ -9,7 +9,7 @@ namespace RoadIT
 		private LatLng location;
 		private string color;
 		private int duration;
-		private int id;
+		private string id;
 		private string locstring;
 		private PolylineOptions polylineOptions;
 		private bool nearest = false;
@@ -17,7 +17,7 @@ namespace RoadIT
 		private Random rnd = new Random();
 		private string[] colorarray = new string[] { "red", "blue", "black", "purple" };
 
-		public PartnerVehicle(LatLng location, int id)
+		public PartnerVehicle(LatLng location, string id)
 		{
 			this.location = location;
 			color = colorarray[rnd.Next(0, colorarray.Length)];
@@ -56,7 +56,7 @@ namespace RoadIT
 			this.color = color;
 		}
 
-		public int getid()
+		public string getid()
 		{
 			return id;
 		}
@@ -103,7 +103,7 @@ namespace RoadIT
 			Log.Debug("dispnearest", nearest.ToString());
 			Log.Debug("disptodraw", toReDraw.ToString());
 			Log.Debug("dispcolor", color);
-			Log.Debug("dispid", id.ToString());
+			Log.Debug("dispid", id);
 		}
 
 

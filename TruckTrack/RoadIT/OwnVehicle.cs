@@ -87,11 +87,11 @@ namespace RoadIT
 					Log.Debug ("mqttsubstring1", Convert.ToDouble (substrings [1]).ToString ());
 					//topic for finisher: roadit/truck/name/#
 					//topic for truck: roadit/fin/name
-					int id = 0;
+					String id = "finisher";
 					if (truckbool == false) {
 						Char delimitertopic = '/';
 						String[] subtopics = topic.Split (delimitertopic);
-						id = Int32.Parse (subtopics [3]);
+						id = subtopics [3];
 					}
 					Console.WriteLine ("id: " + id);
 					bool exists = false;
@@ -131,7 +131,7 @@ namespace RoadIT
 			//string titlestring="";
 			if (truck == "true") {
 				//titlestring = "Truck";
-				topicpub="roadit/truck/"+name+"/"+15;//TODO unieke nummer
+				topicpub="roadit/truck/"+name+"/"+GetMacAddress();//TODO unieke nummer
 				topicsub="roadit/fin/"+name;
 				truckbool = true;
 			} else {
