@@ -12,10 +12,9 @@ import java.sql.Statement;
 //import java.sql.Time;
 
 public class Publisher {
-	public static final String Topic = "fin";
 	private static MqttClient client;
-
-	private static void publish(String message) throws MqttException {
+	
+	private static void publish(String message, String Topic) throws MqttException {
 		final MqttTopic topic = client.getTopic(Topic); // Set topic
 		MqttMessage test = new MqttMessage();
 		test.setQos(0);
@@ -24,13 +23,10 @@ public class Publisher {
 	}
 
 	public static void main(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
-		// final Publisher publisher = new Publisher();
-		// publisher.start();
 		Connection connect = null;
 		Statement statement = null;
-		// private PreparedStatement preparedStatement = null;
 		ResultSet resultSet = null;
-		String number = args[0];
+		String topic = args[0];
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			// Setup the connection with the DB
@@ -41,8 +37,9 @@ public class Publisher {
 			// Statements allow to issue SQL queries to the database
 			statement = connect.createStatement();
 
-			resultSet = statement.executeQuery("select * from mqtt where number= " + number);
+			resultSet = statement.executeQuery("select * from roadit where tijd Between '2016-05-10 13:14:02' And '2016-05-10 14:10:08';");//
 			writeData(resultSet);
+			System.out.println("Done");
 
 			// writeResultSet(resultSet);
 			connect.close();
@@ -57,6 +54,7 @@ public class Publisher {
 
 	private static void writeData(ResultSet resultSet) throws SQLException, InterruptedException {
 		float time;
+		float factor = (float) .01;
 		float oldtime = 0;
 		boolean first = true;
 		String clientId = Utils.getMacAddress() + "-pub"; // get unique ID try
@@ -69,7 +67,7 @@ public class Publisher {
 			System.exit(1);
 		}
 		while (resultSet.next()) {
-			System.out.println(resultSet.getString("tijd") + " \t" + resultSet.getString("number") + " \t"
+			System.out.println(resultSet.getString("tijd") + " \t" + resultSet.getString("topic") + " \t"
 					+ resultSet.getString("string"));
 			String[] parts = resultSet.getString("tijd").toString().split("-");
 			// 2016-04-26 12:32:20.0
@@ -92,14 +90,14 @@ public class Publisher {
 			}
 
 			System.out.println("Sleep (s):" + (time - oldtime));
-			Thread.sleep((long) ((time - oldtime) * 1000));
+			Thread.sleep((long) ((time - oldtime) * 1000*factor));
 			try {
 				MqttConnectOptions options = new MqttConnectOptions();
 				options.setCleanSession(false);
-				options.setUserName("fin");
-				options.setPassword("fin".toCharArray());
+				options.setUserName("simulator");
+				options.setPassword("simulator".toCharArray());
 				client.connect(options); // connect to client
-					publish(resultSet.getString("string"));
+					publish(resultSet.getString("string"), resultSet.getString("topic"));
 				client.disconnect();
 			} catch (MqttException e) {
 				e.printStackTrace();

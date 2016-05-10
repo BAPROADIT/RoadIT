@@ -26,8 +26,8 @@ public class SubscribeCallback implements MqttCallback {
 	// Gives a sign when a message arrives and writes it to the file logData
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
 		System.out.println("Message arrived. Topic: " + topic + "  Message: " + message.toString());
-
-		try {
+		activeTopics.newMessage(topic, message.toString());
+		/*try {//To SQL
 			Class.forName("com.mysql.jdbc.Driver");
 			// Setup the connection with the DB
 			connect = DriverManager.getConnection("jdbc:mysql://nasdenys.synology.me/roadit?autoReconnect=true&useSSL=false&" + "user=roadit&password=roadit");
@@ -35,26 +35,14 @@ public class SubscribeCallback implements MqttCallback {
 			// Statements allow to issue SQL queries to the database
 			 statement = connect.createStatement();
 			// Result set get the result of the SQL query
-			 String[] parts = message.toString().split(",");
-			 if (parts.length==3){
-			 //System.out.println(parts[2]);
-			 statement.executeUpdate("INSERT INTO mqtt(string, number) VALUES (\""+message.toString()+"\",\""+parts[2]+"\");");
-			// writeResultSet(resultSet);
-			 connect.close(); 
-			 }
-			 else{
-				 System.out.println("Format error");
-			 }
-			// PreparedStatements can use variables and are more efficient
-			// preparedStatement = connect.prepareStatement("INSERT INTO 'mqtt'
-			// ('string') VALUES ('"+message.toString()+"');");
-
+			statement.executeUpdate("INSERT INTO roadit(string, topic) VALUES (\""+message.toString()+"\",\""+topic+"\");");
+			
 		} catch (SQLException ex) {
 			// handle any errors
 			System.out.println("SQLException: " + ex.getMessage());
 			System.out.println("SQLState: " + ex.getSQLState());
 			System.out.println("VendorError: " + ex.getErrorCode());
-		}
+		}*/
 	}
 
 	@Override
