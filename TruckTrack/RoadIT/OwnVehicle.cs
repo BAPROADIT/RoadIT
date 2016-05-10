@@ -34,6 +34,7 @@ namespace RoadIT
 		JObject _Jobj;
 		public static string broker = "", topicpub="", topicsub="", username="", pass="";
 		bool truckbool;
+		String id;
 
 		List<PartnerVehicle> partnerlist = new List<PartnerVehicle>();
 
@@ -55,6 +56,19 @@ namespace RoadIT
 			ownlocstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".");
 			Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring));
 			PublishMQTT.Start();
+
+			//truck needs to update its route and duration when its location changes
+			if (truckbool == true)
+			{
+				foreach (PartnerVehicle aPartnerVehicle in partnerlist)
+				{
+					if (aPartnerVehicle.getid() == id)
+					{
+						Thread mapAPICall2 = new Thread(() => mapAPICall(aPartnerVehicle));
+						mapAPICall2.Start();
+					}
+				}
+			}
 		}
 
 		public void MQTTPublish(string content)
@@ -80,14 +94,36 @@ namespace RoadIT
 			Char delimiter = ',';
 			String[] substrings = mqttmessage.Split(delimiter);
 
-			if (substrings.Length == 2) {
+			if (mqttmessage == "killme")
+			{
+				String id = "finisher";
+				if (truckbool == false)
+				{
+					Char delimitertopic = '/';
+					String[] subtopics = topic.Split(delimitertopic);
+					id = subtopics[3];
+				}
+
+				//iterate list in reverse to remove partnervehicle
+				for (int i = partnerlist.Count - 1; i >= 0; i--)
+				{
+					bool exists = false;
+					if (partnerlist[i].getid() == id && exists == false)
+					{
+						exists = true;
+						partnerlist.RemoveAt(i);
+						RunOnUiThread(() => updateUI());
+					}
+				}
+			}
+
+			else if (substrings.Length == 2) {
 				try {
 					//TODO todouble kapot nederlands?? punten verdwijnen?
 					Log.Debug ("mqttsubstring0", Convert.ToDouble (substrings [0]).ToString ());
 					Log.Debug ("mqttsubstring1", Convert.ToDouble (substrings [1]).ToString ());
 					//topic for finisher: roadit/truck/name/#
 					//topic for truck: roadit/fin/name
-					String id = "finisher";
 					if (truckbool == false) {
 						Char delimitertopic = '/';
 						String[] subtopics = topic.Split (delimitertopic);
@@ -95,23 +131,27 @@ namespace RoadIT
 					}
 					Console.WriteLine ("id: " + id);
 					bool exists = false;
-					foreach (PartnerVehicle aPartnerVehicle in partnerlist) {
-						if (aPartnerVehicle.getid () == id) {
-							exists = true;
-							aPartnerVehicle.setLocation (new LatLng (Convert.ToDouble (substrings [0]), Convert.ToDouble (substrings [1])));
-							Thread mapAPICall2 = new Thread (() => mapAPICall (aPartnerVehicle));
-							mapAPICall2.Start ();
+						foreach (PartnerVehicle aPartnerVehicle in partnerlist)
+						{
+							if (aPartnerVehicle.getid() == id)
+							{
+								exists = true;
+								aPartnerVehicle.setLocation(new LatLng(Convert.ToDouble(substrings[0]), Convert.ToDouble(substrings[1])));
+								Thread mapAPICall2 = new Thread(() => mapAPICall(aPartnerVehicle));
+								mapAPICall2.Start();
+							}
 						}
-					}
-					if (exists == false) {
-						partnerlist.Add (new PartnerVehicle (new LatLng (Convert.ToDouble (substrings [0]), Convert.ToDouble (substrings [1])), id));
+						if (exists == false)
+						{
+							partnerlist.Add(new PartnerVehicle(new LatLng(Convert.ToDouble(substrings[0]), Convert.ToDouble(substrings[1])), id));
 
-						Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring));
-						PublishMQTT.Start();
+							Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring));
+							PublishMQTT.Start();
 
-						Thread mapAPICall3 = new Thread (() => mapAPICall (partnerlist.Find (t => t.getid () == id)));
-						mapAPICall3.Start ();
-					}
+							Thread mapAPICall3 = new Thread(() => mapAPICall(partnerlist.Find(t => t.getid() == id)));
+							mapAPICall3.Start();
+						}
+					
 					Log.Debug ("partnerlistelements", partnerlist.Count ().ToString ());
 					Log.Debug ("MQTTinput", "Accept");
 				} catch {
@@ -173,8 +213,8 @@ namespace RoadIT
 
 				//parameters LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, mLocationListener);
 				//mintime in sec*1000 -> 20s
-				//mindistance in meters (float) -> 10m
-				locMgr.RequestLocationUpdates(LocationManager.NetworkProvider, 20000, 10, this);
+				//mindistance in meters (float) -> 20m
+				locMgr.RequestLocationUpdates(LocationManager.NetworkProvider, 20000, 20, this);
 			}
 			else {
 				Toast.MakeText(this, "Please switch on your location service!", ToastLength.Long).Show();
@@ -199,10 +239,14 @@ namespace RoadIT
 			Button stopbutton = FindViewById<Button>(Resource.Id.stopbutton);
 			stopbutton.Click += (sender, e) =>
 			{
-				//TODO send kill me signal
-				//Client.Disconnect;
+				//killsignal, remove me from list
+				Thread PublishMQTT = new Thread(() => MQTTPublish("killme"));
+				PublishMQTT.Start();
+
 				SampleActivity activitysetup = new SampleActivity(1, 2, typeof(MainActivity));
 				activitysetup.Start(this);
+
+				this.FinishActivity(0);
 			};
 		}
 

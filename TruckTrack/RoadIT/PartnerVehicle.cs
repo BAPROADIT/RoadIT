@@ -103,7 +103,7 @@ namespace RoadIT
 			Log.Debug("dispnearest", nearest.ToString());
 			Log.Debug("disptodraw", toReDraw.ToString());
 			Log.Debug("dispcolor", color);
-			Log.Debug("dispid", id);
+			//Log.Debug("dispid", id);
 		}
 
 
