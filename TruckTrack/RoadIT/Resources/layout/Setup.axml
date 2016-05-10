@@ -47,8 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/editTextusername"
-        android:translationY="25dp"
-        android:text="fin" />
+        android:translationY="25dp" />
     <TextView
         android:text="Password"
         android:textAppearance="?android:attr/textAppearanceMedium"

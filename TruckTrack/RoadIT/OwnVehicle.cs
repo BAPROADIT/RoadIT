@@ -106,6 +106,9 @@ namespace RoadIT
 					if (exists == false) {
 						partnerlist.Add (new PartnerVehicle (new LatLng (Convert.ToDouble (substrings [0]), Convert.ToDouble (substrings [1])), id));
 
+						Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring));
+						PublishMQTT.Start();
+
 						Thread mapAPICall3 = new Thread (() => mapAPICall (partnerlist.Find (t => t.getid () == id)));
 						mapAPICall3.Start ();
 					}
@@ -142,10 +145,10 @@ namespace RoadIT
 			}
 			TextView title = FindViewById<TextView>(Resource.Id.textView1);
 
-			username = Intent.GetStringExtra ("username") ?? null;
-			username = GetMacAddress();
+			username = Intent.GetStringExtra ("username") ?? GetMacAddress();
+			//username = GetMacAddress();
 
-			pass = Intent.GetStringExtra ("pass") ?? null;
+			//pass = Intent.GetStringExtra ("pass") ?? null;
 			Console.WriteLine (broker + " "+ name+ " "+ username+" "+ pass);
 			SetContentView(Resource.Layout.Map);
 			//indication truck/finisher
@@ -169,9 +172,9 @@ namespace RoadIT
 				//ACCURACY OF LOCATIONUPDATE
 
 				//parameters LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, mLocationListener);
-				//mintime in sec*1000 
-				//mindistance in meters (float)
-				locMgr.RequestLocationUpdates(LocationManager.NetworkProvider, 20000, 30, this);
+				//mintime in sec*1000 -> 20s
+				//mindistance in meters (float) -> 10m
+				locMgr.RequestLocationUpdates(LocationManager.NetworkProvider, 20000, 10, this);
 			}
 			else {
 				Toast.MakeText(this, "Please switch on your location service!", ToastLength.Long).Show();
