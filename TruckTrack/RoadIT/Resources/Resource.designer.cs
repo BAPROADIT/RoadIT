@@ -2167,12 +2167,6 @@ namespace RoadIT
 			// aapt resource value: 0x7f09008f
 			public const int editTextname = 2131296399;
 			
-			// aapt resource value: 0x7f090093
-			public const int editTextpassword = 2131296403;
-			
-			// aapt resource value: 0x7f090091
-			public const int editTextusername = 2131296401;
-			
 			// aapt resource value: 0x7f090067
 			public const int edit_query = 2131296359;
 			
@@ -2299,14 +2293,14 @@ namespace RoadIT
 			// aapt resource value: 0x7f09005f
 			public const int radio = 2131296351;
 			
-			// aapt resource value: 0x7f090096
-			public const int radioButton1 = 2131296406;
+			// aapt resource value: 0x7f090092
+			public const int radioButton1 = 2131296402;
 			
-			// aapt resource value: 0x7f090094
-			public const int radioGroup1 = 2131296404;
+			// aapt resource value: 0x7f090090
+			public const int radioGroup1 = 2131296400;
 			
-			// aapt resource value: 0x7f090095
-			public const int radiotruck = 2131296405;
+			// aapt resource value: 0x7f090091
+			public const int radiotruck = 2131296401;
 			
 			// aapt resource value: 0x7f09003b
 			public const int right = 2131296315;
@@ -2437,14 +2431,8 @@ namespace RoadIT
 			// aapt resource value: 0x7f09008c
 			public const int textView1 = 2131296396;
 			
-			// aapt resource value: 0x7f090092
-			public const int textView15 = 2131296402;
-			
 			// aapt resource value: 0x7f09008e
 			public const int textView2 = 2131296398;
-			
-			// aapt resource value: 0x7f090090
-			public const int textView3 = 2131296400;
 			
 			// aapt resource value: 0x7f090084
 			public const int time = 2131296388;

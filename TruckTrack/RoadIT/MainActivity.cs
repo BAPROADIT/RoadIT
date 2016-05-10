@@ -58,11 +58,11 @@ namespace RoadIT
 				EditText name = FindViewById<EditText>(Resource.Id.editTextname);
 				string namestring = name.Text;
 
-				EditText username = FindViewById<EditText>(Resource.Id.editTextusername);
-				string usernamestring = username.Text;
+				//EditText username = FindViewById<EditText>(Resource.Id.editTextusername);
+				//string usernamestring = username.Text;
 
-				EditText pass = FindViewById<EditText>(Resource.Id.editTextpassword);
-				string passtring = username.Text;
+				//EditText pass = FindViewById<EditText>(Resource.Id.editTextpassword);
+				//string passtring = username.Text;
 
 				RadioButton truckfin = FindViewById<RadioButton>(Resource.Id.radiotruck);
 				string truck;
@@ -75,11 +75,10 @@ namespace RoadIT
 				var ownvec = new Intent(this, typeof(OwnVehicle));
 				ownvec.PutExtra("broker",brokerstring );
 				ownvec.PutExtra("name",namestring );
-				ownvec.PutExtra("username",usernamestring );
-				ownvec.PutExtra("pass",passtring );
+				//ownvec.PutExtra("username",usernamestring );
+				//ownvec.PutExtra("pass",passtring );
 				ownvec.PutExtra("truck",truck);
 				StartActivity(ownvec);
-
 			};
 		}
 

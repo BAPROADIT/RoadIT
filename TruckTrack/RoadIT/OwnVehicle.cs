@@ -96,7 +96,6 @@ namespace RoadIT
 
 			if (mqttmessage == "killme")
 			{
-				String id = "finisher";
 				if (truckbool == false)
 				{
 					Char delimitertopic = '/';
@@ -235,19 +234,33 @@ namespace RoadIT
 			base.OnResume();
 			Log.Debug("Finisher", "OnResume called");
 
-
 			Button stopbutton = FindViewById<Button>(Resource.Id.stopbutton);
 			stopbutton.Click += (sender, e) =>
 			{
-				//killsignal, remove me from list
-				Thread PublishMQTT = new Thread(() => MQTTPublish("killme"));
-				PublishMQTT.Start();
-
-				SampleActivity activitysetup = new SampleActivity(1, 2, typeof(MainActivity));
-				activitysetup.Start(this);
-
-				this.FinishActivity(0);
+				Kill();
 			};
+		}
+
+		public void Kill()
+		{
+			//killsignal, remove me from list
+			Thread PublishMQTT = new Thread(() => MQTTPublish("killme"));
+			PublishMQTT.Start();
+
+			SampleActivity activitysetup = new SampleActivity(1, 2, typeof(MainActivity));
+			activitysetup.Start(this);
+			if (truckbool == true)
+			{
+				Toast.MakeText(this, "You have arrived at your destination.", ToastLength.Long).Show();
+			}
+			else 
+			{
+				Toast.MakeText(this, "Finisher stopped.", ToastLength.Long).Show();
+			}
+
+			Client.Disconnect();
+
+			this.FinishActivity(1);
 		}
 
 		public 	void ConfigMQTT()
@@ -308,6 +321,7 @@ namespace RoadIT
 		{
 			map = mapFragment.Map;
 			map.MyLocationEnabled = true;
+			map.BuildingsEnabled = true;
 		}
 
 		public void OnProviderDisabled(string provider)
@@ -343,24 +357,17 @@ namespace RoadIT
 				aPartnerVehicle.setNearest(false);
 			}
 
+			PartnerVehicle test = partnerlist.First();
+
 			//sort on duration -> nearest truck first in list
 			partnerlist.Sort((x, y) => x.getDur().CompareTo(y.getDur()));
 			partnerlist.First().setNearest(true);
 
-			////redraw
-			//foreach (Truck aTruck2 in trucklist)
-			//{
-			//	//truck was previously the nearest-> has to be redrawn in original color
-			//	if (aTruck2.getNearest() == false && aTruck2.getToReDraw() == true)
-			//	{
-			//		aTruck2.setToReDraw(false);
-			//		Thread drawRouteThread2 = new Thread(() => drawRoute(aTruck2));
-			//		drawRouteThread2.Start();
-			//	}
-			//}
-
-			////true for first element
-			//trucklist.First().setToReDraw(true);
+			if (test != partnerlist.First())
+			{
+				Thread mapAPICall3 = new Thread(() => mapAPICall(test));
+				mapAPICall3.Start();
+			}
 
 			if (truckbool == false)
 			{
@@ -370,7 +377,6 @@ namespace RoadIT
 			{
 				durationString = "ETA at finisher: " + partnerlist.First().getDur() + "s";
 			}
-
 			
 			TextView durationtextfield = FindViewById<TextView>(Resource.Id.durationText);
 
@@ -406,9 +412,8 @@ namespace RoadIT
 				else
 				{
 					markerpartner.SetIcon(finisher);
-					markerpartner.SetTitle("Arriving at Finisher" + aPartnerVehicle.getid() + "in: " + aPartnerVehicle.getDur() + "s");
+					markerpartner.SetTitle("Arriving at Finisher " + aPartnerVehicle.getid() + "in: " + aPartnerVehicle.getDur() + "s");
 				}
-
 				map.AddMarker(markerpartner);
 			}
 		}
@@ -461,6 +466,8 @@ namespace RoadIT
 					Log.Debug("drawroute", "nearest");
 					temppoly.InvokeColor(0x6600cc00);
 				}
+
+				//other colors for normal route
 				else if (partnervehicle.getcolor() == "blue")
 				{
 					Log.Debug("drawroute", partnervehicle.getid() + partnervehicle.getcolor() + "moet blue zijn");
