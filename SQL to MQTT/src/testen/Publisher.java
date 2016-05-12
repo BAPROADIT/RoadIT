@@ -54,7 +54,7 @@ public class Publisher {
 
 	private static void writeData(ResultSet resultSet) throws SQLException, InterruptedException {
 		float time;
-		float factor = (float) .01;
+		float factor = (float) .2;
 		float oldtime = 0;
 		boolean first = true;
 		String clientId = Utils.getMacAddress() + "-pub"; // get unique ID try
