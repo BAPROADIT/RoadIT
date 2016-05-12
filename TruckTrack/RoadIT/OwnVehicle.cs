@@ -251,7 +251,7 @@ namespace RoadIT
 			activitysetup.Start(this);
 			if (truckbool == true)
 			{
-				Toast.MakeText(this, "You have arrived at your destination.", ToastLength.Long).Show();
+				Toast.MakeText(this, "Truck stopped. Finisher will not receive updates. ", ToastLength.Long).Show();
 			}
 			else 
 			{
@@ -369,13 +369,45 @@ namespace RoadIT
 				mapAPICall3.Start();
 			}
 
-			if (truckbool == false)
+			//seconds to TimeSpan
+			TimeSpan t = TimeSpan.FromSeconds(partnerlist.First().getDur());
+
+			//time to hours/minutes/seconds
+			string time;
+			int partnerduration = partnerlist.First().getDur();
+			if (partnerduration <= 60)
 			{
-				durationString = "ETA of nearest truck: " + partnerlist.First().getDur() + "s";
+				time = t.ToString(@"ss") + "s";
+			}
+			else if (partnerduration <= 3600)
+			{
+				time = t.ToString(@"mm\mss") + "s";
 			}
 			else
 			{
-				durationString = "ETA at finisher: " + partnerlist.First().getDur() + "s";
+				time = t.ToString(@"hh\hmm\mss") + "s";
+			}
+
+
+			if (truckbool == false)
+			{
+				if (partnerduration <= 120)
+				{
+					durationString = "ETA of nearest truck: " + time + "\nA truck is near, you can drive faster.";
+				}
+				else if (partnerduration <= 600)
+				{
+					durationString = "ETA of nearest truck: " + time + "\nKeep your speed.";
+				}
+				else
+				{
+					durationString = "ETA of nearest truck: " + time + "\nSlow down! No truck is nearby.";
+				}
+				
+			}
+			else
+			{
+				durationString = "ETA at finisher: " + time;
 			}
 			
 			TextView durationtextfield = FindViewById<TextView>(Resource.Id.durationText);
@@ -436,10 +468,21 @@ namespace RoadIT
 
 		void mapAPICall(PartnerVehicle partnervehicle)
 		{
-			string origin = partnervehicle.getlocstring();
+			string placeofvehicle = partnervehicle.getlocstring();
 			try
-			{	
-				string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + ownlocstring + "&sensor=false";
+			{
+				string url = "";
+				if (truckbool == false)
+				{
+					//route from trucks place to own finishers location
+					url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + placeofvehicle + "&destination=" + ownlocstring + "&sensor=false";
+				}
+				else
+				{
+					//route from own trucks place to finishers location
+					url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + ownlocstring + "&destination=" + placeofvehicle + "&sensor=false";
+				}
+				
 				string requesturl = url; string content = fileGetJSON(requesturl);;
 				_Jobj = JObject.Parse(content);
 				Log.Debug("apicall", content.ToString());
