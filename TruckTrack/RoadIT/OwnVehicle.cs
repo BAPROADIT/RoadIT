@@ -77,29 +77,31 @@ namespace RoadIT
 					}
 					float meterToGo = Load / LoadPerMeter;
 					float timeToGo = meterToGo / Speed;
-					float recommandSpeed = meterToGo / partnerduration;
-					//temp variable to check if case is changed so notification can be sent
-					int prevcasenotification = casenotification;
-					if (timeToGo > partnerduration) {
+
+						float recommandSpeed = meterToGo / partnerduration;
+						//temp variable to check if case is changed so notification can be sent
+						int prevcasenotification = casenotification;
+						if (timeToGo > partnerduration) {
 						casenotification = 1;
-						//Move faster
-						suggestString = "You can go faster, " + recommandSpeed.ToString("0.00") + "m/s";
-					} else if (timeToGo < partnerduration) {
-						//Move Slower
-						casenotification = 2;
-						suggestString = "Move slower, go "+ recommandSpeed.ToString ("0.00") + "m/s";
+							//Move faster
+							suggestString = "You can go faster, " + recommandSpeed.ToString ("0.00") + "m/s";
+						} else if (timeToGo < partnerduration) {
+							//Move Slower
+							casenotification = 2;
 
-					} else {
-						casenotification = 3;
-						//Go on
-						suggestString = "Correct speed.";
-					}
+							suggestString = "Move slower, go " + recommandSpeed.ToString ("0.00") + "m/s";
 
-					//check for changes
-					if (casenotification != prevcasenotification)
-					{
-						CreateNotification(this.Intent);
-					}
+						} else {
+							casenotification = 3;
+							//Go on
+							suggestString = "Correct speed.";
+						}
+					
+						//check for changes
+						if (casenotification != prevcasenotification) {
+							CreateNotification (this.Intent);
+						}
+					
 				}
 			}
 		}
@@ -375,6 +377,8 @@ namespace RoadIT
 				Speed= Speed/100;
 				updateSeekbars();
 			};
+			SliderLoad.Progress = 100000;
+			SliderSpeed.Progress = 20;
 		}
 
 		public void Kill()
@@ -550,7 +554,9 @@ namespace RoadIT
 			textViewSpeed.Text = "Speed: "+Speed.ToString("0.000") + "m/s";
 			SliderLoad.Progress = (int)( Load*1000);
 			SliderSpeed.Progress = (int)(Speed * 100);
-			textViewMovefasterslower.Text = suggestString;
+			if (partnerduration != 0) {
+				textViewMovefasterslower.Text = suggestString;
+			}
 		}	
 
 		public void updateUI()

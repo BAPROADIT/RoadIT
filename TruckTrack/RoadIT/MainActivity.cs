@@ -63,7 +63,7 @@ namespace RoadIT
 				floatloadpermeter = floatloadpermeter/100;
 				loadtext.Text = "Load per meter: "+ floatloadpermeter.ToString("0.00")+"%/m";
 			};
-
+			loadpermeter.Progress = 250;
 			confirmSettings();
 
 
