@@ -109,6 +109,7 @@
     <AndroidResource Include="Resources\layout\Setup.axml" />
     <AndroidResource Include="Resources\drawable\finisher.png" />
     <AndroidResource Include="Resources\drawable\trucktrackicon.png" />
+    <AndroidResource Include="Resources\drawable\trucktrackbackground.PNG" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\drawable\" />

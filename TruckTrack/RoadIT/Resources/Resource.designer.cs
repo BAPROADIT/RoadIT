@@ -2004,14 +2004,17 @@ namespace RoadIT
 			// aapt resource value: 0x7f020071
 			public const int finisher = 2130837617;
 			
-			// aapt resource value: 0x7f020074
-			public const int notification_template_icon_bg = 2130837620;
+			// aapt resource value: 0x7f020075
+			public const int notification_template_icon_bg = 2130837621;
 			
 			// aapt resource value: 0x7f020072
 			public const int truck = 2130837618;
 			
 			// aapt resource value: 0x7f020073
-			public const int trucktrackicon = 2130837619;
+			public const int trucktrackbackground = 2130837619;
+			
+			// aapt resource value: 0x7f020074
+			public const int trucktrackicon = 2130837620;
 			
 			static Drawable()
 			{

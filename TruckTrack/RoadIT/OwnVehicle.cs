@@ -11,8 +11,9 @@ using Android.Views;
 using System.Threading;
 using System; 
 using System.Collections.Generic; 
-using System.Linq; 
-using System.Text; 
+using System.Linq;
+using Android.Support.V4.App;
+using Android.Graphics;
 
 using Newtonsoft.Json.Linq;
 using Org.Eclipse.Paho.Client.Mqttv3;
@@ -44,6 +45,9 @@ namespace RoadIT
 		TextView textViewSpeed;
 		TextView textViewMovefasterslower;
 		Button stopbutton;
+		NotificationManagerCompat notificationManager;
+		NotificationCompat.Builder builder;
+		Notification notification;
 
 		List<PartnerVehicle> partnerlist = new List<PartnerVehicle>();
 
@@ -51,8 +55,10 @@ namespace RoadIT
 
 		public static MqttClient Client;
 		bool firstloc = true;
+		int casenotification = 0;
 
 		public  void eatLoad(){
+			
 			if (truckbool == true) {
 				SliderLoad.Visibility = ViewStates.Gone;
 				SliderSpeed.Visibility = ViewStates.Gone;
@@ -72,20 +78,32 @@ namespace RoadIT
 					float meterToGo = Load / LoadPerMeter;
 					float timeToGo = meterToGo / Speed;
 					float recommandSpeed = meterToGo / partnerduration;
+					//temp variable to check if case is changed so notification can be sent
+					int prevcasenotification = casenotification;
 					if (timeToGo > partnerduration) {
+						casenotification = 1;
 						//Move faster
-						suggestString = "Move Faster: "+ recommandSpeed.ToString ("0.00") + "m/s";
+						suggestString = "You can go faster, " + recommandSpeed.ToString("0.00") + "m/s";
 					} else if (timeToGo < partnerduration) {
 						//Move Slower
-						suggestString = "Move Slower: "+ recommandSpeed.ToString ("0.00") + "m/s";
+						casenotification = 2;
+						suggestString = "Move slower, go "+ recommandSpeed.ToString ("0.00") + "m/s";
 
 					} else {
+						casenotification = 3;
 						//Go on
-						suggestString = "You're good to go!";
+						suggestString = "Correct speed.";
+					}
+
+					//check for changes
+					if (casenotification != prevcasenotification)
+					{
+						CreateNotification(this.Intent);
 					}
 				}
 			}
 		}
+
 		public void OnLocationChanged(Android.Locations.Location location)
 		{
 			finisherloc = new LatLng(location.Latitude, location.Longitude);
@@ -112,6 +130,61 @@ namespace RoadIT
 					}
 				}
 			}
+		}
+
+		private void CreateNotification(Intent intent)
+		{
+			var style = new NotificationCompat.BigTextStyle().BigText(durationString);
+
+			//wearable notification
+			var wearableExtender = new NotificationCompat.WearableExtender()
+				.SetBackground(BitmapFactory.DecodeResource(this.Resources, Resource.Drawable.trucktrackbackground));
+
+			// Instantiate the builder and set notification elements:
+			builder = new NotificationCompat.Builder(this)
+				.SetContentTitle(suggestString)
+				.SetContentText(durationString)
+				.SetSmallIcon(Resource.Drawable.trucktrackicon)
+				.SetStyle(style)
+				//2 for max priority
+				.SetPriority(2)
+				//2 for vibration
+				.SetDefaults(2)
+				//0x1 for sound
+				.SetDefaults(0x1)
+				.Extend(wearableExtender);
+
+			// Build the notification:
+			notification = builder.Build();
+
+			// Publish the notification:
+			const int notificationId = 0;
+			notificationManager.Notify(notificationId, notification);
+
+		}
+
+		private void UpdateNotification()
+		{
+			var style = new NotificationCompat.BigTextStyle().BigText(durationString);
+
+			//wearable notification
+			var wearableExtender = new NotificationCompat.WearableExtender()
+				.SetBackground(BitmapFactory.DecodeResource(this.Resources, Resource.Drawable.trucktrackbackground));
+
+			// Instantiate the builder and set notification elements:
+			builder = new NotificationCompat.Builder(this)
+				.SetContentTitle(suggestString)
+				.SetContentText(durationString)
+				.SetSmallIcon(Resource.Drawable.trucktrackicon)
+				.SetStyle(style)
+				.Extend(wearableExtender);
+
+			// Build the notification:
+			notification = builder.Build();
+
+			// Publish the notification:
+			const int notificationId = 0;
+			notificationManager.Notify(notificationId, notification);
 		}
 
 		public void MQTTPublish(string content)
@@ -208,8 +281,8 @@ namespace RoadIT
 		{
 			
 			base.OnCreate(bundle);
+			notificationManager = NotificationManagerCompat.From(this);
 			Log.Debug("Finisher", "OnCreate called");
-
 			LoadPerMeter = float.Parse(Intent.GetStringExtra ("loadpermeter"));
 			string temp = Intent.GetStringExtra ("broker") ?? null;
 			broker = "tcp://" + temp + ":1883";
@@ -358,7 +431,7 @@ namespace RoadIT
 					.InvokeZoomControlsEnabled(true)
 					.InvokeCompassEnabled(true);
 				
-				FragmentTransaction fragTx = FragmentManager.BeginTransaction();
+				Android.App.FragmentTransaction fragTx = FragmentManager.BeginTransaction();
 				mapFragment = MapFragment.NewInstance(mapOptions);
 				fragTx.Add(Resource.Id.map, mapFragment, "map");
 					fragTx.Commit();
@@ -469,6 +542,8 @@ namespace RoadIT
 
 			Thread drawRouteThread = new Thread(() => drawRoute(partnervehicle));
 			drawRouteThread.Start();
+
+			UpdateNotification();
 		}
 		public void updateSeekbars(){
 			textViewLoad.Text = "Load: "+Load.ToString("0.000")+"%";
