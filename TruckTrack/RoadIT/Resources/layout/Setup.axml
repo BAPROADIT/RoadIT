@@ -79,6 +79,19 @@
             android:layout_width="wrap_content"
             android:layout_height="30.0dp"
             android:text="Finisher"
-            android:id="@+id/radioButton1" />
+            android:id="@+id/radioButtonfinisher" />
     </RadioGroup>
+    <TextView xmlns:tools="http://schemas.android.com/tools"
+        android:text="Load per Meter"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewloadpermeter"
+        android:translationY="25dp" />
+    <SeekBar xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekBarLoadPerMeter"
+        android:translationY="25dp"
+        android:max="1000" />
 </LinearLayout>

@@ -9,12 +9,43 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:translationY="25dp" />
+    <TextView xmlns:tools="http://schemas.android.com/tools"
+        android:text="Speed"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewSpeed"
+        android:translationY="25dp" />
+    <SeekBar xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekBarSpeed"
+        android:translationY="25dp" />
+    <TextView xmlns:tools="http://schemas.android.com/tools"
+        android:text="Load"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewLoad"
+        android:translationY="25dp" />
+    <SeekBar xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/seekBarLoad"
+        android:translationY="25dp"
+        android:max="100000" />
     <TextView
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Finisher"
         android:id="@+id/durationText"
+        android:translationY="25dp" />
+    <TextView
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/textViewMovefasterslower"
         android:translationY="25dp" />
     <FrameLayout
         android:id="@+id/map"

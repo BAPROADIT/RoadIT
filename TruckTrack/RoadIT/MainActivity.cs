@@ -26,6 +26,7 @@ namespace RoadIT
 		static readonly int REQUEST_COARSELOCATION = 0;
 		static readonly int REQUEST_FINELOCATION = 1;
 		static readonly int REQUEST_INTERNET = 2;
+		float floatloadpermeter=0;
 
 		//static string[] PERMISSIONS_CONTACT = {
 
@@ -43,6 +44,26 @@ namespace RoadIT
 
 			initLocationManager();
 			RequestInternetPermission();
+			RadioButton finisher = FindViewById<RadioButton> (Resource.Id.radioButtonfinisher);
+			SeekBar loadpermeter = FindViewById<SeekBar> (Resource.Id.seekBarLoadPerMeter);
+			TextView loadtext = FindViewById<TextView> (Resource.Id.textViewloadpermeter);
+			loadpermeter.Visibility = ViewStates.Gone;
+			loadtext.Visibility = ViewStates.Gone;
+			finisher.CheckedChange += delegate(object sender, CompoundButton.CheckedChangeEventArgs e) {
+				if (finisher.Checked==true){
+					loadpermeter.Visibility= ViewStates.Visible;
+					loadtext.Visibility= ViewStates.Visible;
+				} else{
+					loadpermeter.Visibility = ViewStates.Gone;
+					loadtext.Visibility = ViewStates.Gone;
+				}
+			};
+			loadpermeter.ProgressChanged += delegate(object sender, SeekBar.ProgressChangedEventArgs e) {
+				floatloadpermeter = loadpermeter.Progress;
+				floatloadpermeter = floatloadpermeter/100;
+				loadtext.Text = "Load per meter: "+ floatloadpermeter.ToString("0.00")+"%/m";
+			};
+
 			confirmSettings();
 
 
@@ -78,6 +99,7 @@ namespace RoadIT
 				//ownvec.PutExtra("username",usernamestring );
 				//ownvec.PutExtra("pass",passtring );
 				ownvec.PutExtra("truck",truck);
+				ownvec.PutExtra("loadpermeter", floatloadpermeter.ToString("0.00"));
 				StartActivity(ownvec);
 			};
 		}

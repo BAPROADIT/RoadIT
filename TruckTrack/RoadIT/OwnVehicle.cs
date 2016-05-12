@@ -35,6 +35,15 @@ namespace RoadIT
 		public static string broker = "", topicpub="", topicsub="", username="", pass="";
 		bool truckbool;
 		String id;
+		int partnerduration;
+		float Load=0, Speed=0, LoadPerMeter;
+		string suggestString;
+		SeekBar SliderLoad;
+		TextView textViewLoad;
+		SeekBar SliderSpeed;
+		TextView textViewSpeed;
+		TextView textViewMovefasterslower;
+		Button stopbutton;
 
 		List<PartnerVehicle> partnerlist = new List<PartnerVehicle>();
 
@@ -42,7 +51,41 @@ namespace RoadIT
 
 		public static MqttClient Client;
 		bool firstloc = true;
-		
+
+		public  void eatLoad(){
+			if (truckbool == true) {
+				SliderLoad.Visibility = ViewStates.Gone;
+				SliderSpeed.Visibility = ViewStates.Gone;
+				textViewLoad.Visibility = ViewStates.Gone;
+				textViewSpeed.Visibility = ViewStates.Gone;
+				textViewMovefasterslower.Visibility = ViewStates.Gone;
+			} else {
+				while (true) {
+					Thread.Sleep (1000);
+					if (Load > 0) {
+						Load = Load - (Speed * LoadPerMeter);
+						Log.Debug ("eat", (Speed * LoadPerMeter).ToString ("0.00") + " " + (Load).ToString ("0.00"));
+						RunOnUiThread (() => {
+							this.updateSeekbars ();
+						});
+					}
+					float meterToGo = Load / LoadPerMeter;
+					float timeToGo = meterToGo / Speed;
+					float recommandSpeed = meterToGo / partnerduration;
+					if (timeToGo > partnerduration) {
+						//Move faster
+						suggestString = "Move Faster: "+ recommandSpeed.ToString ("0.00") + "m/s";
+					} else if (timeToGo < partnerduration) {
+						//Move Slower
+						suggestString = "Move Slower: "+ recommandSpeed.ToString ("0.00") + "m/s";
+
+					} else {
+						//Go on
+						suggestString = "You're good to go!";
+					}
+				}
+			}
+		}
 		public void OnLocationChanged(Android.Locations.Location location)
 		{
 			finisherloc = new LatLng(location.Latitude, location.Longitude);
@@ -166,6 +209,8 @@ namespace RoadIT
 			
 			base.OnCreate(bundle);
 			Log.Debug("Finisher", "OnCreate called");
+
+			LoadPerMeter = float.Parse(Intent.GetStringExtra ("loadpermeter"));
 			string temp = Intent.GetStringExtra ("broker") ?? null;
 			broker = "tcp://" + temp + ":1883";
 			string name = Intent.GetStringExtra ("name") ?? null;
@@ -173,7 +218,7 @@ namespace RoadIT
 			//string titlestring="";
 			if (truck == "true") {
 				//titlestring = "Truck";
-				topicpub="roadit/truck/"+name+"/"+GetMacAddress();//TODO unieke nummer
+				topicpub="roadit/truck/"+name+"/"+GetMacAddress();
 				topicsub="roadit/fin/"+name;
 				truckbool = true;
 			} else {
@@ -233,11 +278,29 @@ namespace RoadIT
 		{
 			base.OnResume();
 			Log.Debug("Finisher", "OnResume called");
+			SliderLoad = FindViewById<SeekBar>(Resource.Id.seekBarLoad);
+			textViewLoad = FindViewById<TextView> (Resource.Id.textViewLoad);
+			SliderSpeed = FindViewById<SeekBar>(Resource.Id.seekBarSpeed);
+			textViewSpeed = FindViewById<TextView> (Resource.Id.textViewSpeed);
+			textViewMovefasterslower = FindViewById<TextView> (Resource.Id.textViewMovefasterslower);
+			Thread thread1 = new Thread(new ThreadStart(eatLoad));
+			thread1.Start ();
 
-			Button stopbutton = FindViewById<Button>(Resource.Id.stopbutton);
+			stopbutton = FindViewById<Button>(Resource.Id.stopbutton);
 			stopbutton.Click += (sender, e) =>
 			{
 				Kill();
+			};
+
+			SliderLoad.ProgressChanged += delegate(object sender, SeekBar.ProgressChangedEventArgs e) {
+				Load = e.Progress;
+				Load= Load/1000;
+				updateSeekbars();
+			};
+			SliderSpeed.ProgressChanged += delegate(object sender, SeekBar.ProgressChangedEventArgs e) {
+				Speed = e.Progress;
+				Speed= Speed/100;
+				updateSeekbars();
 			};
 		}
 
@@ -374,7 +437,7 @@ namespace RoadIT
 
 			//time to hours/minutes/seconds
 			string time;
-			int partnerduration = partnerlist.First().getDur();
+			partnerduration = partnerlist.First().getDur();
 			if (partnerduration <= 60)
 			{
 				time = t.ToString(@"ss") + "s";
@@ -391,18 +454,7 @@ namespace RoadIT
 
 			if (truckbool == false)
 			{
-				if (partnerduration <= 120)
-				{
-					durationString = "ETA of nearest truck: " + time + "\nA truck is near, you can drive faster.";
-				}
-				else if (partnerduration <= 600)
-				{
-					durationString = "ETA of nearest truck: " + time + "\nKeep your speed.";
-				}
-				else
-				{
-					durationString = "ETA of nearest truck: " + time + "\nSlow down! No truck is nearby.";
-				}
+					durationString = "ETA of nearest truck: " + time;
 				
 			}
 			else
@@ -418,9 +470,17 @@ namespace RoadIT
 			Thread drawRouteThread = new Thread(() => drawRoute(partnervehicle));
 			drawRouteThread.Start();
 		}
+		public void updateSeekbars(){
+			textViewLoad.Text = "Load: "+Load.ToString("0.000")+"%";
+			textViewSpeed.Text = "Speed: "+Speed.ToString("0.000") + "m/s";
+			SliderLoad.Progress = (int)( Load*1000);
+			SliderSpeed.Progress = (int)(Speed * 100);
+			textViewMovefasterslower.Text = suggestString;
+		}	
 
 		public void updateUI()
 		{
+			
 			BitmapDescriptor truck = BitmapDescriptorFactory.FromResource(Resource.Drawable.truck);
 			BitmapDescriptor finisher = BitmapDescriptorFactory.FromResource(Resource.Drawable.finisher);
 			map.Clear();
