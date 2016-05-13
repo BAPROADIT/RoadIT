@@ -20,7 +20,7 @@ public class Subscriber {
 	public Subscriber() {
 		Thread kill = new Thread(new Runnable() {
 			public void run() {
-				while (true) {
+				/*while (true) {
 					try {
 						activeTopics.killhandler();
 					} catch (MqttException e1) {
@@ -33,7 +33,7 @@ public class Subscriber {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-				}
+				}*/
 			}
 		});
 		kill.start();

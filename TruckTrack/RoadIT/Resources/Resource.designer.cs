@@ -2165,10 +2165,7 @@ namespace RoadIT
 			public const int durationText = 2131296384;
 			
 			// aapt resource value: 0x7f090092
-			public const int editTextbroker = 2131296402;
-			
-			// aapt resource value: 0x7f090094
-			public const int editTextname = 2131296404;
+			public const int editTextname = 2131296402;
 			
 			// aapt resource value: 0x7f090067
 			public const int edit_query = 2131296359;
@@ -2296,14 +2293,14 @@ namespace RoadIT
 			// aapt resource value: 0x7f09005f
 			public const int radio = 2131296351;
 			
-			// aapt resource value: 0x7f090097
-			public const int radioButtonfinisher = 2131296407;
-			
 			// aapt resource value: 0x7f090095
-			public const int radioGroup1 = 2131296405;
+			public const int radioButtonfinisher = 2131296405;
 			
-			// aapt resource value: 0x7f090096
-			public const int radiotruck = 2131296406;
+			// aapt resource value: 0x7f090093
+			public const int radioGroup1 = 2131296403;
+			
+			// aapt resource value: 0x7f090094
+			public const int radiotruck = 2131296404;
 			
 			// aapt resource value: 0x7f09003b
 			public const int right = 2131296315;
@@ -2362,8 +2359,8 @@ namespace RoadIT
 			// aapt resource value: 0x7f09007f
 			public const int seekBarLoad = 2131296383;
 			
-			// aapt resource value: 0x7f090099
-			public const int seekBarLoadPerMeter = 2131296409;
+			// aapt resource value: 0x7f090097
+			public const int seekBarLoadPerMeter = 2131296407;
 			
 			// aapt resource value: 0x7f09007d
 			public const int seekBarSpeed = 2131296381;
@@ -2441,10 +2438,7 @@ namespace RoadIT
 			public const int textSpacerNoButtons = 2131296344;
 			
 			// aapt resource value: 0x7f090091
-			public const int textView1 = 2131296401;
-			
-			// aapt resource value: 0x7f090093
-			public const int textView2 = 2131296403;
+			public const int textView2 = 2131296401;
 			
 			// aapt resource value: 0x7f09007e
 			public const int textViewLoad = 2131296382;
@@ -2455,8 +2449,8 @@ namespace RoadIT
 			// aapt resource value: 0x7f09007c
 			public const int textViewSpeed = 2131296380;
 			
-			// aapt resource value: 0x7f090098
-			public const int textViewloadpermeter = 2131296408;
+			// aapt resource value: 0x7f090096
+			public const int textViewloadpermeter = 2131296406;
 			
 			// aapt resource value: 0x7f090089
 			public const int time = 2131296393;

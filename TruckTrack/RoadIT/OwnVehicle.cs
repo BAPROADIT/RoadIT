@@ -286,7 +286,8 @@ namespace RoadIT
 			notificationManager = NotificationManagerCompat.From(this);
 			Log.Debug("Finisher", "OnCreate called");
 			LoadPerMeter = float.Parse(Intent.GetStringExtra ("loadpermeter"));
-			string temp = Intent.GetStringExtra ("broker") ?? null;
+			//string temp = Intent.GetStringExtra ("broker") ?? null;
+			string temp = "146.175.139.65";
 			broker = "tcp://" + temp + ":1883";
 			string name = Intent.GetStringExtra ("name") ?? null;
 			string truck = Intent.GetStringExtra("truck") ?? null;

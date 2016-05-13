@@ -94,7 +94,7 @@ namespace RoadIT
 				}
 				SampleActivity activityfin = new SampleActivity(1, 2, typeof(OwnVehicle));
 				var ownvec = new Intent(this, typeof(OwnVehicle));
-				ownvec.PutExtra("broker",brokerstring );
+				//ownvec.PutExtra("broker",brokerstring );
 				ownvec.PutExtra("name",namestring );
 				//ownvec.PutExtra("username",usernamestring );
 				//ownvec.PutExtra("pass",passtring );

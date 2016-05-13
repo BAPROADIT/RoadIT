@@ -27,7 +27,7 @@ public class SubscribeCallback implements MqttCallback {
 	public void messageArrived(String topic, MqttMessage message) throws Exception {
 		System.out.println("Message arrived. Topic: " + topic + "  Message: " + message.toString());
 		activeTopics.newMessage(topic, message.toString());
-		/*try {//To SQL
+		try {//To SQL
 			Class.forName("com.mysql.jdbc.Driver");
 			// Setup the connection with the DB
 			connect = DriverManager.getConnection("jdbc:mysql://nasdenys.synology.me/roadit?autoReconnect=true&useSSL=false&" + "user=roadit&password=roadit");
@@ -42,7 +42,7 @@ public class SubscribeCallback implements MqttCallback {
 			System.out.println("SQLException: " + ex.getMessage());
 			System.out.println("SQLState: " + ex.getSQLState());
 			System.out.println("VendorError: " + ex.getErrorCode());
-		}*/
+		}
 	}
 
 	@Override
