@@ -73,8 +73,8 @@ namespace RoadIT
 		{
 			Button startButton = FindViewById<Button>(Resource.Id.startButton);
 			startButton.Click += delegate {
-				EditText broker = FindViewById<EditText>(Resource.Id.editTextbroker);
-				string brokerstring = broker.Text;
+				//EditText broker = FindViewById<EditText>(Resource.Id.editTextbroker);
+				//string brokerstring = broker.Text;
 
 				EditText name = FindViewById<EditText>(Resource.Id.editTextname);
 				string namestring = name.Text;

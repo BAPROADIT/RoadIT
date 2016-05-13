@@ -303,7 +303,7 @@ namespace RoadIT
 				//titlestring = "Finisher";
 				truckbool = false;
 			}
-			TextView title = FindViewById<TextView>(Resource.Id.textView1);
+			//TextView title = FindViewById<TextView>(Resource.Id.textView1);
 
 			username = Intent.GetStringExtra ("username") ?? GetMacAddress();
 			//username = GetMacAddress();
