@@ -78,18 +78,18 @@ namespace RoadIT
 					float meterToGo = Load / LoadPerMeter;
 					float timeToGo = meterToGo / Speed;
 
-						float recommandSpeed = meterToGo / partnerduration;
+						float recommendSpeed = meterToGo / partnerduration;
 						//temp variable to check if case is changed so notification can be sent
 						int prevcasenotification = casenotification;
 						if (timeToGo > partnerduration) {
 						casenotification = 1;
 							//Move faster
-							suggestString = "You can go faster, " + recommandSpeed.ToString ("0.00") + "m/s";
+							suggestString = "You can go faster, " + recommendSpeed.ToString ("0.00") + "m/s";
 						} else if (timeToGo < partnerduration) {
 							//Move Slower
 							casenotification = 2;
 
-							suggestString = "Move slower, go " + recommandSpeed.ToString ("0.00") + "m/s";
+							suggestString = "Move slower, go " + recommendSpeed.ToString ("0.00") + "m/s";
 
 						} else {
 							casenotification = 3;
@@ -98,7 +98,7 @@ namespace RoadIT
 						}
 					
 						//check for changes
-						if (casenotification != prevcasenotification) {
+					if (casenotification != prevcasenotification && recommendSpeed.ToString("0.00") != "Infinity") {
 							CreateNotification (this.Intent);
 						}
 					
