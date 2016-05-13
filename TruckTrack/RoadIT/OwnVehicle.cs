@@ -399,9 +399,13 @@ namespace RoadIT
 				Toast.MakeText(this, "Finisher stopped.", ToastLength.Long).Show();
 			}
 
-			Client.Disconnect();
+			try
+			{
+				Client.Disconnect();
+			}
+			catch { }
 
-			this.FinishActivity(1);
+				this.FinishActivity(1);
 		}
 
 		public 	void ConfigMQTT()
