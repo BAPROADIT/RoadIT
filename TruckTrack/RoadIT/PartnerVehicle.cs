@@ -4,6 +4,11 @@ using Android.Util;
 
 namespace RoadIT
 {
+	/**
+	 * PartnerVehicle can be a truck or a finisher, depending on which vehicle the Ownvehicle class is.
+	 * The OwnVehicle class contains a dynamic list of PartnerVehicles, from which it receives location updates to display on the map.
+	 * PartnerVehicle mainly consists of parameter with getters and setters to modify these partners
+	 */
 	public class PartnerVehicle
 	{
 		private LatLng location;
@@ -13,19 +18,22 @@ namespace RoadIT
 		private string locstring;
 		private PolylineOptions polylineOptions;
 		private bool nearest = false;
-		private bool toReDraw = false;
 		private Random rnd = new Random();
 		private string[] colorarray = new string[] { "red", "blue", "black", "purple" };
 
+		//constructor gets location and an id(MAC adres)
 		public PartnerVehicle(LatLng location, string id)
 		{
 			this.location = location;
+			//random color from predefined array
 			color = colorarray[rnd.Next(0, colorarray.Length)];
 			this.id = id;
+			//locstring is initialized
 			locstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".");
 			polylineOptions = new PolylineOptions();
 		}
 
+		//setters and getters
 		public void setNearest(bool nearest)
 		{
 			this.nearest = nearest;
@@ -34,16 +42,6 @@ namespace RoadIT
 		public bool getNearest()
 		{
 			return nearest;
-		}
-
-		public void setToReDraw(bool toReDraw)
-		{
-			this.toReDraw = toReDraw;
-		}
-
-		public bool getToReDraw()
-		{
-			return toReDraw;
 		}
 
 		public string getcolor()
@@ -91,22 +89,20 @@ namespace RoadIT
 			return location;
 		}
 
+		//locstring has to be changes as well when the location changes
 		public void setLocation(LatLng location)
 		{
 			this.location = location;
 			locstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".");
 		}
 
+		//Display() function as a way to easily check the parameters when running the application
 		public void display()
 		{
 			Log.Debug("disploc", locstring);
 			Log.Debug("dispnearest", nearest.ToString());
-			Log.Debug("disptodraw", toReDraw.ToString());
 			Log.Debug("dispcolor", color);
-			//Log.Debug("dispid", id);
 		}
-
-
 	}
 }
 

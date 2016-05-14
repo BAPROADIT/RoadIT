@@ -15,40 +15,44 @@ using System.Threading;
 
 namespace RoadIT
 {
+	/**
+	 * MainActivity is used to configure the truck/finisher. It also requests permissions and checks if google play services is installed.
+	 */
 	[Activity(Label = "TruckTrack", MainLauncher = true, Icon = "@drawable/trucktrackicon", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation)]
 	public class MainActivity : Activity
 	{
 		public static readonly int InstallGooglePlayServicesId = 1000;
 		private bool _isGooglePlayServicesInstalled;
-
-		//View layout;
-
 		static readonly int REQUEST_COARSELOCATION = 0;
 		static readonly int REQUEST_FINELOCATION = 1;
 		static readonly int REQUEST_INTERNET = 2;
 		float floatloadpermeter=0;
+		View layout;
 
-		//static string[] PERMISSIONS_CONTACT = {
-
-		//	Android.Manifest.Permission.AccessCoarseLocation,
-		//	Android.Manifest.Permission.AccessFineLocation,
-		//	Android.Manifest.Permission.Internet
-		//};
-
+		//oncreate is called when the app is started
 		protected override void OnCreate(Bundle bundle)
 		{
 			base.OnCreate(bundle);
+
+			//check if google play services is installed, necessary for using the google maps API
 			_isGooglePlayServicesInstalled = TestIfGooglePlayServicesIsInstalled();
 
+			//settingsview to configure paramaters of truck/finisher
 			SetContentView(Resource.Layout.Setup);
 
+			//init locationmanager
 			initLocationManager();
+
+			//request permission
 			RequestInternetPermission();
+
 			RadioButton finisher = FindViewById<RadioButton> (Resource.Id.radioButtonfinisher);
 			SeekBar loadpermeter = FindViewById<SeekBar> (Resource.Id.seekBarLoadPerMeter);
 			TextView loadtext = FindViewById<TextView> (Resource.Id.textViewloadpermeter);
 			loadpermeter.Visibility = ViewStates.Gone;
 			loadtext.Visibility = ViewStates.Gone;
+
+			//loadpermeter seekbaar only visible if finisher is checked
 			finisher.CheckedChange += delegate(object sender, CompoundButton.CheckedChangeEventArgs e) {
 				if (finisher.Checked==true){
 					loadpermeter.Visibility= ViewStates.Visible;
@@ -65,10 +69,9 @@ namespace RoadIT
 			};
 			loadpermeter.Progress = 250;
 			confirmSettings();
-
-
 		}
 
+		//confirm settings and pass to ownVehicle activity when startbutton is pressed
 		public void confirmSettings()
 		{
 			Button startButton = FindViewById<Button>(Resource.Id.startButton);
@@ -92,7 +95,10 @@ namespace RoadIT
 				}else{
 					truck="false";
 				}
+
+				//create ownvehicle activity
 				SampleActivity activityfin = new SampleActivity(1, 2, typeof(OwnVehicle));
+				//create var to give activity extra parameters
 				var ownvec = new Intent(this, typeof(OwnVehicle));
 				//ownvec.PutExtra("broker",brokerstring );
 				ownvec.PutExtra("name",namestring );
@@ -100,10 +106,13 @@ namespace RoadIT
 				//ownvec.PutExtra("pass",passtring );
 				ownvec.PutExtra("truck",truck);
 				ownvec.PutExtra("loadpermeter", floatloadpermeter.ToString("0.00"));
+				//start ownvehicle activity
 				StartActivity(ownvec);
 			};
 		}
 
+
+		//check if google play services is installed
 		private bool TestIfGooglePlayServicesIsInstalled()
 		{
 			int queryResult = GoogleApiAvailability.Instance.IsGooglePlayServicesAvailable(this);
@@ -118,28 +127,29 @@ namespace RoadIT
 				string errorString = GoogleApiAvailability.Instance.GetErrorString(queryResult);
 				Log.Error("Road IT", "There is a problem with Google Play Services on this device: {0} - {1}", queryResult, errorString);
 				Dialog errorDialog = GoogleApiAvailability.Instance.GetErrorDialog(this, queryResult, InstallGooglePlayServicesId);
-				//ErrorDialogFragment dialogFrag = new ErrorDialogFragment(errorDialog);
-
-				//dialogFrag.Show(FragmentManager, "GooglePlayServicesDialog");
 			}
 			return false;
 		}
 
+
+		//locationmanager checks for coarse, fine and internet permission
 		public void initLocationManager()
 		{
-			
+			//coarse location
 			if (ActivityCompat.CheckSelfPermission(this, Android.Manifest.Permission.AccessCoarseLocation) != (int)Android.Content.PM.Permission.Granted)
 			{
 
 				// CoarseLocation permission has not been granted
 				RequestCoarsePermission();
 			}
+			//fine location
 			if (ActivityCompat.CheckSelfPermission(this, Android.Manifest.Permission.AccessFineLocation) != (int)Android.Content.PM.Permission.Granted)
 			{
 
 				// FineLocation permission has not been granted
 				RequestFinePermission();
 			}
+			//internet
 			if (ActivityCompat.CheckSelfPermission(this, Android.Manifest.Permission.Internet) != (int)Android.Content.PM.Permission.Granted)
 			{
 
@@ -147,6 +157,7 @@ namespace RoadIT
 				RequestInternetPermission();
 			}
 		}
+
 
 		/**
      	* Requests the CoarseLocation permission.
@@ -164,10 +175,10 @@ namespace RoadIT
 				// For example if the user has previously denied the permission.
 				//Log.Info (TAG, "Displaying COARSE permission rationale to provide additional context.");
 
-				/*Snackbar
+				Snackbar
 					.Make(layout, "Message sent", Snackbar.LengthLong)
   					.SetAction("OK", (view) => { ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.AccessCoarseLocation }, REQUEST_COARSELOCATION); })
-  					.Show(); */
+  					.Show(); 
 			}
 			else {
 				// Camera permission has not been granted yet. Request it directly.
@@ -191,10 +202,10 @@ namespace RoadIT
 				// For example if the user has previously denied the permission.
 				//Log.Info (TAG, "Displaying Fine permission rationale to provide additional context.");
 
-				/*Snackbar
+				Snackbar
 					.Make(layout, "Message sent", Snackbar.LengthLong)
   					.SetAction("OK", (view) => {ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.AccessFineLocation }, REQUEST_FINELOCATION); })
-  					.Show();*/
+  					.Show();
 			}
 			else {
 				// Camera permission has not been granted yet. Request it directly.
@@ -218,10 +229,10 @@ namespace RoadIT
 				// For example if the user has previously denied the permission.
 				//Log.Info (TAG, "Displaying Intenet permission rationale to provide additional context.");
 
-				/*Snackbar
+				Snackbar
 					.Make(layout, "Message sent", Snackbar.LengthLong)
   					.SetAction("OK", (view) => { ActivityCompat.RequestPermissions(this, new String[] { Android.Manifest.Permission.Internet }, REQUEST_INTERNET); })
-  					.Show();*/
+  					.Show();
 			}
 			else {
 				// Camera permission has not been granted yet. Request it directly.

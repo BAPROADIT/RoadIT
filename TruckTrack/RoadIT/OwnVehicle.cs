@@ -22,11 +22,17 @@ using System.Net.NetworkInformation;
 
 namespace RoadIT
 {
+	/**
+	 * OwnVehicle is the most important activity when the app is fully started. 
+	 * If the use choses finisher, this class is a finisher and otherwise it is a truck.
+	 * The layout consists mainly of a map showing the partnervehicles and an indicator of the time it takes for the nearest truck to arrive.
+	 * This class holds a list of partnervehicles, of which it checks the duration and route.
+	 */
 	//prevents activity from restarting when screen orientation changes
 	[Activity(Label = "OwnVehicle", ConfigurationChanges = Android.Content.PM.ConfigChanges.Orientation)]
 	public class OwnVehicle : Activity, ILocationListener
 	{
-		LatLng finisherloc = new LatLng(0, 0);
+		LatLng ownloc = new LatLng(0, 0);
 		GoogleMap map;
 		MapFragment mapFragment;
 		LocationManager locMgr;
@@ -48,25 +54,249 @@ namespace RoadIT
 		NotificationManagerCompat notificationManager;
 		NotificationCompat.Builder builder;
 		Notification notification;
-
-		List<PartnerVehicle> partnerlist = new List<PartnerVehicle>();
-
 		public static MemoryPersistence persistence = new MemoryPersistence();
-
 		public static MqttClient Client;
 		bool firstloc = true;
 		int casenotification = 0;
 
-		public  void eatLoad(){
-			
+		//list of PartnerVehicles
+		List<PartnerVehicle> partnerlist = new List<PartnerVehicle>();
+
+		//oncreate is called when the activity starts and initialises what needs to be initialised.
+		protected override void OnCreate(Bundle bundle)
+		{
+			Log.Debug("Finisher", "OnCreate called");
+			base.OnCreate(bundle);
+
+			//init notification
+			notificationManager = NotificationManagerCompat.From(this);
+
+			LoadPerMeter = float.Parse(Intent.GetStringExtra("loadpermeter"));
+
+			//broker IP UA broker
+			string temp = "146.175.139.65";
+			broker = "tcp://" + temp + ":1883";
+			string name = Intent.GetStringExtra("name") ?? null;
+			string truck = Intent.GetStringExtra("truck") ?? null;
+
+			//init topics for truck/finisher
+			if (truck == "true")
+			{
+				topicpub = "roadit/truck/" + name + "/" + GetMacAddress();
+				topicsub = "roadit/fin/" + name;
+				truckbool = true;
+			}
+			else {
+				topicpub = "roadit/fin/" + name;
+				topicsub = "roadit/truck/" + name + "/#";
+				truckbool = false;
+			}
+
+			//get MAC adres, which is used as a unique ID
+			username = Intent.GetStringExtra("username") ?? GetMacAddress();
+
+			//pass = Intent.GetStringExtra ("pass") ?? null;
+			Console.WriteLine(broker + " " + name + " " + username + " " + pass);
+
+			//set layout
+			SetContentView(Resource.Layout.Map);
+
+			//indication truck/finisher
+			TextView ind = FindViewById<TextView>(Resource.Id.durationText);
+			if (truckbool == true)
+			{
+				ind.Text = "Truck";
+			}
+			else
+			{
+				ind.Text = "Finisher";
+			}
+
+			// initialize location manager
+			locMgr = GetSystemService(Context.LocationService) as LocationManager;
+			if (locMgr.AllProviders.Contains(LocationManager.NetworkProvider)
+				&& locMgr.IsProviderEnabled(LocationManager.NetworkProvider))
+			{
+				/**
+				 * ACCURACY OF LOCATIONUPDATE
+				 * parameters LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, mLocationListener)
+				 * mintime in sec*1000 -> 20s 
+				 * mindistance in meters (float) -> 20m
+				 */
+				locMgr.RequestLocationUpdates(LocationManager.NetworkProvider, 20000, 20, this);
+			}
+			else {
+				Toast.MakeText(this, "Please switch on your location service!", ToastLength.Long).Show();
+			}
+
+			//init map
+			InitMapFragment();
+
+			//init MQTT
+			Client = makeClient();
+			Client.SetCallback(new MqttSubscribe(this));
+			ConfigMQTT();
+
+			//get seekbar values
+			SliderLoad = FindViewById<SeekBar>(Resource.Id.seekBarLoad);
+			textViewLoad = FindViewById<TextView>(Resource.Id.textViewLoad);
+			SliderSpeed = FindViewById<SeekBar>(Resource.Id.seekBarSpeed);
+			textViewSpeed = FindViewById<TextView>(Resource.Id.textViewSpeed);
+			textViewMovefasterslower = FindViewById<TextView>(Resource.Id.textViewMovefasterslower);
+
+			//start thread to simulate load emptying
+			Thread thread1 = new Thread(new ThreadStart(eatLoad));
+			thread1.Start();
+
+			//init stopbutton, when pressed kill the activity and kill MQTT services
+			stopbutton = FindViewById<Button>(Resource.Id.stopbutton);
+			stopbutton.Click += (sender, e) =>
+			{
+				Kill();
+			};
+
+			//update sliders
+			SliderLoad.ProgressChanged += delegate (object sender, SeekBar.ProgressChangedEventArgs e)
+			{
+				Load = e.Progress;
+				Load = Load / 1000;
+				updateSeekbars();
+			};
+			SliderSpeed.ProgressChanged += delegate (object sender, SeekBar.ProgressChangedEventArgs e)
+			{
+				Speed = e.Progress;
+				Speed = Speed / 100;
+				updateSeekbars();
+			};
+			SliderLoad.Progress = 100000;
+			SliderSpeed.Progress = 20;
+		}
+
+		//onresume is called after oncreate and whenever the user reopens the app if it is running in the background
+		protected override void OnResume()
+		{
+			base.OnResume();
+			Log.Debug("Finisher", "OnResume called");
+		}
+
+		protected override void OnStart()
+		{
+			base.OnStart();
+			Log.Debug("Finisher", "OnStart called: ");
+		}
+
+		//called whenever location is changed
+		public void OnLocationChanged(Android.Locations.Location location)
+		{
+			//own location is updated
+			ownloc = new LatLng(location.Latitude, location.Longitude);
+
+			//When location is initialized an gps position is found, init markers and map
+			if (firstloc == true)
+			{
+				InitMapFragment();
+				InitMarkers();
+				ZoomOnLoc();
+				firstloc = false;
+			}
+
+			//loc to string
+			ownlocstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".");
+
+			//publish own location in a thread to prevent stutters
+			Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring));
+			PublishMQTT.Start();
+
+			//truck needs to update its route and duration when its location changes
+			if (truckbool == true)
+			{
+				foreach (PartnerVehicle aPartnerVehicle in partnerlist)
+				{
+					if (aPartnerVehicle.getid() == id)
+					{
+						Thread mapAPICall2 = new Thread(() => mapAPICall(aPartnerVehicle));
+						mapAPICall2.Start();
+					}
+				}
+			}
+		}
+
+		//create notification for phone and android wear
+		private void CreateNotification(Intent intent)
+		{
+			var style = new NotificationCompat.BigTextStyle().BigText(durationString);
+
+			//wearable notification
+			var wearableExtender = new NotificationCompat.WearableExtender()
+				.SetBackground(BitmapFactory.DecodeResource(this.Resources, Resource.Drawable.trucktrackbackground));
+
+			// Instantiate the builder and set notification elements:
+			builder = new NotificationCompat.Builder(this)
+				.SetContentTitle(suggestString)
+				.SetContentText(durationString)
+				.SetSmallIcon(Resource.Drawable.trucktrackicon)
+				.SetStyle(style)
+				//2 for max priority
+				.SetPriority(2)
+				//2 for vibration
+				.SetDefaults(2)
+				//0x1 for sound
+				.SetDefaults(0x1)
+				//enable wearable extender
+				.Extend(wearableExtender);
+
+			// Build the notification:
+			notification = builder.Build();
+
+			// Publish the notification:
+			const int notificationId = 0;
+			notificationManager.Notify(notificationId, notification);
+
+		}
+
+		//kill the activity and start setup activity, disconnect MQTT client
+		public void Kill()
+		{
+			//killsignal, remove me from list
+			Thread PublishMQTT = new Thread(() => MQTTPublish("killme"));
+			PublishMQTT.Start();
+
+			//start setupactivity
+			SampleActivity activitysetup = new SampleActivity(1, 2, typeof(MainActivity));
+			activitysetup.Start(this);
+			if (truckbool == true)
+			{
+				Toast.MakeText(this, "Truck stopped. Finisher will not receive updates. ", ToastLength.Long).Show();
+			}
+			else
+			{
+				Toast.MakeText(this, "Finisher stopped.", ToastLength.Long).Show();
+			}
+
+			try
+			{
+				Client.Disconnect();
+			}
+			catch { }
+
+			//stop this activity
+			this.FinishActivity(1);
+		}
+
+		//thread to simulate the depleting of the finisher's load
+		public  void eatLoad()
+		{
 			if (truckbool == true) {
 				SliderLoad.Visibility = ViewStates.Gone;
 				SliderSpeed.Visibility = ViewStates.Gone;
 				textViewLoad.Visibility = ViewStates.Gone;
 				textViewSpeed.Visibility = ViewStates.Gone;
 				textViewMovefasterslower.Visibility = ViewStates.Gone;
-			} else {
-				while (true) {
+			} 
+			else 
+			{
+				while (true)
+				{
 					Thread.Sleep (1000);
 					if (Load > 0) {
 						Load = Load - (Speed * LoadPerMeter);
@@ -101,70 +331,11 @@ namespace RoadIT
 					if (casenotification != prevcasenotification && recommendSpeed.ToString("0.00") != "Infinity") {
 							CreateNotification (this.Intent);
 						}
-					
 				}
 			}
 		}
 
-		public void OnLocationChanged(Android.Locations.Location location)
-		{
-			finisherloc = new LatLng(location.Latitude, location.Longitude);
-			if (firstloc == true)
-			{
-				InitMapFragment();
-				InitMarkers();
-				ZoomOnLoc();
-				firstloc = false;
-			}
-			ownlocstring = location.Latitude.ToString().Replace(",", ".") + "," + location.Longitude.ToString().Replace(",", ".");
-			Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring));
-			PublishMQTT.Start();
-
-			//truck needs to update its route and duration when its location changes
-			if (truckbool == true)
-			{
-				foreach (PartnerVehicle aPartnerVehicle in partnerlist)
-				{
-					if (aPartnerVehicle.getid() == id)
-					{
-						Thread mapAPICall2 = new Thread(() => mapAPICall(aPartnerVehicle));
-						mapAPICall2.Start();
-					}
-				}
-			}
-		}
-
-		private void CreateNotification(Intent intent)
-		{
-			var style = new NotificationCompat.BigTextStyle().BigText(durationString);
-
-			//wearable notification
-			var wearableExtender = new NotificationCompat.WearableExtender()
-				.SetBackground(BitmapFactory.DecodeResource(this.Resources, Resource.Drawable.trucktrackbackground));
-
-			// Instantiate the builder and set notification elements:
-			builder = new NotificationCompat.Builder(this)
-				.SetContentTitle(suggestString)
-				.SetContentText(durationString)
-				.SetSmallIcon(Resource.Drawable.trucktrackicon)
-				.SetStyle(style)
-				//2 for max priority
-				.SetPriority(2)
-				//2 for vibration
-				.SetDefaults(2)
-				//0x1 for sound
-				.SetDefaults(0x1)
-				.Extend(wearableExtender);
-
-			// Build the notification:
-			notification = builder.Build();
-
-			// Publish the notification:
-			const int notificationId = 0;
-			notificationManager.Notify(notificationId, notification);
-
-		}
-
+		//update the notification without vibrating/sound, this way the duration showed is always up to date
 		private void UpdateNotification()
 		{
 			var style = new NotificationCompat.BigTextStyle().BigText(durationString);
@@ -189,10 +360,26 @@ namespace RoadIT
 			notificationManager.Notify(notificationId, notification);
 		}
 
+		//Connecting to MQTT client
+		public void ConfigMQTT()
+		{
+			try
+			{
+				Client.Connect();
+				Client.Subscribe(topicsub);
+				Log.Debug("MqttSubscribe", "connect topic: " + topicsub);
+			}
+			catch (MqttException me)
+			{
+				Log.Debug("MqttSubscribe", "(re)connect failed" + me.ToString());
+			}
+		}
+
+		//publish any message
 		public void MQTTPublish(string content)
 		{
+			//quality of service 2 to make sure message arrives
 			int qos = 2;
-
 			try
 			{
 				byte[] bytes = System.Text.Encoding.ASCII.GetBytes(content);
@@ -207,11 +394,17 @@ namespace RoadIT
 			}
 		}
 
+		public MqttClient makeClient(){
+			return new MqttClient(broker, username, persistence);
+		}
+
+		//Decipher the incoming message and take the right action
 		public void MQTTupdate(string mqttmessage, string topic)
 		{
 			Char delimiter = ',';
 			String[] substrings = mqttmessage.Split(delimiter);
 
+			//if killme remove this vehicle from the list
 			if (mqttmessage == "killme")
 			{
 				if (truckbool == false)
@@ -234,201 +427,62 @@ namespace RoadIT
 				}
 			}
 
-			else if (substrings.Length == 2) {
-				try {
-					//TODO todouble kapot nederlands?? punten verdwijnen?
-					Log.Debug ("mqttsubstring0", Convert.ToDouble (substrings [0]).ToString ());
-					Log.Debug ("mqttsubstring1", Convert.ToDouble (substrings [1]).ToString ());
+			else if (substrings.Length == 2)
+			{
+				try
+				{
+					//split string of message
+					Log.Debug("mqttsubstring0", Convert.ToDouble(substrings[0]).ToString());
+					Log.Debug("mqttsubstring1", Convert.ToDouble(substrings[1]).ToString());
 					//topic for finisher: roadit/truck/name/#
 					//topic for truck: roadit/fin/name
-					if (truckbool == false) {
+					if (truckbool == false)
+					{
 						Char delimitertopic = '/';
-						String[] subtopics = topic.Split (delimitertopic);
-						id = subtopics [3];
+						String[] subtopics = topic.Split(delimitertopic);
+						id = subtopics[3];
 					}
-					Console.WriteLine ("id: " + id);
+					Console.WriteLine("id: " + id);
 					bool exists = false;
-						foreach (PartnerVehicle aPartnerVehicle in partnerlist)
+					foreach (PartnerVehicle aPartnerVehicle in partnerlist)
+					{
+						if (aPartnerVehicle.getid() == id)
 						{
-							if (aPartnerVehicle.getid() == id)
-							{
-								exists = true;
-								aPartnerVehicle.setLocation(new LatLng(Convert.ToDouble(substrings[0]), Convert.ToDouble(substrings[1])));
-								Thread mapAPICall2 = new Thread(() => mapAPICall(aPartnerVehicle));
-								mapAPICall2.Start();
-							}
+							//if vehicle exists, set its location to new update location + new API call to update on map + duration
+							exists = true;
+							aPartnerVehicle.setLocation(new LatLng(Convert.ToDouble(substrings[0]), Convert.ToDouble(substrings[1])));
+							Thread mapAPICall2 = new Thread(() => mapAPICall(aPartnerVehicle));
+							mapAPICall2.Start();
 						}
-						if (exists == false)
-						{
-							partnerlist.Add(new PartnerVehicle(new LatLng(Convert.ToDouble(substrings[0]), Convert.ToDouble(substrings[1])), id));
+					}
+					if (exists == false)
+					{
+						//if new vehicle add to list of vehicles
+						partnerlist.Add(new PartnerVehicle(new LatLng(Convert.ToDouble(substrings[0]), Convert.ToDouble(substrings[1])), id));
 
-							Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring));
-							PublishMQTT.Start();
+						//publish own location to make sure new vehicle knows where you are
+						Thread PublishMQTT = new Thread(() => MQTTPublish(ownlocstring));
+						PublishMQTT.Start();
 
-							Thread mapAPICall3 = new Thread(() => mapAPICall(partnerlist.Find(t => t.getid() == id)));
-							mapAPICall3.Start();
-						}
-					
-					Log.Debug ("partnerlistelements", partnerlist.Count ().ToString ());
-					Log.Debug ("MQTTinput", "Accept");
-				} catch {
+						//API call to update on map + duration
+						Thread mapAPICall3 = new Thread(() => mapAPICall(partnerlist.Find(t => t.getid() == id)));
+						mapAPICall3.Start();
+					}
+
+					Log.Debug("partnerlistelements", partnerlist.Count().ToString());
+					Log.Debug("MQTTinput", "Accept");
+				}
+				catch
+				{
 					Log.Debug("MQTTinput", "input not right");
 				}
-			} else {
+			}
+			else {
 				Log.Debug("MQTTinput", "input not right");
 			}
 		}
 
-		protected override void OnCreate(Bundle bundle)
-		{
-			
-			base.OnCreate(bundle);
-			notificationManager = NotificationManagerCompat.From(this);
-			Log.Debug("Finisher", "OnCreate called");
-			LoadPerMeter = float.Parse(Intent.GetStringExtra ("loadpermeter"));
-			//string temp = Intent.GetStringExtra ("broker") ?? null;
-			string temp = "146.175.139.65";
-			broker = "tcp://" + temp + ":1883";
-			string name = Intent.GetStringExtra ("name") ?? null;
-			string truck = Intent.GetStringExtra("truck") ?? null;
-			//string titlestring="";
-			if (truck == "true") {
-				//titlestring = "Truck";
-				topicpub="roadit/truck/"+name+"/"+GetMacAddress();
-				topicsub="roadit/fin/"+name;
-				truckbool = true;
-			} else {
-				topicpub="roadit/fin/"+name;
-				topicsub="roadit/truck/"+name+"/#";
-				//titlestring = "Finisher";
-				truckbool = false;
-			}
-			//TextView title = FindViewById<TextView>(Resource.Id.textView1);
-
-			username = Intent.GetStringExtra ("username") ?? GetMacAddress();
-			//username = GetMacAddress();
-
-			//pass = Intent.GetStringExtra ("pass") ?? null;
-			Console.WriteLine (broker + " "+ name+ " "+ username+" "+ pass);
-			SetContentView(Resource.Layout.Map);
-			//indication truck/finisher
-			TextView ind = FindViewById<TextView>(Resource.Id.durationText);
-			if (truckbool == true)
-			{
-				ind.Text = "Truck";
-			}
-			else
-			{
-				ind.Text = "Finisher";
-			}
-
-			// initialize location manager
-			locMgr = GetSystemService(Context.LocationService) as LocationManager;
-
-			if (locMgr.AllProviders.Contains(LocationManager.NetworkProvider)
-				&& locMgr.IsProviderEnabled(LocationManager.NetworkProvider))
-			{
-				//TODO
-				//ACCURACY OF LOCATIONUPDATE
-
-				//parameters LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, mLocationListener);
-				//mintime in sec*1000 -> 20s
-				//mindistance in meters (float) -> 20m
-				locMgr.RequestLocationUpdates(LocationManager.NetworkProvider, 20000, 20, this);
-			}
-			else {
-				Toast.MakeText(this, "Please switch on your location service!", ToastLength.Long).Show();
-			}
-
-			InitMapFragment();
-			Client = makeClient ();
-			Client.SetCallback(new MqttSubscribe(this));
-			ConfigMQTT();
-		}
-
-		public MqttClient makeClient(){
-			return new MqttClient(broker, username, persistence);
-		}
-
-		protected override void OnResume()
-		{
-			base.OnResume();
-			Log.Debug("Finisher", "OnResume called");
-			SliderLoad = FindViewById<SeekBar>(Resource.Id.seekBarLoad);
-			textViewLoad = FindViewById<TextView> (Resource.Id.textViewLoad);
-			SliderSpeed = FindViewById<SeekBar>(Resource.Id.seekBarSpeed);
-			textViewSpeed = FindViewById<TextView> (Resource.Id.textViewSpeed);
-			textViewMovefasterslower = FindViewById<TextView> (Resource.Id.textViewMovefasterslower);
-			Thread thread1 = new Thread(new ThreadStart(eatLoad));
-			thread1.Start ();
-
-			stopbutton = FindViewById<Button>(Resource.Id.stopbutton);
-			stopbutton.Click += (sender, e) =>
-			{
-				Kill();
-			};
-
-			SliderLoad.ProgressChanged += delegate(object sender, SeekBar.ProgressChangedEventArgs e) {
-				Load = e.Progress;
-				Load= Load/1000;
-				updateSeekbars();
-			};
-			SliderSpeed.ProgressChanged += delegate(object sender, SeekBar.ProgressChangedEventArgs e) {
-				Speed = e.Progress;
-				Speed= Speed/100;
-				updateSeekbars();
-			};
-			SliderLoad.Progress = 100000;
-			SliderSpeed.Progress = 20;
-		}
-
-		public void Kill()
-		{
-			//killsignal, remove me from list
-			Thread PublishMQTT = new Thread(() => MQTTPublish("killme"));
-			PublishMQTT.Start();
-
-			SampleActivity activitysetup = new SampleActivity(1, 2, typeof(MainActivity));
-			activitysetup.Start(this);
-			if (truckbool == true)
-			{
-				Toast.MakeText(this, "Truck stopped. Finisher will not receive updates. ", ToastLength.Long).Show();
-			}
-			else 
-			{
-				Toast.MakeText(this, "Finisher stopped.", ToastLength.Long).Show();
-			}
-
-			try
-			{
-				Client.Disconnect();
-			}
-			catch { }
-
-				this.FinishActivity(1);
-		}
-
-		public 	void ConfigMQTT()
-		{
-			try
-			{
-				Client.Connect();
-				Client.Subscribe(topicsub);
-				Log.Debug("MqttSubscribe", "connect topic: "+topicsub);
-			}
-			catch (MqttException me)
-			{
-				Log.Debug("MqttSubscribe", "(re)connect failed"+ me.ToString());
-			}
-		}
-
-
-		protected override void OnStart()
-		{
-			base.OnStart();
-			Log.Debug("Finisher", "OnStart called: ");
-		}
-
+		//init the map and set its parameters
 		public void InitMapFragment()
 		{
 			mapFragment = FragmentManager.FindFragmentByTag("map") as MapFragment;
@@ -448,10 +502,11 @@ namespace RoadIT
 
 		}
 
+		//zoom on own location with animation
 		void ZoomOnLoc()
 		{
 			CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
-			builder.Target(finisherloc);
+			builder.Target(ownloc);
 			builder.Zoom(12);
 			builder.Bearing(0);
 			builder.Tilt(0);
@@ -462,6 +517,7 @@ namespace RoadIT
 			map.AnimateCamera(CameraUpdateFactory.NewCameraPosition(cameraPosition));
 		}
 
+		//init map
 		public void InitMarkers()
 		{
 			map = mapFragment.Map;
@@ -469,29 +525,54 @@ namespace RoadIT
 			map.BuildingsEnabled = true;
 		}
 
-		public void OnProviderDisabled(string provider)
-		{
-			Log.Debug("Finisher", provider + " disabled by user");
-		}
+		//update the values of the seekbars
+		public void updateSeekbars(){
+			textViewLoad.Text = "Load: "+Load.ToString("0.000")+"%";
+			textViewSpeed.Text = "Speed: "+Speed.ToString("0.000") + "m/s";
+			SliderLoad.Progress = (int)( Load*1000);
+			SliderSpeed.Progress = (int)(Speed * 100);
+			if (partnerduration != 0) {
+				textViewMovefasterslower.Text = suggestString;
+			}
+		}	
 
-		public void OnProviderEnabled(string provider)
+		//API call to google->gets a JSON packet which is deciphered
+		void mapAPICall(PartnerVehicle partnervehicle)
 		{
-			Log.Debug("Finisher", provider + " enabled by user");
-		}
+			string placeofvehicle = partnervehicle.getlocstring();
+			try
+			{
+				string url = "";
+				if (truckbool == false)
+				{
+					//route from trucks place to own finishers location
+					url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + placeofvehicle + "&destination=" + ownlocstring + "&sensor=false";
+				}
+				else
+				{
+					//route from own trucks place to finishers location
+					url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + ownlocstring + "&destination=" + placeofvehicle + "&sensor=false";
+				}
+				
+				string requesturl = url; string content = fileGetJSON(requesturl);;
+				_Jobj = JObject.Parse(content);
+				Log.Debug("apicall", content.ToString());
+			}
+			catch { }
 
-		public void OnStatusChanged(string provider, Availability status, Bundle extras)
-		{
-			Log.Debug("Finisher", provider + " availability has changed to " + status.ToString());
+			//start durationthread
+			Thread durationThread = new Thread(() => getDuration(partnervehicle));
+			durationThread.Start();
 		}
 
 		public void getDuration(PartnerVehicle partnervehicle)
 		{
+			//get duration from JSON
 			int dur = getDistanceTo();
 			int min = int.MaxValue;
 
+			//set duration of partnervehicle
 			partnervehicle.setDur(dur);
-
-			//TODO CLEANUP
 
 			Log.Debug("durationmin", min.ToString());
 			Log.Debug("durationdur", dur.ToString());
@@ -502,12 +583,14 @@ namespace RoadIT
 				aPartnerVehicle.setNearest(false);
 			}
 
+			//temp value so change of nearest truck can easily be found
 			PartnerVehicle test = partnerlist.First();
 
 			//sort on duration -> nearest truck first in list
 			partnerlist.Sort((x, y) => x.getDur().CompareTo(y.getDur()));
 			partnerlist.First().setNearest(true);
 
+			//check if new truck is newest truck, if yes update previous nearest truck so its route is not green
 			if (test != partnerlist.First())
 			{
 				Thread mapAPICall3 = new Thread(() => mapAPICall(test));
@@ -533,73 +616,32 @@ namespace RoadIT
 				time = t.ToString(@"hh\hmm\mss") + "s";
 			}
 
-
 			if (truckbool == false)
 			{
-					durationString = "ETA of nearest truck: " + time;
-				
+				durationString = "ETA of nearest truck: " + time;
+
 			}
 			else
 			{
 				durationString = "ETA at finisher: " + time;
 			}
-			
+
 			TextView durationtextfield = FindViewById<TextView>(Resource.Id.durationText);
 
 			//update textfield in main UI thread
 			RunOnUiThread(() => durationtextfield.Text = durationString);
 
+			//draw the route
 			Thread drawRouteThread = new Thread(() => drawRoute(partnervehicle));
 			drawRouteThread.Start();
 
+			//update notification so duration stays updated
 			UpdateNotification();
 		}
-		public void updateSeekbars(){
-			textViewLoad.Text = "Load: "+Load.ToString("0.000")+"%";
-			textViewSpeed.Text = "Speed: "+Speed.ToString("0.000") + "m/s";
-			SliderLoad.Progress = (int)( Load*1000);
-			SliderSpeed.Progress = (int)(Speed * 100);
-			if (partnerduration != 0) {
-				textViewMovefasterslower.Text = suggestString;
-			}
-		}	
 
-		public void updateUI()
-		{
-			
-			BitmapDescriptor truck = BitmapDescriptorFactory.FromResource(Resource.Drawable.truck);
-			BitmapDescriptor finisher = BitmapDescriptorFactory.FromResource(Resource.Drawable.finisher);
-			map.Clear();
-
-			//temp variable -> no chance of changes in foreach
-			List<PartnerVehicle> listtemp = partnerlist;
-
-			Log.Debug("updateUI", "list of partners");
-
-			foreach (PartnerVehicle aPartnerVehicle in listtemp)
-			{
-				aPartnerVehicle.display();
-				map.AddPolyline(aPartnerVehicle.getPolylineOptions());
-				MarkerOptions markerpartner = new MarkerOptions();
-				markerpartner.SetPosition(aPartnerVehicle.getLocation());
-				if (truckbool == false)
-				{
-					markerpartner.SetIcon(truck);
-					markerpartner.SetTitle("Truck " + aPartnerVehicle.getid() + " arrives in: " + aPartnerVehicle.getDur() + "s");
-				}
-				else
-				{
-					markerpartner.SetIcon(finisher);
-					markerpartner.SetTitle("Arriving at Finisher " + aPartnerVehicle.getid() + "in: " + aPartnerVehicle.getDur() + "s");
-				}
-				map.AddMarker(markerpartner);
-			}
-		}
-
+		//get duration from json object
 		public int getDistanceTo()
 		{
-			//System.Threading.Thread.Sleep(50);
-
 			int duration = -1;
 			try
 			{
@@ -612,33 +654,7 @@ namespace RoadIT
 			}
 		}
 
-		void mapAPICall(PartnerVehicle partnervehicle)
-		{
-			string placeofvehicle = partnervehicle.getlocstring();
-			try
-			{
-				string url = "";
-				if (truckbool == false)
-				{
-					//route from trucks place to own finishers location
-					url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + placeofvehicle + "&destination=" + ownlocstring + "&sensor=false";
-				}
-				else
-				{
-					//route from own trucks place to finishers location
-					url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + ownlocstring + "&destination=" + placeofvehicle + "&sensor=false";
-				}
-				
-				string requesturl = url; string content = fileGetJSON(requesturl);;
-				_Jobj = JObject.Parse(content);
-				Log.Debug("apicall", content.ToString());
-			}
-			catch { }
-
-			Thread durationThread = new Thread(() => getDuration(partnervehicle));
-			durationThread.Start();
-		}
-
+		//draw route from polylines in json object
 		void drawRoute(PartnerVehicle partnervehicle)
 		{
 			Log.Debug("http", "drawroutestart");
@@ -659,22 +675,18 @@ namespace RoadIT
 				//other colors for normal route
 				else if (partnervehicle.getcolor() == "blue")
 				{
-					Log.Debug("drawroute", partnervehicle.getid() + partnervehicle.getcolor() + "moet blue zijn");
 					temppoly.InvokeColor(0x66000099);
 				}
 				else if (partnervehicle.getcolor() == "red")
 				{
-					Log.Debug("drawroute", partnervehicle.getid() + partnervehicle.getcolor() + "moet red zijn");
 					temppoly.InvokeColor(0x66ff0000);
 				}
 				else if (partnervehicle.getcolor() == "black")
 				{
-					Log.Debug("drawroute", partnervehicle.getid() + partnervehicle.getcolor() + "moet black zijn");
 					temppoly.InvokeColor(0x66000000);
 				}
 				else if (partnervehicle.getcolor() == "purple")
 				{
-					Log.Debug("drawroute", partnervehicle.getid() + partnervehicle.getcolor() + "moet purple zijn");
 					temppoly.InvokeColor(0x669933ff);
 				}
 				else
@@ -691,8 +703,10 @@ namespace RoadIT
 				temppoly.InvokeColor(0x66000099);
 			}
 
+			//setwidth 
 			temppoly.InvokeWidth(13);
 
+			//get polypoints from json object
 			try
 			{
 				string polyPoints;
@@ -712,13 +726,65 @@ namespace RoadIT
 			RunOnUiThread(() => updateUI());
 		}
 
+		//updates the markers and route
+		public void updateUI()
+		{
+			BitmapDescriptor truck = BitmapDescriptorFactory.FromResource(Resource.Drawable.truck);
+			BitmapDescriptor finisher = BitmapDescriptorFactory.FromResource(Resource.Drawable.finisher);
+			map.Clear();
+
+			//temp variable -> no chance of changes in foreach
+			List<PartnerVehicle> listtemp = partnerlist;
+
+			Log.Debug("updateUI", "list of partners");
+
+			foreach (PartnerVehicle aPartnerVehicle in listtemp)
+			{
+				aPartnerVehicle.display();
+				//add polylines from all vehicles to map
+				map.AddPolyline(aPartnerVehicle.getPolylineOptions());
+				//add markers and set positions
+				MarkerOptions markerpartner = new MarkerOptions();
+				markerpartner.SetPosition(aPartnerVehicle.getLocation());
+				if (truckbool == false)
+				{
+					//truckmarker
+					markerpartner.SetIcon(truck);
+					markerpartner.SetTitle("Truck " + aPartnerVehicle.getid() + " arrives in: " + aPartnerVehicle.getDur() + "s");
+				}
+				else
+				{
+					//finisher marker
+					markerpartner.SetIcon(finisher);
+					markerpartner.SetTitle("Arriving at Finisher " + aPartnerVehicle.getid() + "in: " + aPartnerVehicle.getDur() + "s");
+				}
+				map.AddMarker(markerpartner);
+			}
+		}
+
+		//gets mac adres from device which is used as a unique ID
+		public string GetMacAddress()
+		{
+			foreach (var netInterface in NetworkInterface.GetAllNetworkInterfaces())
+			{
+				if (netInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 ||
+					netInterface.NetworkInterfaceType == NetworkInterfaceType.Ethernet)
+				{
+					var address = netInterface.GetPhysicalAddress();
+					return BitConverter.ToString(address.GetAddressBytes());
+				}
+			}
+
+			return "NoMac";
+		}
+
+		//decode polypoints from json object
 		List<LatLng> DecodePolylinePoints(string encodedPoints)
 		{
 			if (encodedPoints == null || encodedPoints == "") return null;
 			List<LatLng> poly = new List<LatLng>();
 			char[] polylinechars = encodedPoints.ToCharArray();
 			int index = 0;
-
 			int currentLat = 0;
 			int currentLng = 0;
 			int next5bits;
@@ -772,6 +838,7 @@ namespace RoadIT
 			return poly;
 		}
 
+		//get JSON object
 		protected string fileGetJSON(string fileName)
 		{
 			string _sData = string.Empty;
@@ -794,20 +861,23 @@ namespace RoadIT
 			catch { _sData = "unable to connect to server "; }
 			return _sData;
 		}
-		public string GetMacAddress()
+
+		//called when provider is disabled
+		public void OnProviderDisabled(string provider)
 		{
-			foreach (var netInterface in NetworkInterface.GetAllNetworkInterfaces()) 
-			{
-				if (netInterface.NetworkInterfaceType == NetworkInterfaceType.Wireless80211 ||
-					netInterface.NetworkInterfaceType == NetworkInterfaceType.Ethernet) 
-				{
-					var address = netInterface.GetPhysicalAddress();
-					return BitConverter.ToString(address.GetAddressBytes());
+			Log.Debug("Finisher", provider + " disabled by user");
+		}
 
-				}
-			}
+		//called when provider is enabled
+		public void OnProviderEnabled(string provider)
+		{
+			Log.Debug("Finisher", provider + " enabled by user");
+		}
 
-			return "NoMac";
+		//called when status of provider is changed
+		public void OnStatusChanged(string provider, Availability status, Bundle extras)
+		{
+			Log.Debug("Finisher", provider + " availability has changed to " + status.ToString());
 		}
 	}
 }
