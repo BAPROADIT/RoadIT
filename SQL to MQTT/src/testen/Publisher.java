@@ -57,9 +57,9 @@ public class Publisher {
 		float factor = (float) 1;
 		float oldtime = 0;
 		boolean first = true;
-		String clientId = Utils.getMacAddress() + "-pub"; // get unique ID try
+		String clientId = Utils.getMacAddress(); // get unique ID try
 		try {
-			client = new MqttClient("tcp://146.175.139.65:1883", clientId);
+			client = new MqttClient("tcp://nasdenys.synology.me:1883", clientId);
 			// initiliaze MQTTClient
 
 		} catch (MqttException e) {

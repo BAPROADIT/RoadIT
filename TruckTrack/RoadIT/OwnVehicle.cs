@@ -58,6 +58,8 @@ namespace RoadIT
 		public static MqttClient Client;
 		bool firstloc = true;
 		int casenotification = 0;
+		//quality of service 2 to make sure message arrives
+		int qos = 2;
 
 		//list of PartnerVehicles
 		List<PartnerVehicle> partnerlist = new List<PartnerVehicle>();
@@ -75,6 +77,7 @@ namespace RoadIT
 
 			//broker IP UA broker
 			string temp = "146.175.139.65";
+			temp="nasdenys.synology.me";
 			broker = "tcp://" + temp + ":1883";
 			string name = Intent.GetStringExtra("name") ?? null;
 			string truck = Intent.GetStringExtra("truck") ?? null;
@@ -168,6 +171,7 @@ namespace RoadIT
 				Speed = Speed / 100;
 				updateSeekbars();
 			};
+			//init sliders
 			SliderLoad.Progress = 100000;
 			SliderSpeed.Progress = 20;
 		}
@@ -286,6 +290,7 @@ namespace RoadIT
 		//thread to simulate the depleting of the finisher's load
 		public  void eatLoad()
 		{
+			//if truck remove sliders
 			if (truckbool == true) {
 				SliderLoad.Visibility = ViewStates.Gone;
 				SliderSpeed.Visibility = ViewStates.Gone;
@@ -296,41 +301,41 @@ namespace RoadIT
 			else 
 			{
 				while (true)
-				{
+				{	//wait a sec
 					Thread.Sleep (1000);
+					//reduce load
 					if (Load > 0) {
 						Load = Load - (Speed * LoadPerMeter);
-						Log.Debug ("eat", (Speed * LoadPerMeter).ToString ("0.00") + " " + (Load).ToString ("0.00"));
+						//update sliders
 						RunOnUiThread (() => {
 							this.updateSeekbars ();
 						});
 					}
+					//calculate recommend speed
 					float meterToGo = Load / LoadPerMeter;
 					float timeToGo = meterToGo / Speed;
-
-						float recommendSpeed = meterToGo / partnerduration;
-						//temp variable to check if case is changed so notification can be sent
-						int prevcasenotification = casenotification;
-						if (timeToGo > partnerduration) {
-						casenotification = 1;
-							//Move faster
-							suggestString = "You can go faster, " + recommendSpeed.ToString ("0.00") + "m/s";
-						} else if (timeToGo < partnerduration) {
+					float recommendSpeed = meterToGo / partnerduration;
+					//temp variable to check if case is changed so notification can be sent
+					int prevcasenotification = casenotification;
+					if (timeToGo > partnerduration) {
+					casenotification = 1;
+						//Move faster
+						suggestString = "You can go faster, " + recommendSpeed.ToString ("0.00") + "m/s";
+					} else if (timeToGo < partnerduration) {
 							//Move Slower
 							casenotification = 2;
-
 							suggestString = "Move slower, go " + recommendSpeed.ToString ("0.00") + "m/s";
 
-						} else {
-							casenotification = 3;
-							//Go on
-							suggestString = "Correct speed.";
-						}
+					} else {
+						casenotification = 3;
+						//Go on
+						suggestString = "Correct speed.";
+					}
 					
-						//check for changes
+					//check for changes
 					if (casenotification != prevcasenotification && recommendSpeed.ToString("0.00") != "Infinity") {
 							CreateNotification (this.Intent);
-						}
+					}
 				}
 			}
 		}
@@ -378,8 +383,6 @@ namespace RoadIT
 		//publish any message
 		public void MQTTPublish(string content)
 		{
-			//quality of service 2 to make sure message arrives
-			int qos = 2;
 			try
 			{
 				byte[] bytes = System.Text.Encoding.ASCII.GetBytes(content);

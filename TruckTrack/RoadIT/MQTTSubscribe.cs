@@ -11,7 +11,7 @@ namespace RoadIT
 	{
 		OwnVehicle ownvec;
 		public MqttSubscribe(OwnVehicle myvec)
-		{
+		{	
 			ownvec = myvec;
 		}
 
@@ -20,13 +20,15 @@ namespace RoadIT
 			base.OnCreate(savedInstanceState);
 			Log.Debug("MqttSubscribe", "create");	
 		}
+		//message arrived
 		public void MessageArrived(string topic, MqttMessage message)
 		{
 			Log.Debug("MqttSubscribe", "Topic: "+topic+"Msg: "+ message.ToString());
 			string messagestring = message.ToString();
+			//run mqttupdate on ownvehilce
 			ownvec.MQTTupdate(messagestring, topic);
 		}
-
+		//connection lost? make a connection agian
 		public void ConnectionLost(Throwable cause)
 		{
 			Log.Debug("MqttSubscribe", "connectionlost");
