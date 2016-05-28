@@ -126,7 +126,7 @@ namespace RoadIT
 				 * mintime in sec*1000 -> 20s 
 				 * mindistance in meters (float) -> 20m
 				 */
-				locMgr.RequestLocationUpdates(LocationManager.NetworkProvider, 20000, 20, this);
+				locMgr.RequestLocationUpdates(LocationManager.NetworkProvider, 1, 1, this);
 			}
 			else {
 				Toast.MakeText(this, "Please switch on your location service!", ToastLength.Long).Show();
