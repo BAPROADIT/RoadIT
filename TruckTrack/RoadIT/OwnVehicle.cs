@@ -174,6 +174,7 @@ namespace RoadIT
 			//init sliders
 			SliderLoad.Progress = 100000;
 			SliderSpeed.Progress = 20;
+			InitNotification(this.Intent);
 		}
 
 		//onresume is called after oncreate and whenever the user reopens the app if it is running in the background
@@ -225,8 +226,7 @@ namespace RoadIT
 			}
 		}
 
-		//create notification for phone and android wear
-		private void CreateNotification(Intent intent)
+		private void InitNotification(Intent intent)
 		{
 			var style = new NotificationCompat.BigTextStyle().BigText(durationString);
 
@@ -248,13 +248,40 @@ namespace RoadIT
 				.SetDefaults(0x1)
 				//enable wearable extender
 				.Extend(wearableExtender);
+		}
 
-			// Build the notification:
-			notification = builder.Build();
+		//push notification for phone and android wear
+		private void PushNotification(Intent intent)
+		{
+			var style = new NotificationCompat.BigTextStyle().BigText(durationString);
 
-			// Publish the notification:
-			const int notificationId = 0;
-			notificationManager.Notify(notificationId, notification);
+			//wearable notification
+			var wearableExtender = new NotificationCompat.WearableExtender()
+				.SetBackground(BitmapFactory.DecodeResource(this.Resources, Resource.Drawable.trucktrackbackground));
+
+			try
+			{
+				// Instantiate the builder and set notification elements:
+				builder.SetContentTitle(suggestString)
+					.SetContentText(durationString)
+					.SetSmallIcon(Resource.Drawable.trucktrackicon)
+					.SetStyle(style)
+					//2 for max priority
+					.SetPriority(2)
+					//2 for vibration
+					.SetDefaults(2)
+					//0x1 for sound
+					.SetDefaults(0x1)
+					//enable wearable extender
+					.Extend(wearableExtender);
+
+				// Build the notification:
+				notification = builder.Build();
+
+				// Publish the notification:
+				const int notificationId = 0;
+				notificationManager.Notify(notificationId, notification);
+			}catch { }
 
 		}
 
@@ -334,7 +361,7 @@ namespace RoadIT
 					
 					//check for changes
 					if (casenotification != prevcasenotification && recommendSpeed.ToString("0.00") != "Infinity") {
-							CreateNotification (this.Intent);
+						PushNotification (this.Intent);
 					}
 				}
 			}
@@ -343,26 +370,20 @@ namespace RoadIT
 		//update the notification without vibrating/sound, this way the duration showed is always up to date
 		private void UpdateNotification()
 		{
-			var style = new NotificationCompat.BigTextStyle().BigText(durationString);
+			try
+			{
+				//set new values
+				builder.SetContentTitle(suggestString)
+				   		.SetContentText(durationString)
+				        .SetPriority(0)
+				        //light
+						.SetDefaults(0x4);
 
-			//wearable notification
-			var wearableExtender = new NotificationCompat.WearableExtender()
-				.SetBackground(BitmapFactory.DecodeResource(this.Resources, Resource.Drawable.trucktrackbackground));
+				//0 = notification ID of current notification => updates current notification
+				notificationManager.Notify(0, builder.Build());
+			}
+			catch { }
 
-			// Instantiate the builder and set notification elements:
-			builder = new NotificationCompat.Builder(this)
-				.SetContentTitle(suggestString)
-				.SetContentText(durationString)
-				.SetSmallIcon(Resource.Drawable.trucktrackicon)
-				.SetStyle(style)
-				.Extend(wearableExtender);
-
-			// Build the notification:
-			notification = builder.Build();
-
-			// Publish the notification:
-			const int notificationId = 0;
-			notificationManager.Notify(notificationId, notification);
 		}
 
 		//Connecting to MQTT client
