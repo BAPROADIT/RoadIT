@@ -41,7 +41,7 @@ public class Subscriber {
 
 			// mqttClient = new MqttClient("tcp://iot.eclipse.org:1883",
 			// clientId);
-			mqttClient = new MqttClient("tcp://146.175.139.65:1883", clientId);
+			mqttClient = new MqttClient("tcp://nasdenys.synology.me:1883", clientId);
 		} catch (MqttException e) {
 			e.printStackTrace();
 			System.exit(1);

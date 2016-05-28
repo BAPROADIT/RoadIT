@@ -36,7 +36,7 @@ public class SubscribeCallback implements MqttCallback {
 			 statement = connect.createStatement();
 			// Result set get the result of the SQL query
 			statement.executeUpdate("INSERT INTO roadit(string, topic) VALUES (\""+message.toString()+"\",\""+topic+"\");");
-			
+			connect.close();
 		} catch (SQLException ex) {
 			// handle any errors
 			System.out.println("SQLException: " + ex.getMessage());

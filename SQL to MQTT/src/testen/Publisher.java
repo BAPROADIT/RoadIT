@@ -37,7 +37,7 @@ public class Publisher {
 			// Statements allow to issue SQL queries to the database
 			statement = connect.createStatement();
 
-			resultSet = statement.executeQuery("select * from roadit where tijd Between '2016-05-13 15:51:02' And '2016-05-13 16:10:08';");//
+			resultSet = statement.executeQuery("select * from roadit where tijd Between '2016-05-20 09:25:02' And '2016-05-20 16:10:08';");//
 			writeData(resultSet);
 			System.out.println("Done");
 
@@ -54,7 +54,7 @@ public class Publisher {
 
 	private static void writeData(ResultSet resultSet) throws SQLException, InterruptedException {
 		float time;
-		float factor = (float) 1;
+		float factor = (float) .2;
 		float oldtime = 0;
 		boolean first = true;
 		String clientId = Utils.getMacAddress(); // get unique ID try
