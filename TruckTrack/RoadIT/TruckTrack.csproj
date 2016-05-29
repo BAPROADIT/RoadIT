@@ -81,7 +81,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="MQTT">
-      <HintPath>..\packages\MQTT.dll</HintPath>
+      <HintPath>..\TruckTrack\bin\Debug\MQTT.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
