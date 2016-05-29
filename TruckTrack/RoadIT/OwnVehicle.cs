@@ -117,8 +117,8 @@ namespace RoadIT
 
 			// initialize location manager
 			locMgr = GetSystemService(Context.LocationService) as LocationManager;
-			if (locMgr.AllProviders.Contains(LocationManager.NetworkProvider)
-				&& locMgr.IsProviderEnabled(LocationManager.NetworkProvider))
+			if (locMgr.AllProviders.Contains(LocationManager.GpsProvider)
+				&& locMgr.IsProviderEnabled(LocationManager.GpsProvider))
 			{
 				/**
 				 * ACCURACY OF LOCATIONUPDATE
@@ -126,7 +126,7 @@ namespace RoadIT
 				 * mintime in sec*1000 -> 20s 
 				 * mindistance in meters (float) -> 20m
 				 */
-				locMgr.RequestLocationUpdates(LocationManager.NetworkProvider, 1, 1, this);
+				locMgr.RequestLocationUpdates(LocationManager.GpsProvider, 20000, 20, this);
 			}
 			else {
 				Toast.MakeText(this, "Please switch on your location service!", ToastLength.Long).Show();
