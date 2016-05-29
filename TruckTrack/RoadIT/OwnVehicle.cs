@@ -117,6 +117,7 @@ namespace RoadIT
 
 			// initialize location manager
 			locMgr = GetSystemService(Context.LocationService) as LocationManager;
+
 			if (locMgr.AllProviders.Contains(LocationManager.GpsProvider)
 				&& locMgr.IsProviderEnabled(LocationManager.GpsProvider))
 			{
@@ -127,9 +128,26 @@ namespace RoadIT
 				 * mindistance in meters (float) -> 20m
 				 */
 				locMgr.RequestLocationUpdates(LocationManager.GpsProvider, 20000, 20, this);
+				Toast.MakeText(this, "I use GPS!", ToastLength.Long).Show();
 			}
 			else {
-				Toast.MakeText(this, "Please switch on your location service!", ToastLength.Long).Show();
+				if (locMgr.AllProviders.Contains(LocationManager.NetworkProvider)
+					&& locMgr.IsProviderEnabled(LocationManager.NetworkProvider))
+				{
+					/**
+				 * ACCURACY OF LOCATIONUPDATE
+				 * parameters LocationManager.NETWORK_PROVIDER, MIN_TIME, MIN_DISTANCE, mLocationListener)
+				 * mintime in sec*1000 -> 20s 
+				 * mindistance in meters (float) -> 20m
+				 */
+					locMgr.RequestLocationUpdates(LocationManager.NetworkProvider, 20000, 20, this);
+					Toast.MakeText(this, "I use networkprovider!", ToastLength.Long).Show();
+
+				}
+				else {
+					Toast.MakeText(this, "Please switch on your NetworkProvider!", ToastLength.Long).Show();
+				}
+
 			}
 
 			//init map
