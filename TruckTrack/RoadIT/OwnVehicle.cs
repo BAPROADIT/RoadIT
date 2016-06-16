@@ -77,7 +77,7 @@ namespace RoadIT
 
 			//broker IP UA broker
 			string temp = "146.175.139.65";
-			temp="nasdenys.synology.me";
+			//temp="nasdenys.synology.me";
 			broker = "tcp://" + temp + ":1883";
 			string name = Intent.GetStringExtra("name") ?? null;
 			string truck = Intent.GetStringExtra("truck") ?? null;
@@ -97,6 +97,7 @@ namespace RoadIT
 
 			//get MAC adres, which is used as a unique ID
 			username = Intent.GetStringExtra("username") ?? GetMacAddress();
+			Toast.MakeText(this, username, ToastLength.Long).Show();
 
 			//pass = Intent.GetStringExtra ("pass") ?? null;
 			Console.WriteLine(broker + " " + name + " " + username + " " + pass);
@@ -816,8 +817,11 @@ namespace RoadIT
 					return BitConverter.ToString(address.GetAddressBytes());
 				}
 			}
+			Random rnd = new Random();
 
-			return "NoMac";
+			int num = rnd.Next(1000000);
+
+			return num.ToString();
 		}
 
 		//decode polypoints from json object
