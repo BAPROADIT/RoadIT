@@ -76,10 +76,15 @@ namespace RoadIT
 			LoadPerMeter = float.Parse(Intent.GetStringExtra("loadpermeter"));
 
 			//broker IP UA broker
-			string temp = "146.175.139.65";
+			//string temp = "146.175.139.65";
 			//temp="nasdenys.synology.me";
+
+			//Broker from setupscreen
+			string temp = Intent.GetStringExtra("broker");
 			broker = "tcp://" + temp + ":1883";
+			//finisher name from setupscreen
 			string name = Intent.GetStringExtra("name") ?? null;
+
 			string truck = Intent.GetStringExtra("truck") ?? null;
 
 			//init topics for truck/finisher
@@ -95,11 +100,18 @@ namespace RoadIT
 				truckbool = false;
 			}
 
-			//get MAC adres, which is used as a unique ID
+			//username from setupscreen
+			string user = Intent.GetStringExtra("user");
+
+			//get MAC adres, which is used as a unique ID 
+			/*
+			 * We user mac adres as "username" but now you can etner it in the setupscreen
+			 */
 			username = Intent.GetStringExtra("username") ?? GetMacAddress();
 			Toast.MakeText(this, username, ToastLength.Long).Show();
 
-			//pass = Intent.GetStringExtra ("pass") ?? null;
+			//pass from setupscreen
+			pass = Intent.GetStringExtra ("pass") ?? null;
 			Console.WriteLine(broker + " " + name + " " + username + " " + pass);
 
 			//set layout

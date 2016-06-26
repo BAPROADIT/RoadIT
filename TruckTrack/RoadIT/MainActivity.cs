@@ -76,17 +76,17 @@ namespace RoadIT
 		{
 			Button startButton = FindViewById<Button>(Resource.Id.startButton);
 			startButton.Click += delegate {
-				//EditText broker = FindViewById<EditText>(Resource.Id.editTextbroker);
-				//string brokerstring = broker.Text;
+				EditText broker = FindViewById<EditText>(Resource.Id.editTextbroker);
+				string brokerstring = broker.Text;
 
 				EditText name = FindViewById<EditText>(Resource.Id.editTextname);
 				string namestring = name.Text;
 
-				//EditText username = FindViewById<EditText>(Resource.Id.editTextusername);
-				//string usernamestring = username.Text;
+				EditText username = FindViewById<EditText>(Resource.Id.editTextusername);
+				string usernamestring = username.Text;
 
-				//EditText pass = FindViewById<EditText>(Resource.Id.editTextpassword);
-				//string passtring = username.Text;
+				EditText pass = FindViewById<EditText>(Resource.Id.editTextpassword);
+				string passtring = username.Text;
 
 				RadioButton truckfin = FindViewById<RadioButton>(Resource.Id.radiotruck);
 				string truck;
@@ -100,10 +100,10 @@ namespace RoadIT
 				SampleActivity activityfin = new SampleActivity(1, 2, typeof(OwnVehicle));
 				//create var to give activity extra parameters
 				var ownvec = new Intent(this, typeof(OwnVehicle));
-				//ownvec.PutExtra("broker",brokerstring );
+				ownvec.PutExtra("broker",brokerstring );
 				ownvec.PutExtra("name",namestring );
-				//ownvec.PutExtra("username",usernamestring );
-				//ownvec.PutExtra("pass",passtring );
+				ownvec.PutExtra("username",usernamestring );
+				ownvec.PutExtra("pass",passtring );
 				ownvec.PutExtra("truck",truck);
 				ownvec.PutExtra("loadpermeter", floatloadpermeter.ToString("0.00"));
 				//start ownvehicle activity
